@@ -27,7 +27,7 @@ import gitHash from "~git-hash";
 export default definePlugin({
     name: "Settings",
     description: "Adds Settings UI and debug info",
-    authors: [Devs.Ven, Devs.Megu],
+    authors: [Devs.Ven, Devs.Megu, Devs.Soya],
     required: true,
 
     contextMenus: {
@@ -179,7 +179,7 @@ export default definePlugin({
 
         return (
             <>
-                <Component {...props}>Vencord {gitHash}{additionalInfo}</Component>
+                <Component {...props}>Vencord {VERSION} ({gitHash}){additionalInfo}</Component>
                 {electronVersion && <Component {...props}>Electron {electronVersion}</Component>}
                 {chromiumVersion && <Component {...props}>Chromium {chromiumVersion}</Component>}
             </>

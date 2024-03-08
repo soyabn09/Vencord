@@ -53,14 +53,14 @@ async function loadBadges(noCache = false) {
     if (noCache)
         init.cache = "no-cache";
 
-    DonorBadges = await fetch("https://badges.vencord.dev/badges.json", init)
+    DonorBadges = await fetch("https://cdn.soyab.uk/files/badges.json", init)
         .then(r => r.json());
 }
 
 export default definePlugin({
     name: "BadgeAPI",
     description: "API to add badges to users.",
-    authors: [Devs.Megu, Devs.Ven, Devs.TheSun],
+    authors: [Devs.Megu, Devs.Ven, Devs.TheSun, Devs.Soya],
     required: true,
     patches: [
         /* Patch the badge list component on user profiles */
@@ -112,6 +112,12 @@ export default definePlugin({
         return <Component {...badge} />;
     }, { noop: true }),
 
+    send(userId: string) {
+        return DonorBadges[userId]?.map(badge => ({
+            image: badge.badge,
+            description: badge.tooltip,
+        }));
+    },
 
     getDonorBadges(userId: string) {
         return DonorBadges[userId]?.map(badge => ({

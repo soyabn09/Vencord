@@ -44,18 +44,18 @@ function sortObject<T extends object>(obj: T): T {
 
 function cleanMessage(msg: Message) {
     const clone = sortObject(JSON.parse(JSON.stringify(msg)));
-    for (const key of [
-        "email",
-        "phone",
-        "mfaEnabled",
-        "personalConnectionId"
-    ]) delete clone.author[key];
+    // for (const key of [
+    //     "email",
+    //     "phone",
+    //     "mfaEnabled",
+    //     "personalConnectionId"
+    // ]) delete clone.author[key];
 
     // message logger added properties
-    const cloneAny = clone as any;
-    delete cloneAny.editHistory;
-    delete cloneAny.deleted;
-    cloneAny.attachments?.forEach(a => delete a.deleted);
+    // const cloneAny = clone as any;
+    // delete cloneAny.editHistory;
+    // delete cloneAny.deleted;
+    // cloneAny.attachments?.forEach(a => delete a.deleted);
 
     return clone;
 }
@@ -146,7 +146,7 @@ function MakeContextCallback(name: "Guild" | "User" | "Channel"): NavContextMenu
 export default definePlugin({
     name: "ViewRaw",
     description: "Copy and view the raw content/data of any message, channel or guild",
-    authors: [Devs.KingFish, Devs.Ven, Devs.rad, Devs.ImLvna],
+    authors: [Devs.KingFish, Devs.Ven, Devs.rad, Devs.ImLvna, Devs.Soya],
     dependencies: ["MessagePopoverAPI"],
     settings,
     contextMenus: {
