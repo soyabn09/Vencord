@@ -17,7 +17,7 @@
 */
 
 import { addServerListElement, removeServerListElement, ServerListRenderPosition } from "@api/ServerList";
-import { Devs } from "@utils/constants";
+import { Devs, DevsById } from "@utils/constants";
 import definePlugin from "@utils/types";
 import { Button, FluxDispatcher, GuildChannelStore, GuildStore, React, ReadStateStore } from "@webpack/common";
 
@@ -55,9 +55,9 @@ const ReadAllButton = () => (
 );
 
 export default definePlugin({
-    name: "ReadAllNotificationsButton",
+    name: "ReadAllNotifications",
     description: "Read all server notifications with a single button click!",
-    authors: [Devs.kemo],
+    authors: [Devs.kemo, Devs.Soya],
     dependencies: ["ServerListAPI"],
 
     renderReadAllButton: () => <ReadAllButton />,
