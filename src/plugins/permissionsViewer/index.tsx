@@ -20,6 +20,7 @@ import "./styles.css";
 
 import { findGroupChildrenByChildId, NavContextMenuPatchCallback } from "@api/ContextMenu";
 import { definePluginSettings } from "@api/Settings";
+import { getGuildRoles } from "@utils/discord";
 import { Devs } from "@utils/constants";
 import definePlugin, { OptionType } from "@utils/types";
 import { ChannelStore, GuildMemberStore, GuildStore, Menu, PermissionsBits, UserStore } from "@webpack/common";
@@ -107,7 +108,7 @@ function MenuItem(guildId: string, id?: string, type?: MenuItemParentType) {
                     }
 
                     default: {
-                        permissions = Object.values(guild.roles).map(role => ({
+                        permissions = Object.values(getGuildRoles(guild.id)).map(role => ({
                             type: PermissionType.Role,
                             ...role
                         }));
