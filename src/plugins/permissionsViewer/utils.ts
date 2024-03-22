@@ -14,12 +14,11 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { classNameFactory } from "@api/Styles";
-import { getGuildRoles } from "@utils/discord";
 import { wordsToTitle } from "@utils/text";
-import { i18n, Parser } from "@webpack/common";
+import { GuildStore, i18n, Parser } from "@webpack/common";
 import { Guild, GuildMember, Role } from "discord-types/general";
 import type { ReactNode } from "react";
 
@@ -45,9 +44,11 @@ const PermissionKeyMap = {
 export function getPermissionString(permission: string) {
     permission = PermissionKeyMap[permission] || permission;
 
-    return i18n.Messages[permission] ||
+    return (
+        i18n.Messages[permission] ||
         // shouldn't get here but just in case
-        formatPermissionWithoutMatchingString(permission);
+        formatPermissionWithoutMatchingString(permission)
+    );
 }
 
 export function getPermissionDescription(permission: string): ReactNode {
@@ -59,9 +60,10 @@ export function getPermissionDescription(permission: string): ReactNode {
     else if (permission !== "STREAM")
         permission = PermissionKeyMap[permission] || permission;
 
-    const msg = i18n.Messages[`ROLE_PERMISSIONS_${permission}_DESCRIPTION`] as any;
-    if (msg?.hasMarkdown)
-        return Parser.parse(msg.message);
+    const msg = i18n.Messages[
+        `ROLE_PERMISSIONS_${permission}_DESCRIPTION`
+    ] as any;
+    if (msg?.hasMarkdown) return Parser.parse(msg.message);
 
     if (typeof msg === "string") return msg;
 
@@ -69,9 +71,10 @@ export function getPermissionDescription(permission: string): ReactNode {
 }
 
 export function getSortedRoles({ id }: Guild, member: GuildMember) {
-    const roles = getGuildRoles(id);
+    const roles = GuildStore.getRoles(id);
+
     return [...member.roles, id]
-        .map(id => roles[id])
+        .map((id) => roles[id])
         .sort((a, b) => b.position - a.position);
 }
 
@@ -86,11 +89,14 @@ export function sortUserRoles(roles: Role[]) {
     }
 }
 
-export function sortPermissionOverwrites<T extends { id: string; type: number; }>(overwrites: T[], guildId: string) {
-    const roles = getGuildRoles(guildId);
+export function sortPermissionOverwrites<
+    T extends { id: string; type: number }
+>(overwrites: T[], guildId: string) {
+    const roles = GuildStore.getRoles(guildId);
 
     return overwrites.sort((a, b) => {
-        if (a.type !== PermissionType.Role || b.type !== PermissionType.Role) return 0;
+        if (a.type !== PermissionType.Role || b.type !== PermissionType.Role)
+            return 0;
 
         const roleA = roles[a.id];
         const roleB = roles[b.id];
