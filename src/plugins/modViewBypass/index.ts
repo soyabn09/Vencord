@@ -9,36 +9,19 @@ import definePlugin from "@utils/types";
 
 export default definePlugin({
     name: "ModViewBypass",
-    description: "Open the mod view sidebar in guilds you don't have moderator permissions in, or where the experiment is disabled.",
+    description: "Open the mod view sidebar in guilds you don't have moderator permissions in.",
     authors: [Devs.Soya],
     patches: [
-        {
-            find: "canAccessGuildMemberModViewWithExperiment:",
-            replacement: {
-                match: /canAccessGuildMemberModViewWithExperiment:function\(\){return\s\i/,
-                replace: "canAccessGuildMemberModViewWithExperiment:function(){return ()=>true;",
-            },
-        },
-        {
-            find: "useCanAccessGuildMemberModView:",
-            replacement: {
-                match: /\i.default.hasAny\(/,
-                replace: "true; (",
-            },
-        },
-        {
-            find: "isInGuildMemberModViewExperiment:",
-            replacement: {
-                match: /isInGuildMemberModViewExperiment:function\(\){return\s\i/,
-                replace: "isInGuildMemberModViewExperiment:function(){return ()=>true;",
-            },
-        },
-        {
-            find: "useGuildMemberModViewExperiment:",
-            replacement: {
-                match: /useGuildMemberModViewExperiment:function\(\){return\s\i/,
-                replace: "useGuildMemberModViewExperiment:function(){return ()=>true;",
-            },
-        },
-    ],
+        "useCanAccessGuildMemberModView",
+        // these can probably be removed safely now and revert to the regular patch style
+        "canAccessGuildMemberModViewWithExperiment",
+        "isInGuildMemberModViewExperiment",
+        "useGuildMemberModViewExperiment",
+    ].map(f => ({
+        find: `${f}:`,
+        replacement: {
+            match: new RegExp(`(${f}:function\\(\\){return\\s)\\i`),
+            replace: "$1()=>true;",
+        }
+    }))
 });
