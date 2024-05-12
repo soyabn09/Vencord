@@ -19,7 +19,8 @@
 import "./style.css";
 
 import { addServerListElement, removeServerListElement, ServerListRenderPosition } from "@api/ServerList";
-import { Devs, DevsById } from "@utils/constants";
+import ErrorBoundary from "@components/ErrorBoundary";
+import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 import { Button, FluxDispatcher, GuildChannelStore, GuildStore, React, ReadStateStore } from "@webpack/common";
 
@@ -64,7 +65,7 @@ export default definePlugin({
     authors: [Devs.kemo, Devs.Soya],
     dependencies: ["ServerListAPI"],
 
-    renderReadAllButton: () => <ReadAllButton />,
+    renderReadAllButton: ErrorBoundary.wrap(ReadAllButton, { noop: true }),
 
     start() {
         addServerListElement(ServerListRenderPosition.Above, this.renderReadAllButton);
