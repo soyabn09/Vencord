@@ -109,13 +109,6 @@ export default definePlugin({
         return <Component {...badge} />;
     }, { noop: true }),
 
-    send(userId: string) {
-        return DonorBadges[userId]?.map(badge => ({
-            image: badge.badge,
-            description: badge.tooltip,
-        }));
-    },
-
     getDonorBadges(userId: string) {
         return DonorBadges[userId]?.map(badge => ({
             image: badge.badge,
