@@ -55,7 +55,7 @@ const RoleButtonClasses = findByPropsLazy(
     "button",
     "buttonInner",
     "icon",
-    "text"
+    "banner"
 );
 
 export const enum PermissionsSortOrder {
