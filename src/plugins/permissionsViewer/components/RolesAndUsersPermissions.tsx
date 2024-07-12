@@ -1,19 +1,7 @@
 /*
- * Vencord, a modification for Discord's desktop app
- * Copyright (c) 2023 Vendicated and contributors
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * Vencord, a Discord client mod
+ * Copyright (c) 2024 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import ErrorBoundary from "@components/ErrorBoundary";
@@ -51,7 +39,7 @@ function openRolesAndUsersPermissionsModal(
     guild: Guild,
     header: string
 ) {
-    return openModal((modalProps) => (
+    return openModal(modalProps => (
         <RolesAndUsersPermissions
             modalProps={modalProps}
             permissions={permissions}
@@ -84,7 +72,7 @@ function RolesAndUsersPermissionsComponent({
     useEffect(() => {
         const usersToRequest = permissions
             .filter(
-                (p) =>
+                p =>
                     p.type === PermissionType.User &&
                     !GuildMemberStore.isMember(guild.id, p.id!)
             )
@@ -162,58 +150,58 @@ function RolesAndUsersPermissionsComponent({
                                                 PermissionType.Role ||
                                                 permission.type ===
                                                 PermissionType.Owner) && (
-                                                    <span
-                                                        className={cl(
-                                                            "perms-role-circle"
-                                                        )}
-                                                        style={{
-                                                            backgroundColor:
+                                                <span
+                                                    className={cl(
+                                                        "perms-role-circle"
+                                                    )}
+                                                    style={{
+                                                        backgroundColor:
                                                                 role?.colorString ??
                                                                 "var(--primary-300)",
-                                                        }}
-                                                    />
-                                                )}
+                                                    }}
+                                                />
+                                            )}
                                             {permission.type ===
                                                 PermissionType.User &&
                                                 user !== undefined && (
-                                                    <img
-                                                        className={cl(
-                                                            "perms-user-img"
-                                                        )}
-                                                        src={user.getAvatarURL(
-                                                            void 0,
-                                                            void 0,
-                                                            false
-                                                        )}
-                                                    />
-                                                )}
+                                                <img
+                                                    className={cl(
+                                                        "perms-user-img"
+                                                    )}
+                                                    src={user.getAvatarURL(
+                                                        void 0,
+                                                        void 0,
+                                                        false
+                                                    )}
+                                                />
+                                            )}
                                             <Text variant="text-md/normal">
                                                 {permission.type ===
                                                     PermissionType.Role ? (
-                                                    role?.name ?? "Unknown Role"
-                                                ) : permission.type ===
+                                                        role?.name ?? "Unknown Role"
+                                                    ) : permission.type ===
                                                     PermissionType.User ? (
-                                                    (user &&
+                                                            (user &&
                                                         getUniqueUsername(
                                                             user
                                                         )) ??
                                                     "Unknown User"
-                                                ) : (
-                                                    <Flex
-                                                        style={{
-                                                            gap: "0.2em",
-                                                            justifyItems:
+                                                        ) : (
+                                                            <Flex
+                                                                style={{
+                                                                    gap: "0.2em",
+                                                                    justifyItems:
                                                                 "center",
-                                                        }}
-                                                    >
+                                                                }}
+                                                            >
                                                         @owner
-                                                        <OwnerCrownIcon
-                                                            height={18}
-                                                            width={18}
-                                                            aria-hidden="true"
-                                                        />
-                                                    </Flex>
-                                                )}
+                                                                <OwnerCrownIcon
+                                                                    height={18}
+                                                                    width={18}
+                                                                    aria-hidden="true"
+                                                                />
+                                                            </Flex>
+                                                        )}
                                             </Text>
                                         </div>
                                     </button>
@@ -272,7 +260,7 @@ function RolesAndUsersPermissionsComponent({
                                                 ) || "No Description"
                                             }
                                         >
-                                            {(props) => <InfoIcon {...props} />}
+                                            {props => <InfoIcon {...props} />}
                                         </Tooltip>
                                     </div>
                                 )
