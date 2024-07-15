@@ -1,19 +1,7 @@
 /*
- * Vencord, a modification for Discord's desktop app
- * Copyright (c) 2022 Vendicated and contributors
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * Vencord, a Discord client mod
+ * Copyright (c) 2024 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import { NavContextMenuPatchCallback } from "@api/ContextMenu";
@@ -70,17 +58,17 @@ function cleanMessage(msg: Message) {
     // ]) delete clone.author[key];
 
     // message logger added properties
-    const cloneAny = clone as any;
-    delete cloneAny.editHistory;
-    delete cloneAny.deleted;
-    delete cloneAny.firstEditTimestamp;
-    cloneAny.attachments?.forEach((a) => delete a.deleted);
+    // const cloneAny = clone as any;
+    // delete cloneAny.editHistory;
+    // delete cloneAny.deleted;
+    // delete cloneAny.firstEditTimestamp;
+    // cloneAny.attachments?.forEach((a) => delete a.deleted);
 
     return clone;
 }
 
 function openViewRawModal(json: string, type: string, msgContent?: string) {
-    const key = openModal((props) => (
+    const key = openModal(props => (
         <ErrorBoundary>
             <ModalRoot {...props} size={ModalSize.LARGE}>
                 <ModalHeader>
@@ -206,7 +194,7 @@ export default definePlugin({
     },
 
     start() {
-        addButton("ViewRaw", (msg) => {
+        addButton("ViewRaw", msg => {
             const handleClick = () => {
                 if (settings.store.clickMethod === "Right") {
                     copyWithToast(msg.content);
@@ -215,7 +203,7 @@ export default definePlugin({
                 }
             };
 
-            const handleContextMenu = (e) => {
+            const handleContextMenu = e => {
                 if (settings.store.clickMethod === "Left") {
                     e.preventDefault();
                     e.stopPropagation();
