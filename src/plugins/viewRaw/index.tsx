@@ -68,7 +68,7 @@ function cleanMessage(msg: Message) {
 }
 
 function openViewRawModal(json: string, type: string, msgContent?: string) {
-    const key = openModal(props => (
+    const key = openModal((props) => (
         <ErrorBoundary>
             <ModalRoot {...props} size={ModalSize.LARGE}>
                 <ModalHeader>
@@ -190,11 +190,12 @@ export default definePlugin({
     contextMenus: {
         "guild-context": MakeContextCallback("Guild"),
         "channel-context": MakeContextCallback("Channel"),
+        "thread-context": MakeContextCallback("Channel"),
         "user-context": MakeContextCallback("User"),
     },
 
     start() {
-        addButton("ViewRaw", msg => {
+        addButton("ViewRaw", (msg) => {
             const handleClick = () => {
                 if (settings.store.clickMethod === "Right") {
                     copyWithToast(msg.content);
@@ -203,7 +204,7 @@ export default definePlugin({
                 }
             };
 
-            const handleContextMenu = e => {
+            const handleContextMenu = (e) => {
                 if (settings.store.clickMethod === "Left") {
                     e.preventDefault();
                     e.stopPropagation();
