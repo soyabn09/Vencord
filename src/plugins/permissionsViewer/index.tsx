@@ -101,7 +101,7 @@ function MenuItem(guildId: string, id?: string, type?: MenuItemParentType) {
                         const member = GuildMemberStore.getMember(guildId, id!);
 
                         permissions = getSortedRoles(guild, member).map(
-                            role => ({
+                            (role) => ({
                                 type: PermissionType.Role,
                                 ...role,
                             })
@@ -146,7 +146,7 @@ function MenuItem(guildId: string, id?: string, type?: MenuItemParentType) {
                     default: {
                         permissions = Object.values(
                             GuildStore.getRoles(guild.id)
-                        ).map(role => ({
+                        ).map((role) => ({
                             type: PermissionType.Role,
                             ...role,
                         }));
@@ -210,14 +210,6 @@ export default definePlugin({
 
     patches: [
         {
-            find: ".popularApplicationCommandIds,",
-            replacement: {
-                match: /showBorder:(.{0,60})}\),(?<=guild:(\i),guildMember:(\i),.+?)/,
-                replace: (m, showBoder, guild, guildMember) =>
-                    `${m}$self.UserPermissions(${guild},${guildMember},${showBoder}),`,
-            },
-        },
-        {
             find: ".VIEW_ALL_ROLES,",
             replacement: {
                 match: /children:"\+"\.concat\(\i\.length-\i\.length\).{0,20}\}\),/,
@@ -225,19 +217,6 @@ export default definePlugin({
             },
         },
     ],
-
-    UserPermissions: (
-        guild: Guild,
-        guildMember: GuildMember | undefined,
-        showBorder: boolean
-    ) =>
-        !!guildMember && (
-            <UserPermissions
-                guild={guild}
-                guildMember={guildMember}
-                showBorder={showBorder}
-            />
-        ),
 
     ViewPermissionsButton: ErrorBoundary.wrap(
         ({
@@ -258,13 +237,12 @@ export default definePlugin({
                         <UserPermissions
                             guild={guild}
                             guildMember={guildMember}
-                            showBorder
                             forceOpen
                         />
                     </Dialog>
                 )}
             >
-                {popoutProps => (
+                {(popoutProps) => (
                     <TooltipContainer text="View Permissions">
                         <Button
                             {...popoutProps}
