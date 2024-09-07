@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Promisable } from "type-fest";
 
@@ -27,7 +27,7 @@ export class Queue {
      * @param maxSize The maximum amount of functions that can be queued at once.
      *                If the queue is full, the oldest function will be removed.
      */
-    constructor(public readonly maxSize = Infinity) { }
+    constructor(public readonly maxSize = Infinity) {}
 
     private queue = [] as Array<() => Promisable<unknown>>;
 
@@ -39,13 +39,11 @@ export class Queue {
             this.promise = Promise.resolve()
                 .then(func)
                 .finally(() => this.next());
-        else
-            this.promise = undefined;
+        else this.promise = undefined;
     }
 
     private run() {
-        if (!this.promise)
-            this.next();
+        if (!this.promise) this.next();
     }
 
     /**
@@ -54,8 +52,7 @@ export class Queue {
      * @param func Task
      */
     push<T>(func: () => Promisable<T>) {
-        if (this.size >= this.maxSize)
-            this.queue.shift();
+        if (this.size >= this.maxSize) this.queue.shift();
 
         this.queue.push(func);
         this.run();
@@ -67,8 +64,7 @@ export class Queue {
      * @param func Task
      */
     unshift<T>(func: () => Promisable<T>) {
-        if (this.size >= this.maxSize)
-            this.queue.pop();
+        if (this.size >= this.maxSize) this.queue.pop();
 
         this.queue.unshift(func);
         this.run();

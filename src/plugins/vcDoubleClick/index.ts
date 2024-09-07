@@ -14,16 +14,19 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 import { ChannelStore, SelectedChannelStore } from "@webpack/common";
 
-const timers = {} as Record<string, {
-    timeout?: NodeJS.Timeout;
-    i: number;
-}>;
+const timers = {} as Record<
+    string,
+    {
+        timeout?: NodeJS.Timeout;
+        i: number;
+    }
+>;
 
 export default definePlugin({
     name: "VoiceChatDoubleClick",
@@ -32,8 +35,8 @@ export default definePlugin({
     patches: [
         ...[
             ".handleVoiceStatusClick", // voice channels
-            ".handleClickChat" // stage channels
-        ].map(find => ({
+            ".handleClickChat", // stage channels
+        ].map((find) => ({
             find,
             // hack: these are not React onClick, it is a custom prop handled by Discord
             // thus, replacing this with onDoubleClick won't work, and you also cannot check
@@ -42,19 +45,21 @@ export default definePlugin({
             replacement: [
                 {
                     match: /onClick:\(\)=>\{this.handleClick\(\)/g,
-                    replace: "onClick:()=>{$self.schedule(()=>{this.handleClick()},this)",
+                    replace:
+                        "onClick:()=>{$self.schedule(()=>{this.handleClick()},this)",
                 },
-            ]
+            ],
         })),
         {
             // channel mentions
             find: 'className:"channelMention",children',
             replacement: {
                 match: /onClick:(\i)(?=,.{0,30}className:"channelMention".+?(\i)\.inContent)/,
-                replace: (_, onClick, props) => ""
-                    + `onClick:(vcDoubleClickEvt)=>$self.shouldRunOnClick(vcDoubleClickEvt,${props})&&${onClick}()`,
-            }
-        }
+                replace: (_, onClick, props) =>
+                    "" +
+                    `onClick:(vcDoubleClickEvt)=>$self.shouldRunOnClick(vcDoubleClickEvt,${props})&&${onClick}()`,
+            },
+        },
     ],
 
     shouldRunOnClick(e: MouseEvent, { channelId }) {
@@ -84,5 +89,5 @@ export default definePlugin({
                 delete timers[id];
             }, 500);
         }
-    }
+    },
 });

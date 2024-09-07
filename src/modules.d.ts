@@ -14,22 +14,34 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 /// <reference types="standalone-electron-types"/>
 
 declare module "~plugins" {
     const plugins: Record<string, import("./utils/types").Plugin>;
     export default plugins;
-    export const PluginMeta: Record<string, {
-        folderName: string;
-        userPlugin: boolean;
-    }>;
-    export const ExcludedPlugins: Record<string, "web" | "discordDesktop" | "vencordDesktop" | "desktop" | "dev">;
+    export const PluginMeta: Record<
+        string,
+        {
+            folderName: string;
+            userPlugin: boolean;
+        }
+    >;
+    export const ExcludedPlugins: Record<
+        string,
+        "web" | "discordDesktop" | "vencordDesktop" | "desktop" | "dev"
+    >;
 }
 
 declare module "~pluginNatives" {
-    const pluginNatives: Record<string, Record<string, (event: Electron.IpcMainInvokeEvent, ...args: unknown[]) => unknown>>;
+    const pluginNatives: Record<
+        string,
+        Record<
+            string,
+            (event: Electron.IpcMainInvokeEvent, ...args: unknown[]) => unknown
+        >
+    >;
     export default pluginNatives;
 }
 

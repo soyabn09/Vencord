@@ -12,6 +12,8 @@ export function decorationToAsset(decoration: Decoration) {
     return `${decoration.animated ? "a_" : ""}${decoration.hash}`;
 }
 
-export function decorationToAvatarDecoration(decoration: Decoration): AvatarDecoration {
+export function decorationToAvatarDecoration(
+    decoration: Decoration,
+): AvatarDecoration {
     return { asset: decorationToAsset(decoration), skuId: SKU_ID };
 }

@@ -62,12 +62,12 @@ export interface RoleOrUserPermission {
 
 type GetRoleIconData = (
     role: Role,
-    size: number
+    size: number,
 ) => { customIconSrc?: string; unicodeEmoji?: UnicodeEmoji };
 const getRoleIconData: GetRoleIconData = findByCodeLazy(
     "convertSurrogateToName",
     "customIconSrc",
-    "unicodeEmoji"
+    "unicodeEmoji",
 );
 
 function getRoleIconSrc(role: Role) {
@@ -95,7 +95,7 @@ function RolesAndUsersPermissionsComponent({
         [GuildMemberStore],
         () => GuildMemberStore.getMemberIds(guild.id),
         null,
-        (old, current) => old.length === current.length
+        (old, current) => old.length === current.length,
     );
 
     useEffect(() => {
@@ -103,7 +103,7 @@ function RolesAndUsersPermissionsComponent({
             .filter(
                 (p) =>
                     p.type === PermissionType.User &&
-                    !GuildMemberStore.isMember(guild.id, p.id!)
+                    !GuildMemberStore.isMember(guild.id, p.id!),
             )
             .map(({ id }) => id);
 
@@ -185,7 +185,7 @@ function RolesAndUsersPermissionsComponent({
                                                                     modalProps.onClose
                                                                 }
                                                             />
-                                                        )
+                                                        ),
                                                     );
                                                 else if (
                                                     permission.type ===
@@ -199,7 +199,7 @@ function RolesAndUsersPermissionsComponent({
                                                                     permission.id!
                                                                 }
                                                             />
-                                                        )
+                                                        ),
                                                     );
                                                 }
                                             }}
@@ -210,7 +210,7 @@ function RolesAndUsersPermissionsComponent({
                                                     PermissionType.Owner) && (
                                                 <span
                                                     className={cl(
-                                                        "modal-role-circle"
+                                                        "modal-role-circle",
                                                     )}
                                                     style={{
                                                         backgroundColor:
@@ -224,7 +224,7 @@ function RolesAndUsersPermissionsComponent({
                                                 roleIconSrc != null && (
                                                     <img
                                                         className={cl(
-                                                            "modal-role-image"
+                                                            "modal-role-image",
                                                         )}
                                                         src={roleIconSrc}
                                                     />
@@ -234,26 +234,27 @@ function RolesAndUsersPermissionsComponent({
                                                 user != null && (
                                                     <img
                                                         className={cl(
-                                                            "modal-user-img"
+                                                            "modal-user-img",
                                                         )}
                                                         src={user.getAvatarURL(
                                                             void 0,
                                                             void 0,
-                                                            false
+                                                            false,
                                                         )}
                                                     />
                                                 )}
                                             <Text variant="text-md/normal">
                                                 {permission.type ===
                                                 PermissionType.Role ? (
-                                                    role?.name ?? "Unknown Role"
+                                                    (role?.name ??
+                                                    "Unknown Role")
                                                 ) : permission.type ===
                                                   PermissionType.User ? (
-                                                    (user != null &&
+                                                    ((user != null &&
                                                         getUniqueUsername(
-                                                            user
+                                                            user,
                                                         )) ??
-                                                    "Unknown User"
+                                                    "Unknown User")
                                                 ) : (
                                                     <Flex
                                                         style={{
@@ -286,7 +287,7 @@ function RolesAndUsersPermissionsComponent({
                                     <div className={cl("modal-perms-item")}>
                                         <div
                                             className={cl(
-                                                "modal-perms-item-icon"
+                                                "modal-perms-item-icon",
                                             )}
                                         >
                                             {(() => {
@@ -321,21 +322,21 @@ function RolesAndUsersPermissionsComponent({
                                         </div>
                                         <Text variant="text-md/normal">
                                             {getPermissionString(
-                                                permissionName
+                                                permissionName,
                                             )}
                                         </Text>
 
                                         <Tooltip
                                             text={
                                                 getPermissionDescription(
-                                                    permissionName
+                                                    permissionName,
                                                 ) || "No Description"
                                             }
                                         >
                                             {(props) => <InfoIcon {...props} />}
                                         </Tooltip>
                                     </div>
-                                )
+                                ),
                             )}
                         </ScrollerThin>
                     </div>
@@ -413,13 +414,13 @@ function UserContextMenu({ userId }: { userId: string }) {
 }
 
 const RolesAndUsersPermissions = ErrorBoundary.wrap(
-    RolesAndUsersPermissionsComponent
+    RolesAndUsersPermissionsComponent,
 );
 
 export default function openRolesAndUsersPermissionsModal(
     permissions: Array<RoleOrUserPermission>,
     guild: Guild,
-    header: string
+    header: string,
 ) {
     return openModal((modalProps) => (
         <RolesAndUsersPermissions

@@ -14,12 +14,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { waitFor } from "@webpack";
 
 let NoticesModule: any;
-waitFor(m => m.show && m.dismiss && !m.suppressAll, m => NoticesModule = m);
+waitFor(
+    (m) => m.show && m.dismiss && !m.suppressAll,
+    (m) => (NoticesModule = m),
+);
 
 export const noticesQueue = [] as any[];
 export let currentNotice: any = null;
@@ -36,7 +39,11 @@ export function nextNotice() {
     }
 }
 
-export function showNotice(message: string, buttonText: string, onOkClick: () => void) {
+export function showNotice(
+    message: string,
+    buttonText: string,
+    onOkClick: () => void,
+) {
     noticesQueue.push(["GENERIC", message, buttonText, onOkClick]);
     if (!currentNotice) nextNotice();
 }

@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Parser, useEffect, useState } from "@webpack/common";
 import { Message } from "discord-types/general";
@@ -28,18 +28,15 @@ export function handleTranslate(messageId: string, data: TranslationValue) {
     TranslationSetters.get(messageId)!(data);
 }
 
-function Dismiss({ onDismiss }: { onDismiss: () => void; }) {
+function Dismiss({ onDismiss }: { onDismiss: () => void }) {
     return (
-        <button
-            onClick={onDismiss}
-            className={cl("dismiss")}
-        >
+        <button onClick={onDismiss} className={cl("dismiss")}>
             Dismiss
         </button>
     );
 }
 
-export function TranslationAccessory({ message }: { message: Message; }) {
+export function TranslationAccessory({ message }: { message: Message }) {
     const [translation, setTranslation] = useState<TranslationValue>();
 
     useEffect(() => {
@@ -56,9 +53,9 @@ export function TranslationAccessory({ message }: { message: Message; }) {
     return (
         <span className={cl("accessory")}>
             <TranslateIcon width={16} height={16} />
-            {Parser.parse(translation.text)}
-            {" "}
-            (translated from {translation.sourceLanguage} - <Dismiss onDismiss={() => setTranslation(undefined)} />)
+            {Parser.parse(translation.text)} (translated from{" "}
+            {translation.sourceLanguage} -{" "}
+            <Dismiss onDismiss={() => setTranslation(undefined)} />)
         </span>
     );
 }

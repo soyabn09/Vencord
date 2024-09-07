@@ -7,7 +7,12 @@
 import { proxyLazy } from "@utils/lazy";
 import { sleep } from "@utils/misc";
 import { Queue } from "@utils/Queue";
-import { Flux, FluxDispatcher, GuildChannelStore, PrivateChannelsStore } from "@webpack/common";
+import {
+    Flux,
+    FluxDispatcher,
+    GuildChannelStore,
+    PrivateChannelsStore,
+} from "@webpack/common";
 
 export const OnlineMemberCountStore = proxyLazy(() => {
     const preloadQueue = new Queue();
@@ -22,31 +27,43 @@ export const OnlineMemberCountStore = proxyLazy(() => {
         async _ensureCount(guildId: string) {
             if (onlineMemberMap.has(guildId)) return;
 
-            await PrivateChannelsStore.preload(guildId, GuildChannelStore.getDefaultChannel(guildId).id);
+            await PrivateChannelsStore.preload(
+                guildId,
+                GuildChannelStore.getDefaultChannel(guildId).id,
+            );
         }
 
         ensureCount(guildId?: string) {
             if (!guildId || onlineMemberMap.has(guildId)) return;
 
             preloadQueue.push(() =>
-                this._ensureCount(guildId)
-                    .then(
-                        () => sleep(200),
-                        () => sleep(200)
-                    )
+                this._ensureCount(guildId).then(
+                    () => sleep(200),
+                    () => sleep(200),
+                ),
             );
         }
     }
 
     return new OnlineMemberCountStore(FluxDispatcher, {
-        GUILD_MEMBER_LIST_UPDATE({ guildId, groups }: { guildId: string, groups: { count: number; id: string; }[]; }) {
+        GUILD_MEMBER_LIST_UPDATE({
+            guildId,
+            groups,
+        }: {
+            guildId: string;
+            groups: { count: number; id: string }[];
+        }) {
             onlineMemberMap.set(
                 guildId,
-                groups.reduce((total, curr) => total + (curr.id === "offline" ? 0 : curr.count), 0)
+                groups.reduce(
+                    (total, curr) =>
+                        total + (curr.id === "offline" ? 0 : curr.count),
+                    0,
+                ),
             );
         },
         ONLINE_GUILD_MEMBER_COUNT_UPDATE({ guildId, count }) {
             onlineMemberMap.set(guildId, count);
-        }
+        },
     });
 });

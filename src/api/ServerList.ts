@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Logger } from "@utils/Logger";
 
@@ -29,14 +29,22 @@ const renderFunctionsAbove = new Set<Function>();
 const renderFunctionsIn = new Set<Function>();
 
 function getRenderFunctions(position: ServerListRenderPosition) {
-    return position === ServerListRenderPosition.Above ? renderFunctionsAbove : renderFunctionsIn;
+    return position === ServerListRenderPosition.Above
+        ? renderFunctionsAbove
+        : renderFunctionsIn;
 }
 
-export function addServerListElement(position: ServerListRenderPosition, renderFunction: Function) {
+export function addServerListElement(
+    position: ServerListRenderPosition,
+    renderFunction: Function,
+) {
     getRenderFunctions(position).add(renderFunction);
 }
 
-export function removeServerListElement(position: ServerListRenderPosition, renderFunction: Function) {
+export function removeServerListElement(
+    position: ServerListRenderPosition,
+    renderFunction: Function,
+) {
     getRenderFunctions(position).delete(renderFunction);
 }
 

@@ -21,39 +21,54 @@ export interface DecorSectionProps {
     noMargin?: boolean;
 }
 
-export default function DecorSection({ hideTitle = false, hideDivider = false, noMargin = false }: DecorSectionProps) {
+export default function DecorSection({
+    hideTitle = false,
+    hideDivider = false,
+    noMargin = false,
+}: DecorSectionProps) {
     const authorization = useAuthorizationStore();
-    const { selectedDecoration, select: selectDecoration, fetch: fetchDecorations } = useCurrentUserDecorationsStore();
+    const {
+        selectedDecoration,
+        select: selectDecoration,
+        fetch: fetchDecorations,
+    } = useCurrentUserDecorationsStore();
 
     useEffect(() => {
         if (authorization.isAuthorized()) fetchDecorations();
     }, [authorization.token]);
 
-    return <CustomizationSection
-        title={!hideTitle && "Decor"}
-        hasBackground={true}
-        hideDivider={hideDivider}
-        className={noMargin && cl("section-remove-margin")}
-    >
-        <Flex>
-            <Button
-                onClick={() => {
-                    if (!authorization.isAuthorized()) {
-                        authorization.authorize().then(openChangeDecorationModal).catch(() => { });
-                    } else openChangeDecorationModal();
-                }}
-                size={Button.Sizes.SMALL}
-            >
-                Change Decoration
-            </Button>
-            {selectedDecoration && authorization.isAuthorized() && <Button
-                onClick={() => selectDecoration(null)}
-                color={Button.Colors.PRIMARY}
-                size={Button.Sizes.SMALL}
-                look={Button.Looks.LINK}
-            >
-                Remove Decoration
-            </Button>}
-        </Flex>
-    </CustomizationSection>;
+    return (
+        <CustomizationSection
+            title={!hideTitle && "Decor"}
+            hasBackground={true}
+            hideDivider={hideDivider}
+            className={noMargin && cl("section-remove-margin")}
+        >
+            <Flex>
+                <Button
+                    onClick={() => {
+                        if (!authorization.isAuthorized()) {
+                            authorization
+                                .authorize()
+                                .then(openChangeDecorationModal)
+                                .catch(() => {});
+                        } else openChangeDecorationModal();
+                    }}
+                    size={Button.Sizes.SMALL}
+                >
+                    Change Decoration
+                </Button>
+                {selectedDecoration && authorization.isAuthorized() && (
+                    <Button
+                        onClick={() => selectDecoration(null)}
+                        color={Button.Colors.PRIMARY}
+                        size={Button.Sizes.SMALL}
+                        look={Button.Looks.LINK}
+                    >
+                        Remove Decoration
+                    </Button>
+                )}
+            </Flex>
+        </CustomizationSection>
+    );
 }

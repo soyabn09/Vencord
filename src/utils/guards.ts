@@ -14,9 +14,11 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
-export function isTruthy<T>(item: T): item is Exclude<T, 0 | "" | false | null | undefined> {
+export function isTruthy<T>(
+    item: T,
+): item is Exclude<T, 0 | "" | false | null | undefined> {
     return Boolean(item);
 }
 

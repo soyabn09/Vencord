@@ -14,17 +14,28 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { cpSync, moveSync, readdirSync, rmSync } from "fs-extra";
 import { join } from "path";
 
-readdirSync(join(__dirname, "src"))
-    .forEach(child => moveSync(join(__dirname, "src", child), join(__dirname, child), { overwrite: true }));
+readdirSync(join(__dirname, "src")).forEach((child) =>
+    moveSync(join(__dirname, "src", child), join(__dirname, child), {
+        overwrite: true,
+    }),
+);
 
 const VencordSrc = join(__dirname, "..", "..", "src");
 
-for (const file of ["preload.d.ts", "userplugins", "main", "debug", "src", "browser", "scripts"]) {
+for (const file of [
+    "preload.d.ts",
+    "userplugins",
+    "main",
+    "debug",
+    "src",
+    "browser",
+    "scripts",
+]) {
     rmSync(join(__dirname, file), { recursive: true, force: true });
 }
 

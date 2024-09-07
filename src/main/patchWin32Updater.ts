@@ -14,10 +14,17 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { app } from "electron";
-import { existsSync, mkdirSync, readdirSync, renameSync, statSync, writeFileSync } from "original-fs";
+import {
+    existsSync,
+    mkdirSync,
+    readdirSync,
+    renameSync,
+    statSync,
+    writeFileSync,
+} from "original-fs";
 import { basename, dirname, join } from "path";
 
 function isNewer($new: string, old: string) {
@@ -40,9 +47,7 @@ function patchLatest() {
         const discordPath = join(currentAppPath, "..");
 
         const latestVersion = readdirSync(discordPath).reduce((prev, curr) => {
-            return (curr.startsWith("app-") && isNewer(curr, prev))
-                ? curr
-                : prev;
+            return curr.startsWith("app-") && isNewer(curr, prev) ? curr : prev;
         }, currentVersion as string);
 
         if (latestVersion === currentVersion) return;
@@ -57,11 +62,17 @@ function patchLatest() {
 
         renameSync(app, _app);
         mkdirSync(app);
-        writeFileSync(join(app, "package.json"), JSON.stringify({
-            name: "discord",
-            main: "index.js"
-        }));
-        writeFileSync(join(app, "index.js"), `require(${JSON.stringify(join(__dirname, "patcher.js"))});`);
+        writeFileSync(
+            join(app, "package.json"),
+            JSON.stringify({
+                name: "discord",
+                main: "index.js",
+            }),
+        );
+        writeFileSync(
+            join(app, "index.js"),
+            `require(${JSON.stringify(join(__dirname, "patcher.js"))});`,
+        );
     } catch (err) {
         console.error("[Vencord] Failed to repatch latest host update", err);
     }

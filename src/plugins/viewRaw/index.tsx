@@ -44,7 +44,7 @@ const CopyIcon = () => {
 
 function sortObject<T extends object>(obj: T): T {
     return Object.fromEntries(
-        Object.entries(obj).sort(([k1], [k2]) => k1.localeCompare(k2))
+        Object.entries(obj).sort(([k1], [k2]) => k1.localeCompare(k2)),
     ) as T;
 }
 
@@ -101,7 +101,7 @@ function openViewRawModal(json: string, type: string, msgContent?: string) {
                             onClick={() =>
                                 copyWithToast(
                                     json,
-                                    `${type} data copied to clipboard!`
+                                    `${type} data copied to clipboard!`,
                                 )
                             }
                         >
@@ -112,7 +112,7 @@ function openViewRawModal(json: string, type: string, msgContent?: string) {
                                 onClick={() =>
                                     copyWithToast(
                                         msgContent,
-                                        "Content copied to clipboard!"
+                                        "Content copied to clipboard!",
                                     )
                                 }
                             >
@@ -150,7 +150,7 @@ const settings = definePluginSettings({
 });
 
 function MakeContextCallback(
-    name: "Guild" | "User" | "Channel"
+    name: "Guild" | "User" | "Channel",
 ): NavContextMenuPatchCallback {
     return (children, props) => {
         const value = props[name.toLowerCase()];
@@ -175,7 +175,7 @@ function MakeContextCallback(
                     openViewRawModal(JSON.stringify(value, null, 4), name)
                 }
                 icon={CopyIcon}
-            />
+            />,
         );
     };
 }

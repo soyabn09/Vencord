@@ -17,8 +17,8 @@ export default definePlugin({
             find: ".CHILLING)",
             replacement: {
                 match: /{enableHangStatus:(\i),/,
-                replace: "{_enableHangStatus:$1=false,"
-            }
-        }
-    ]
+                replace: "{_enableHangStatus:$1=false,",
+            },
+        },
+    ],
 });

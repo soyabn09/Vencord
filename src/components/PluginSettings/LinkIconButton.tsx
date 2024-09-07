@@ -15,7 +15,9 @@ export function GithubLinkIcon() {
 }
 
 export function WebsiteLinkIcon() {
-    return <WebsiteIcon aria-hidden className={"vc-settings-modal-link-icon"} />;
+    return (
+        <WebsiteIcon aria-hidden className={"vc-settings-modal-link-icon"} />
+    );
 }
 
 interface Props {
@@ -23,10 +25,10 @@ interface Props {
     href: string;
 }
 
-function LinkIcon({ text, href, Icon }: Props & { Icon: React.ComponentType; }) {
+function LinkIcon({ text, href, Icon }: Props & { Icon: React.ComponentType }) {
     return (
         <Tooltip text={text}>
-            {props => (
+            {(props) => (
                 <MaskedLink {...props} href={href}>
                     <Icon />
                 </MaskedLink>
@@ -35,5 +37,9 @@ function LinkIcon({ text, href, Icon }: Props & { Icon: React.ComponentType; }) 
     );
 }
 
-export const WebsiteButton = (props: Props) => <LinkIcon {...props} Icon={WebsiteLinkIcon} />;
-export const GithubButton = (props: Props) => <LinkIcon {...props} Icon={GithubLinkIcon} />;
+export const WebsiteButton = (props: Props) => (
+    <LinkIcon {...props} Icon={WebsiteLinkIcon} />
+);
+export const GithubButton = (props: Props) => (
+    <LinkIcon {...props} Icon={GithubLinkIcon} />
+);

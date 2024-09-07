@@ -14,9 +14,16 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
-import type { ComponentType, CSSProperties, MouseEvent, PropsWithChildren, ReactNode, UIEvent } from "react";
+import type {
+    ComponentType,
+    CSSProperties,
+    MouseEvent,
+    PropsWithChildren,
+    ReactNode,
+    UIEvent,
+} from "react";
 
 type RC<C> = ComponentType<PropsWithChildren<C & Record<string, any>>>;
 
@@ -66,11 +73,11 @@ export interface Menu {
         interactive?: boolean;
     }>;
     MenuSliderControl: RC<{
-        minValue: number,
-        maxValue: number,
-        value: number,
-        onChange(value: number): void,
-        renderValue?(value: number): string,
+        minValue: number;
+        maxValue: number;
+        value: number;
+        onChange(value: number): void;
+        renderValue?(value: number): string;
     }>;
 }
 
@@ -79,13 +86,12 @@ export interface ContextMenuApi {
     openContextMenu(
         event: UIEvent,
         render?: Menu["Menu"],
-        options?: { enableSpellCheck?: boolean; },
-        renderLazy?: () => Promise<Menu["Menu"]>
+        options?: { enableSpellCheck?: boolean },
+        renderLazy?: () => Promise<Menu["Menu"]>,
     ): void;
     openContextMenuLazy(
         event: UIEvent,
         renderLazy?: () => Promise<Menu["Menu"]>,
-        options?: { enableSpellCheck?: boolean; }
+        options?: { enableSpellCheck?: boolean },
     ): void;
 }
-

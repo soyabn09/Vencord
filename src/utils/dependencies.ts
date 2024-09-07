@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { makeLazy } from "./lazy";
 
@@ -24,7 +24,9 @@ import { makeLazy } from "./lazy";
 
 // needed to parse APNGs in the nitroBypass plugin
 export const importApngJs = makeLazy(() => {
-    return require("./apng-canvas").APNG as { parseURL(url: string): Promise<ApngFrameData>; };
+    return require("./apng-canvas").APNG as {
+        parseURL(url: string): Promise<ApngFrameData>;
+    };
 });
 
 // https://wiki.mozilla.org/APNG_Specification#.60fcTL.60:_The_Frame_Control_Chunk
@@ -40,13 +42,13 @@ export const enum ApngDisposeOp {
     /**
      * the frame's region of the output buffer is to be reverted to the previous contents before rendering the next frame.
      */
-    PREVIOUS
+    PREVIOUS,
 }
 
 // TODO: Might need to somehow implement this
 export const enum ApngBlendOp {
     SOURCE,
-    OVER
+    OVER,
 }
 export interface ApngFrame {
     left: number;
@@ -70,7 +72,10 @@ export interface ApngFrameData {
 // Browser (extension) builds do not contain these remote imports.
 
 export const shikiWorkerSrc = `https://unpkg.com/@vap/shiki-worker@0.0.8/dist/${IS_DEV ? "index.js" : "index.min.js"}`;
-export const shikiOnigasmSrc = "https://unpkg.com/@vap/shiki@0.10.3/dist/onig.wasm";
+export const shikiOnigasmSrc =
+    "https://unpkg.com/@vap/shiki@0.10.3/dist/onig.wasm";
 
 // @ts-expect-error
-export const getStegCloak = /* #__PURE__*/ makeLazy(() => import("https://unpkg.com/stegcloak-dist@1.0.0/index.js"));
+export const getStegCloak = /* #__PURE__*/ makeLazy(
+    () => import("https://unpkg.com/stegcloak-dist@1.0.0/index.js"),
+);

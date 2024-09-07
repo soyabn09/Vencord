@@ -13,69 +13,93 @@ const settings = definePluginSettings({
         type: OptionType.BOOLEAN,
         description: "Enable to show Vencord donor badges in chat.",
         hidden: true,
-        default: true
+        default: true,
     },
     VencordDonorPosition: {
         type: OptionType.NUMBER,
         description: "The position of the Vencord Donor badges.",
         hidden: true,
-        default: 0
+        default: 0,
     },
     showVencordContributor: {
         type: OptionType.BOOLEAN,
         description: "Enable to show Vencord contributor badges in chat.",
         hidden: true,
-        default: true
+        default: true,
     },
     VencordContributorPosition: {
         type: OptionType.NUMBER,
         description: "The position of the Vencord Contributor badge.",
         hidden: true,
-        default: 1
+        default: 1,
     },
     showDiscordProfile: {
         type: OptionType.BOOLEAN,
         description: "Enable to show Discord profile badges in chat.",
         hidden: true,
-        default: true
+        default: true,
     },
     DiscordProfilePosition: {
         type: OptionType.NUMBER,
         description: "The position of the Discord profile badges.",
         hidden: true,
-        default: 2
+        default: 2,
     },
     showDiscordNitro: {
         type: OptionType.BOOLEAN,
         description: "Enable to show Discord Nitro badges in chat.",
         hidden: true,
-        default: true
+        default: true,
     },
     DiscordNitroPosition: {
         type: OptionType.NUMBER,
         description: "The position of the Discord Nitro badge.",
         hidden: true,
-        default: 3
+        default: 3,
     },
     badgeSettings: {
         type: OptionType.COMPONENT,
         description: "Setup badge layout and visibility",
-        component: () => <BadgeSettings />
-    }
+        component: () => <BadgeSettings />,
+    },
 });
 
 export default settings;
 
 const BadgeSettings = () => {
     const [images, setImages] = useState([
-        { src: "https://cdn.discordapp.com/emojis/1026533070955872337.png", shown: settings.store.showVencordDonor, title: "Vencord donor badges", key: "VencordDonor", position: settings.store.VencordDonorPosition },
-        { src: "https://vencord.dev/assets/favicon.png", shown: settings.store.showVencordContributor, title: "Vencord contributor badge", key: "VencordContributer", position: settings.store.VencordContributorPosition },
-        { src: "https://cdn.discordapp.com/badge-icons/bf01d1073931f921909045f3a39fd264.png", shown: settings.store.showDiscordProfile, title: "Discord profile badges (HypeSquad, Discord Staff, Active Developer, etc.)", key: "DiscordProfile", position: settings.store.DiscordProfilePosition },
-        { src: "https://cdn.discordapp.com/badge-icons/2ba85e8026a8614b640c2837bcdfe21b.png", shown: settings.store.showDiscordNitro, title: "Nitro badge", key: "DiscordNitro", position: settings.store.DiscordNitroPosition }
+        {
+            src: "https://cdn.discordapp.com/emojis/1026533070955872337.png",
+            shown: settings.store.showVencordDonor,
+            title: "Vencord donor badges",
+            key: "VencordDonor",
+            position: settings.store.VencordDonorPosition,
+        },
+        {
+            src: "https://vencord.dev/assets/favicon.png",
+            shown: settings.store.showVencordContributor,
+            title: "Vencord contributor badge",
+            key: "VencordContributer",
+            position: settings.store.VencordContributorPosition,
+        },
+        {
+            src: "https://cdn.discordapp.com/badge-icons/bf01d1073931f921909045f3a39fd264.png",
+            shown: settings.store.showDiscordProfile,
+            title: "Discord profile badges (HypeSquad, Discord Staff, Active Developer, etc.)",
+            key: "DiscordProfile",
+            position: settings.store.DiscordProfilePosition,
+        },
+        {
+            src: "https://cdn.discordapp.com/badge-icons/2ba85e8026a8614b640c2837bcdfe21b.png",
+            shown: settings.store.showDiscordNitro,
+            title: "Nitro badge",
+            key: "DiscordNitro",
+            position: settings.store.DiscordNitroPosition,
+        },
     ]);
 
     useEffect(() => {
-        images.forEach(image => {
+        images.forEach((image) => {
             switch (image.key) {
                 case "VencordDonor":
                     settings.store.VencordDonorPosition = image.position;
@@ -107,7 +131,7 @@ const BadgeSettings = () => {
         }
     };
 
-    const handleDragOver = e => {
+    const handleDragOver = (e) => {
         e.preventDefault();
     };
 
@@ -134,29 +158,36 @@ const BadgeSettings = () => {
 
     return (
         <>
-            <Text>Drag the badges to reorder them, you can click to enable/disable a specific badge type.</Text>
+            <Text>
+                Drag the badges to reorder them, you can click to enable/disable
+                a specific badge type.
+            </Text>
             <div className="vc-sbic-badge-settings">
-                <img className="vc-sbic-settings-avatar" src={UserStore.getCurrentUser().getAvatarURL()}></img>
-                <Text className="vc-sbic-settings-username">{(UserStore.getCurrentUser() as any).globalName}</Text>
+                <img
+                    className="vc-sbic-settings-avatar"
+                    src={UserStore.getCurrentUser().getAvatarURL()}
+                ></img>
+                <Text className="vc-sbic-settings-username">
+                    {(UserStore.getCurrentUser() as any).globalName}
+                </Text>
                 {images
                     .sort((a, b) => a.position - b.position)
                     .map((image, index) => (
                         <div
                             key={image.key}
                             className={`vc-sbic-image-container ${!image.shown ? "vc-sbic-disabled" : ""}`}
-                            onDragOver={e => handleDragOver(e)}
-                            onDrop={e => handleDrop(e, index)}
+                            onDragOver={(e) => handleDragOver(e)}
+                            onDrop={(e) => handleDrop(e, index)}
                             onClick={() => toggleDisable(index)}
                         >
                             <img
                                 src={image.src}
                                 draggable={image.shown}
-                                onDragStart={e => handleDragStart(e, index)}
+                                onDragStart={(e) => handleDragStart(e, index)}
                                 title={image.title}
                             />
                         </div>
-                    ))
-                }
+                    ))}
             </div>
         </>
     );

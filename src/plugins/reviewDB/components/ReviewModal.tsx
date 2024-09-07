@@ -14,10 +14,18 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import ErrorBoundary from "@components/ErrorBoundary";
-import { ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalRoot, ModalSize, openModal } from "@utils/modal";
+import {
+    ModalCloseButton,
+    ModalContent,
+    ModalFooter,
+    ModalHeader,
+    ModalRoot,
+    ModalSize,
+    openModal,
+} from "@utils/modal";
 import { useForceUpdater } from "@utils/react";
 import { Paginator, Text, useRef, useState } from "@webpack/common";
 
@@ -28,7 +36,19 @@ import { cl } from "../utils";
 import ReviewComponent from "./ReviewComponent";
 import ReviewsView, { ReviewsInputComponent } from "./ReviewsView";
 
-function Modal({ modalProps, modalKey, discordId, name, type }: { modalProps: any; modalKey: string, discordId: string; name: string; type: ReviewType; }) {
+function Modal({
+    modalProps,
+    modalKey,
+    discordId,
+    name,
+    type,
+}: {
+    modalProps: any;
+    modalKey: string;
+    discordId: string;
+    name: string;
+    type: ReviewType;
+}) {
     const [data, setData] = useState<Response>();
     const [signal, refetch] = useForceUpdater(true);
     const [page, setPage] = useState(1);
@@ -36,13 +56,18 @@ function Modal({ modalProps, modalKey, discordId, name, type }: { modalProps: an
     const ref = useRef<HTMLDivElement>(null);
 
     const reviewCount = data?.reviewCount;
-    const ownReview = data?.reviews.find(r => r.sender.discordID === Auth.user?.discordID);
+    const ownReview = data?.reviews.find(
+        (r) => r.sender.discordID === Auth.user?.discordID,
+    );
 
     return (
         <ErrorBoundary>
             <ModalRoot {...modalProps} size={ModalSize.MEDIUM}>
                 <ModalHeader>
-                    <Text variant="heading-lg/semibold" className={cl("modal-header")}>
+                    <Text
+                        variant="heading-lg/semibold"
+                        className={cl("modal-header")}
+                    >
                         {name}'s Reviews
                         {!!reviewCount && <span> ({reviewCount} Reviews)</span>}
                     </Text>
@@ -57,7 +82,12 @@ function Modal({ modalProps, modalKey, discordId, name, type }: { modalProps: an
                             page={page}
                             refetchSignal={signal}
                             onFetchReviews={setData}
-                            scrollToTop={() => ref.current?.scrollTo({ top: 0, behavior: "smooth" })}
+                            scrollToTop={() =>
+                                ref.current?.scrollTo({
+                                    top: 0,
+                                    behavior: "smooth",
+                                })
+                            }
                             hideOwnReview
                             type={type}
                         />
@@ -97,16 +127,23 @@ function Modal({ modalProps, modalKey, discordId, name, type }: { modalProps: an
     );
 }
 
-export function openReviewsModal(discordId: string, name: string, type: ReviewType) {
+export function openReviewsModal(
+    discordId: string,
+    name: string,
+    type: ReviewType,
+) {
     const modalKey = "vc-rdb-modal-" + Date.now();
 
-    openModal(props => (
-        <Modal
-            modalKey={modalKey}
-            modalProps={props}
-            discordId={discordId}
-            name={name}
-            type={type}
-        />
-    ), { modalKey });
+    openModal(
+        (props) => (
+            <Modal
+                modalKey={modalKey}
+                modalProps={props}
+                discordId={discordId}
+                name={name}
+                type={type}
+            />
+        ),
+        { modalKey },
+    );
 }

@@ -18,7 +18,11 @@ interface ActivityTimestamps {
     end?: string;
 }
 
-const ActivityTimeBar = findComponentByCodeLazy<ActivityTimestamps>(".Millis.HALF_SECOND", ".bar", ".progress");
+const ActivityTimeBar = findComponentByCodeLazy<ActivityTimestamps>(
+    ".Millis.HALF_SECOND",
+    ".bar",
+    ".progress",
+);
 
 export const settings = definePluginSettings({
     hideActivityDetailText: {
@@ -30,12 +34,13 @@ export const settings = definePluginSettings({
         type: OptionType.BOOLEAN,
         description: "Hide the timer badges next to the activity",
         default: true,
-    }
+    },
 });
 
 export default definePlugin({
     name: "TimeBarAllActivities",
-    description: "Adds the Spotify time bar to all activities if they have start and end timestamps",
+    description:
+        "Adds the Spotify time bar to all activities if they have start and end timestamps",
     authors: [Devs.fawn, Devs.niko],
     settings,
     patches: [
@@ -45,32 +50,43 @@ export default definePlugin({
                 // Insert Spotify time bar component
                 {
                     match: /\(0,.{0,30}activity:(\i),className:\i\.badges\}\)/g,
-                    replace: "$&,$self.getTimeBar($1)"
+                    replace: "$&,$self.getTimeBar($1)",
                 },
                 // Hide the large title on listening activities, to make them look more like Spotify (also visible from hovering over the large icon)
                 {
                     match: /(\i).type===(\i\.\i)\.WATCHING/,
-                    replace: "($self.settings.store.hideActivityDetailText&&$self.isActivityTimestamped($1)&&$1.type===$2.LISTENING)||$&"
-                }
-            ]
+                    replace:
+                        "($self.settings.store.hideActivityDetailText&&$self.isActivityTimestamped($1)&&$1.type===$2.LISTENING)||$&",
+                },
+            ],
         },
         // Hide the "badge" timers that count the time since the activity starts
         {
             find: ".TvIcon).otherwise",
             replacement: {
                 match: /null!==\(\i=null===\(\i=(\i)\.timestamps\).{0,50}created_at/,
-                replace: "($self.settings.store.hideActivityTimerBadges&&$self.isActivityTimestamped($1))?null:$&"
-            }
-        }
+                replace:
+                    "($self.settings.store.hideActivityTimerBadges&&$self.isActivityTimestamped($1))?null:$&",
+            },
+        },
     ],
 
     isActivityTimestamped(activity: Activity) {
-        return activity.timestamps != null && activity.timestamps.start != null && activity.timestamps.end != null;
+        return (
+            activity.timestamps != null &&
+            activity.timestamps.start != null &&
+            activity.timestamps.end != null
+        );
     },
 
     getTimeBar(activity: Activity) {
         if (this.isActivityTimestamped(activity)) {
-            return <ActivityTimeBar start={activity.timestamps!.start} end={activity.timestamps!.end} />;
+            return (
+                <ActivityTimeBar
+                    start={activity.timestamps!.start}
+                    end={activity.timestamps!.end}
+                />
+            );
         }
-    }
+    },
 });

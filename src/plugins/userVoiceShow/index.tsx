@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { definePluginSettings } from "@api/Settings";
 import ErrorBoundary from "@components/ErrorBoundary";
@@ -36,9 +36,10 @@ const settings = definePluginSettings({
     },
     showVoiceChannelSectionHeader: {
         type: OptionType.BOOLEAN,
-        description: 'Whether to show "IN A VOICE CHANNEL" above the join button',
+        description:
+            'Whether to show "IN A VOICE CHANNEL" above the join button',
         default: true,
-    }
+    },
 });
 
 interface UserProps {
@@ -69,13 +70,13 @@ const VoiceChannelField = ErrorBoundary.wrap(({ user }: UserProps) => {
 
 export default definePlugin({
     name: "UserVoiceShow",
-    description: "Shows whether a User is currently in a voice channel somewhere in their profile",
+    description:
+        "Shows whether a User is currently in a voice channel somewhere in their profile",
     authors: [Devs.LordElias],
     settings,
 
     patchModal({ user }: UserProps) {
-        if (!settings.store.showInUserProfileModal)
-            return null;
+        if (!settings.store.showInUserProfileModal) return null;
 
         return (
             <div className="vc-uvs-modal-margin">

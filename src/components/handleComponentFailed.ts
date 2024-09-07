@@ -14,14 +14,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { maybePromptToUpdate } from "@utils/updater";
 
 export function handleComponentFailed() {
     maybePromptToUpdate(
         "Uh Oh! Failed to render this Page." +
-        " However, there is an update available that might fix it." +
-        " Would you like to update and restart now?"
+            " However, there is an update available that might fix it." +
+            " Would you like to update and restart now?",
     );
 }

@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { app, protocol, session } from "electron";
 import { join } from "path";
@@ -58,13 +58,26 @@ if (IS_VESKTOP || !IS_VANILLA) {
         try {
             if (RendererSettings.store.enableReactDevtools)
                 installExt("fmkadmapgofadopljbjfkapdkoienihi")
-                    .then(() => console.info("[Vencord] Installed React Developer Tools"))
-                    .catch(err => console.error("[Vencord] Failed to install React Developer Tools", err));
-        } catch { }
+                    .then(() =>
+                        console.info(
+                            "[Vencord] Installed React Developer Tools",
+                        ),
+                    )
+                    .catch((err) =>
+                        console.error(
+                            "[Vencord] Failed to install React Developer Tools",
+                            err,
+                        ),
+                    );
+        } catch {}
 
-
-        const findHeader = (headers: Record<string, string[]>, headerName: Lowercase<string>) => {
-            return Object.keys(headers).find(h => h.toLowerCase() === headerName);
+        const findHeader = (
+            headers: Record<string, string[]>,
+            headerName: Lowercase<string>,
+        ) => {
+            return Object.keys(headers).find(
+                (h) => h.toLowerCase() === headerName,
+            );
         };
 
         // Remove CSP
@@ -72,9 +85,14 @@ if (IS_VESKTOP || !IS_VANILLA) {
 
         const parsePolicy = (policy: string): PolicyResult => {
             const result: PolicyResult = {};
-            policy.split(";").forEach(directive => {
-                const [directiveKey, ...directiveValue] = directive.trim().split(/\s+/g);
-                if (directiveKey && !Object.prototype.hasOwnProperty.call(result, directiveKey)) {
+            policy.split(";").forEach((directive) => {
+                const [directiveKey, ...directiveValue] = directive
+                    .trim()
+                    .split(/\s+/g);
+                if (
+                    directiveKey &&
+                    !Object.prototype.hasOwnProperty.call(result, directiveKey)
+                ) {
                     result[directiveKey] = directiveValue;
                 }
             });
@@ -84,7 +102,7 @@ if (IS_VESKTOP || !IS_VANILLA) {
         const stringifyPolicy = (policy: PolicyResult): string =>
             Object.entries(policy)
                 .filter(([, values]) => values?.length)
-                .map(directive => directive.flat().join(" "))
+                .map((directive) => directive.flat().join(" "))
                 .join("; ");
 
         const patchCsp = (headers: Record<string, string[]>) => {
@@ -93,40 +111,60 @@ if (IS_VESKTOP || !IS_VANILLA) {
             if (header) {
                 const csp = parsePolicy(headers[header][0]);
 
-                for (const directive of ["style-src", "connect-src", "img-src", "font-src", "media-src", "worker-src"]) {
+                for (const directive of [
+                    "style-src",
+                    "connect-src",
+                    "img-src",
+                    "font-src",
+                    "media-src",
+                    "worker-src",
+                ]) {
                     csp[directive] ??= [];
-                    csp[directive].push("*", "blob:", "data:", "vencord:", "'unsafe-inline'");
+                    csp[directive].push(
+                        "*",
+                        "blob:",
+                        "data:",
+                        "vencord:",
+                        "'unsafe-inline'",
+                    );
                 }
 
                 // TODO: Restrict this to only imported packages with fixed version.
                 // Perhaps auto generate with esbuild
                 csp["script-src"] ??= [];
-                csp["script-src"].push("'unsafe-eval'", "https://unpkg.com", "https://cdnjs.cloudflare.com");
+                csp["script-src"].push(
+                    "'unsafe-eval'",
+                    "https://unpkg.com",
+                    "https://cdnjs.cloudflare.com",
+                );
                 headers[header] = [stringifyPolicy(csp)];
             }
         };
 
-        session.defaultSession.webRequest.onHeadersReceived(({ responseHeaders, resourceType }, cb) => {
-            if (responseHeaders) {
-                if (resourceType === "mainFrame")
-                    patchCsp(responseHeaders);
+        session.defaultSession.webRequest.onHeadersReceived(
+            ({ responseHeaders, resourceType }, cb) => {
+                if (responseHeaders) {
+                    if (resourceType === "mainFrame") patchCsp(responseHeaders);
 
-                // Fix hosts that don't properly set the css content type, such as
-                // raw.githubusercontent.com
-                if (resourceType === "stylesheet") {
-                    const header = findHeader(responseHeaders, "content-type");
-                    if (header)
-                        responseHeaders[header] = ["text/css"];
+                    // Fix hosts that don't properly set the css content type, such as
+                    // raw.githubusercontent.com
+                    if (resourceType === "stylesheet") {
+                        const header = findHeader(
+                            responseHeaders,
+                            "content-type",
+                        );
+                        if (header) responseHeaders[header] = ["text/css"];
+                    }
                 }
-            }
 
-            cb({ cancel: false, responseHeaders });
-        });
+                cb({ cancel: false, responseHeaders });
+            },
+        );
 
         // assign a noop to onHeadersReceived to prevent other mods from adding their own incompatible ones.
         // For instance, OpenAsar adds their own that doesn't fix content-type for stylesheets which makes it
         // impossible to load css from github raw despite our fix above
-        session.defaultSession.webRequest.onHeadersReceived = () => { };
+        session.defaultSession.webRequest.onHeadersReceived = () => {};
     });
 }
 

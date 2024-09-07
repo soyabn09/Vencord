@@ -10,33 +10,44 @@ import { Devs } from "@utils/constants";
 import { Logger } from "@utils/Logger";
 import definePlugin, { OptionType } from "@utils/types";
 import { waitFor } from "@webpack";
-import { ComponentDispatch, FocusLock, i18n, Menu, useEffect, useRef } from "@webpack/common";
+import {
+    ComponentDispatch,
+    FocusLock,
+    i18n,
+    Menu,
+    useEffect,
+    useRef,
+} from "@webpack/common";
 import type { HTMLAttributes, ReactElement } from "react";
 
-type SettingsEntry = { section: string, label: string; };
+type SettingsEntry = { section: string; label: string };
 
 const cl = classNameFactory("");
 let Classes: Record<string, string>;
-waitFor(["animating", "baseLayer", "bg", "layer", "layers"], m => Classes = m);
+waitFor(
+    ["animating", "baseLayer", "bg", "layer", "layers"],
+    (m) => (Classes = m),
+);
 
 const settings = definePluginSettings({
     disableFade: {
         description: "Disable the crossfade animation",
         type: OptionType.BOOLEAN,
         default: true,
-        restartNeeded: true
+        restartNeeded: true,
     },
     organizeMenu: {
         description: "Organizes the settings cog context menu into categories",
         type: OptionType.BOOLEAN,
-        default: true
+        default: true,
     },
     eagerLoad: {
-        description: "Removes the loading delay when opening the menu for the first time",
+        description:
+            "Removes the loading delay when opening the menu for the first time",
         type: OptionType.BOOLEAN,
         default: true,
-        restartNeeded: true
-    }
+        restartNeeded: true,
+    },
 });
 
 interface LayerProps extends HTMLAttributes<HTMLDivElement> {
@@ -48,10 +59,13 @@ function Layer({ mode, baseLayer = false, ...props }: LayerProps) {
     const hidden = mode === "HIDDEN";
     const containerRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => () => {
-        ComponentDispatch.dispatch("LAYER_POP_START");
-        ComponentDispatch.dispatch("LAYER_POP_COMPLETE");
-    }, []);
+    useEffect(
+        () => () => {
+            ComponentDispatch.dispatch("LAYER_POP_START");
+            ComponentDispatch.dispatch("LAYER_POP_COMPLETE");
+        },
+        [],
+    );
 
     const node = (
         <div
@@ -60,16 +74,18 @@ function Layer({ mode, baseLayer = false, ...props }: LayerProps) {
             className={cl({
                 [Classes.layer]: true,
                 [Classes.baseLayer]: baseLayer,
-                "stop-animations": hidden
+                "stop-animations": hidden,
             })}
             style={{ opacity: hidden ? 0 : undefined }}
             {...props}
         />
     );
 
-    return baseLayer
-        ? node
-        : <FocusLock containerRef={containerRef}>{node}</FocusLock>;
+    return baseLayer ? (
+        node
+    ) : (
+        <FocusLock containerRef={containerRef}>{node}</FocusLock>
+    );
 }
 
 export default definePlugin({
@@ -82,47 +98,52 @@ export default definePlugin({
         {
             find: "this.renderArtisanalHack()",
             replacement: [
-                { // Fade in on layer
+                {
+                    // Fade in on layer
                     match: /(?<=\((\i),"contextType",\i\.\i\);)/,
                     replace: "$1=$self.Layer;",
-                    predicate: () => settings.store.disableFade
+                    predicate: () => settings.store.disableFade,
                 },
-                { // Lazy-load contents
+                {
+                    // Lazy-load contents
                     match: /createPromise:\(\)=>([^:}]*?),webpackId:"?\d+"?,name:(?!="CollectiblesShop")"[^"]+"/g,
                     replace: "$&,_:$1",
-                    predicate: () => settings.store.eagerLoad
-                }
-            ]
+                    predicate: () => settings.store.eagerLoad,
+                },
+            ],
         },
-        { // For some reason standardSidebarView also has a small fade-in
+        {
+            // For some reason standardSidebarView also has a small fade-in
             find: 'minimal:"contentColumnMinimal"',
             replacement: [
                 {
                     match: /\(0,\i\.useTransition\)\((\i)/,
-                    replace: "(_cb=>_cb(void 0,$1))||$&"
+                    replace: "(_cb=>_cb(void 0,$1))||$&",
                 },
                 {
                     match: /\i\.animated\.div/,
-                    replace: '"div"'
-                }
+                    replace: '"div"',
+                },
             ],
-            predicate: () => settings.store.disableFade
+            predicate: () => settings.store.disableFade,
         },
-        { // Load menu TOC eagerly
+        {
+            // Load menu TOC eagerly
             find: "Messages.USER_SETTINGS_WITH_BUILD_OVERRIDE.format",
             replacement: {
                 match: /(\i)\(this,"handleOpenSettingsContextMenu",.{0,100}?null!=\i&&.{0,100}?(await Promise\.all[^};]*?\)\)).*?,(?=\1\(this)/,
-                replace: "$&(async ()=>$2)(),"
+                replace: "$&(async ()=>$2)(),",
             },
-            predicate: () => settings.store.eagerLoad
+            predicate: () => settings.store.eagerLoad,
         },
-        { // Settings cog context menu
+        {
+            // Settings cog context menu
             find: "Messages.USER_SETTINGS_ACTIONS_MENU_LABEL",
             replacement: {
                 match: /(EXPERIMENTS:.+?)(\(0,\i.\i\)\(\))(?=\.filter\(\i=>\{let\{section:\i\}=)/,
-                replace: "$1$self.wrapMenu($2)"
-            }
-        }
+                replace: "$1$self.wrapMenu($2)",
+            },
+        },
     ],
 
     // This is the very outer layer of the entire ui, so we can't wrap this in an ErrorBoundary
@@ -133,7 +154,9 @@ export default definePlugin({
     // not in children
     Layer(props: LayerProps) {
         if (!FocusLock || !ComponentDispatch || !Classes) {
-            new Logger("BetterSettings").error("Failed to find some components");
+            new Logger("BetterSettings").error(
+                "Failed to find some components",
+            );
             return props.children;
         }
 
@@ -143,7 +166,9 @@ export default definePlugin({
     wrapMenu(list: SettingsEntry[]) {
         if (!settings.store.organizeMenu) return list;
 
-        const items = [{ label: null as string | null, items: [] as SettingsEntry[] }];
+        const items = [
+            { label: null as string | null, items: [] as SettingsEntry[] },
+        ];
 
         for (const item of list) {
             if (item.section === "HEADER") {
@@ -164,7 +189,7 @@ export default definePlugin({
             },
             map(render: (item: SettingsEntry) => ReactElement) {
                 return items
-                    .filter(a => a.items.length > 0)
+                    .filter((a) => a.items.length > 0)
                     .map(({ label, items }) => {
                         const children = items.map(render);
                         if (label) {
@@ -174,12 +199,13 @@ export default definePlugin({
                                     label={label}
                                     children={children}
                                     action={children[0].props.action}
-                                />);
+                                />
+                            );
                         } else {
                             return children;
                         }
                     });
-            }
+            },
         };
-    }
+    },
 });

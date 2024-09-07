@@ -14,37 +14,37 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 
-
 export default definePlugin({
     name: "NoUnblockToJump",
-    description: "Allows you to jump to messages of blocked users without unblocking them",
+    description:
+        "Allows you to jump to messages of blocked users without unblocking them",
     authors: [Devs.dzshn],
     patches: [
         {
             find: '.id,"Search Results"',
             replacement: {
                 match: /if\(.{1,10}\)(.{1,10}\.show\({.{1,50}UNBLOCK_TO_JUMP_TITLE)/,
-                replace: "if(false)$1"
-            }
+                replace: "if(false)$1",
+            },
         },
         {
             find: "renderJumpButton()",
             replacement: {
                 match: /if\(.{1,10}\)(.{1,10}\.show\({.{1,50}UNBLOCK_TO_JUMP_TITLE)/,
-                replace: "if(false)$1"
-            }
+                replace: "if(false)$1",
+            },
         },
         {
             find: "flash:!0,returnMessageId",
             replacement: {
                 match: /.\?(.{1,10}\.show\({.{1,50}UNBLOCK_TO_JUMP_TITLE)/,
-                replace: "false?$1"
-            }
-        }
-    ]
+                replace: "false?$1",
+            },
+        },
+    ],
 });

@@ -17,7 +17,7 @@ export function Grid(props: Props & JSX.IntrinsicElements["div"]) {
         display: props.inline ? "inline-grid" : "grid",
         gridTemplateColumns: `repeat(${props.columns}, 1fr)`,
         gap: props.gap,
-        ...props.style
+        ...props.style,
     };
 
     return (

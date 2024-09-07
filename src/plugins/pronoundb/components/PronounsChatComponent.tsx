@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import ErrorBoundary from "@components/ErrorBoundary";
 import { classes } from "@utils/misc";
@@ -30,48 +30,65 @@ const styles: Record<string, string> = findByPropsLazy("timestampInline");
 const AUTO_MODERATION_ACTION = 24;
 
 function shouldShow(message: Message): boolean {
-    if (!settings.store.showInMessages)
+    if (!settings.store.showInMessages) return false;
+    if (
+        message.author.bot ||
+        message.author.system ||
+        message.type === AUTO_MODERATION_ACTION
+    )
         return false;
-    if (message.author.bot || message.author.system || message.type === AUTO_MODERATION_ACTION)
-        return false;
-    if (!settings.store.showSelf && message.author.id === UserStore.getCurrentUser().id)
+    if (
+        !settings.store.showSelf &&
+        message.author.id === UserStore.getCurrentUser().id
+    )
         return false;
 
     return true;
 }
 
-export const PronounsChatComponentWrapper = ErrorBoundary.wrap(({ message }: { message: Message; }) => {
-    return shouldShow(message)
-        ? <PronounsChatComponent message={message} />
-        : null;
-}, { noop: true });
+export const PronounsChatComponentWrapper = ErrorBoundary.wrap(
+    ({ message }: { message: Message }) => {
+        return shouldShow(message) ? (
+            <PronounsChatComponent message={message} />
+        ) : null;
+    },
+    { noop: true },
+);
 
-export const CompactPronounsChatComponentWrapper = ErrorBoundary.wrap(({ message }: { message: Message; }) => {
-    return shouldShow(message)
-        ? <CompactPronounsChatComponent message={message} />
-        : null;
-}, { noop: true });
+export const CompactPronounsChatComponentWrapper = ErrorBoundary.wrap(
+    ({ message }: { message: Message }) => {
+        return shouldShow(message) ? (
+            <CompactPronounsChatComponent message={message} />
+        ) : null;
+    },
+    { noop: true },
+);
 
-function PronounsChatComponent({ message }: { message: Message; }) {
+function PronounsChatComponent({ message }: { message: Message }) {
     const [result] = useFormattedPronouns(message.author.id);
 
-    return result
-        ? (
-            <span
-                className={classes(styles.timestampInline, styles.timestamp)}
-            >• {result}</span>
-        )
-        : null;
+    return result ? (
+        <span className={classes(styles.timestampInline, styles.timestamp)}>
+            • {result}
+        </span>
+    ) : null;
 }
 
-export const CompactPronounsChatComponent = ErrorBoundary.wrap(({ message }: { message: Message; }) => {
-    const [result] = useFormattedPronouns(message.author.id);
+export const CompactPronounsChatComponent = ErrorBoundary.wrap(
+    ({ message }: { message: Message }) => {
+        const [result] = useFormattedPronouns(message.author.id);
 
-    return result
-        ? (
+        return result ? (
             <span
-                className={classes(styles.timestampInline, styles.timestamp, "vc-pronoundb-compact")}
-            >• {result}</span>
-        )
-        : null;
-}, { noop: true });
+                className={classes(
+                    styles.timestampInline,
+                    styles.timestamp,
+                    "vc-pronoundb-compact",
+                )}
+            >
+                • {result}
+            </span>
+        ) : null;
+    },
+    { noop: true },
+);

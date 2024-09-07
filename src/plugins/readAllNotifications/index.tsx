@@ -14,16 +14,27 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import "./style.css";
 
-import { addServerListElement, removeServerListElement, ServerListRenderPosition } from "@api/ServerList";
+import {
+    addServerListElement,
+    removeServerListElement,
+    ServerListRenderPosition,
+} from "@api/ServerList";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 import { findStoreLazy } from "@webpack";
-import { Button, FluxDispatcher, GuildChannelStore, GuildStore, React, ReadStateStore } from "@webpack/common";
+import {
+    Button,
+    FluxDispatcher,
+    GuildChannelStore,
+    GuildStore,
+    React,
+    ReadStateStore,
+} from "@webpack/common";
 import { Channel } from "discord-types/general";
 
 interface ThreadJoined {
@@ -38,25 +49,31 @@ interface ActiveJoinedThreadsStore {
     getActiveJoinedThreadsForGuild(guildId: string): ThreadsJoinedByParent;
 }
 
-const ActiveJoinedThreadsStore: ActiveJoinedThreadsStore = findStoreLazy("ActiveJoinedThreadsStore");
+const ActiveJoinedThreadsStore: ActiveJoinedThreadsStore = findStoreLazy(
+    "ActiveJoinedThreadsStore",
+);
 
 function onClick() {
     const channels: Array<any> = [];
 
-    Object.values(GuildStore.getGuilds()).forEach(guild => {
-        GuildChannelStore.getChannels(guild.id).SELECTABLE // Array<{ channel, comparator }>
+    Object.values(GuildStore.getGuilds()).forEach((guild) => {
+        GuildChannelStore.getChannels(guild.id)
+            .SELECTABLE // Array<{ channel, comparator }>
             .concat(GuildChannelStore.getChannels(guild.id).VOCAL) // Array<{ channel, comparator }>
             .concat(
-                Object.values(ActiveJoinedThreadsStore.getActiveJoinedThreadsForGuild(guild.id))
-                    .flatMap(threadChannels => Object.values(threadChannels))
+                Object.values(
+                    ActiveJoinedThreadsStore.getActiveJoinedThreadsForGuild(
+                        guild.id,
+                    ),
+                ).flatMap((threadChannels) => Object.values(threadChannels)),
             )
-            .forEach((c: { channel: { id: string; }; }) => {
+            .forEach((c: { channel: { id: string } }) => {
                 if (!ReadStateStore.hasUnread(c.channel.id)) return;
 
                 channels.push({
                     channelId: c.channel.id,
                     messageId: ReadStateStore.lastMessageId(c.channel.id),
-                    readStateType: 0
+                    readStateType: 0,
                 });
             });
     });
@@ -64,7 +81,7 @@ function onClick() {
     FluxDispatcher.dispatch({
         type: "BULK_ACK",
         context: "APP",
-        channels: channels
+        channels: channels,
     });
 }
 
@@ -88,10 +105,16 @@ export default definePlugin({
     renderReadAllButton: ErrorBoundary.wrap(ReadAllButton, { noop: true }),
 
     start() {
-        addServerListElement(ServerListRenderPosition.Above, this.renderReadAllButton);
+        addServerListElement(
+            ServerListRenderPosition.Above,
+            this.renderReadAllButton,
+        );
     },
 
     stop() {
-        removeServerListElement(ServerListRenderPosition.Above, this.renderReadAllButton);
-    }
+        removeServerListElement(
+            ServerListRenderPosition.Above,
+            this.renderReadAllButton,
+        );
+    },
 });

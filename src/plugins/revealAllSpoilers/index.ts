@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
@@ -25,7 +25,8 @@ const MessagesClasses = findByPropsLazy("messagesWrapper");
 
 export default definePlugin({
     name: "RevealAllSpoilers",
-    description: "Reveal all spoilers in a message by Ctrl-clicking a spoiler, or in the chat with Ctrl+Shift-click",
+    description:
+        "Reveal all spoilers in a message by Ctrl-clicking a spoiler, or in the chat with Ctrl+Shift-click",
     authors: [Devs.whqwert],
 
     patches: [
@@ -33,15 +34,17 @@ export default definePlugin({
             find: ".removeObscurity,",
             replacement: {
                 match: /(?<="removeObscurity",(\i)=>{)/,
-                replace: (_, event) => `$self.reveal(${event});`
-            }
-        }
+                replace: (_, event) => `$self.reveal(${event});`,
+            },
+        },
     ],
 
     reveal(event: MouseEvent) {
         const { ctrlKey, shiftKey, target } = event;
 
-        if (!ctrlKey) { return; }
+        if (!ctrlKey) {
+            return;
+        }
 
         const { spoilerContent, hidden } = SpoilerClasses;
         const { messagesWrapper } = MessagesClasses;
@@ -50,9 +53,10 @@ export default definePlugin({
             ? document.querySelector(`div.${messagesWrapper}`)
             : (target as HTMLSpanElement).parentElement;
 
-        for (const spoiler of parent!.querySelectorAll(`span.${spoilerContent}.${hidden}`)) {
+        for (const spoiler of parent!.querySelectorAll(
+            `span.${spoilerContent}.${hidden}`,
+        )) {
             (spoiler as HTMLSpanElement).click();
         }
-    }
-
+    },
 });

@@ -14,20 +14,22 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { IShikiTheme } from "@vap/shiki";
 
 export const SHIKI_REPO = "shikijs/shiki";
 export const SHIKI_REPO_COMMIT = "0b28ad8ccfbf2615f2d9d38ea8255416b8ac3043";
-export const shikiRepoTheme = (name: string) => `https://raw.githubusercontent.com/${SHIKI_REPO}/${SHIKI_REPO_COMMIT}/packages/shiki/themes/${name}.json`;
+export const shikiRepoTheme = (name: string) =>
+    `https://raw.githubusercontent.com/${SHIKI_REPO}/${SHIKI_REPO_COMMIT}/packages/shiki/themes/${name}.json`;
 
 export const themes = {
     // Default
     DarkPlus: shikiRepoTheme("dark-plus"),
 
     // Dev Choices
-    MaterialCandy: "https://raw.githubusercontent.com/millsp/material-candy/master/material-candy.json",
+    MaterialCandy:
+        "https://raw.githubusercontent.com/millsp/material-candy/master/material-candy.json",
 
     // More from Shiki repo
     DraculaSoft: shikiRepoTheme("dracula-soft"),
@@ -63,5 +65,5 @@ export const themeCache = new Map<string, IShikiTheme>();
 
 export const getTheme = (url: string): Promise<IShikiTheme> => {
     if (themeCache.has(url)) return Promise.resolve(themeCache.get(url)!);
-    return fetch(url).then(res => res.json());
+    return fetch(url).then((res) => res.json());
 };

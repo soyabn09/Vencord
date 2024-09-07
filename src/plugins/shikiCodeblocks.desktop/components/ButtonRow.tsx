@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Clipboard } from "@webpack/common";
 
@@ -38,7 +38,7 @@ export function ButtonRow({ content, theme }: ButtonRowProps) {
                     backgroundColor: theme.accentBgColor,
                     color: theme.accentFgColor,
                 }}
-            />
+            />,
         );
     }
 

@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import ErrorBoundary from "@components/ErrorBoundary";
 import { useAwaiter, useIntersection } from "@utils/react";
@@ -57,11 +57,10 @@ export const Highlighter = ({
     isPreview,
     tempSettings,
 }: HighlighterProps) => {
-    const {
-        tryHljs,
-        useDevIcon,
-        bgOpacity,
-    } = useShikiSettings(["tryHljs", "useDevIcon", "bgOpacity"], tempSettings);
+    const { tryHljs, useDevIcon, bgOpacity } = useShikiSettings(
+        ["tryHljs", "useDevIcon", "bgOpacity"],
+        tempSettings,
+    );
     const { id: currentThemeId, theme: currentTheme } = useTheme();
 
     const shikiLang = lang ? resolveLang(lang) : null;
@@ -69,25 +68,31 @@ export const Highlighter = ({
 
     const [rootRef, isIntersecting] = useIntersection(true);
 
-    const [tokens] = useAwaiter(async () => {
-        if (!shikiLang || useHljs || !isIntersecting) return null;
-        return await shiki.tokenizeCode(content, lang!);
-    }, {
-        fallbackValue: null,
-        deps: [lang, content, currentThemeId, isIntersecting],
-    });
+    const [tokens] = useAwaiter(
+        async () => {
+            if (!shikiLang || useHljs || !isIntersecting) return null;
+            return await shiki.tokenizeCode(content, lang!);
+        },
+        {
+            fallbackValue: null,
+            deps: [lang, content, currentThemeId, isIntersecting],
+        },
+    );
 
     const themeBase: ThemeBase = {
         plainColor: currentTheme?.fg || "var(--text-normal)",
         accentBgColor:
-            currentTheme?.colors?.["statusBar.background"] || (useHljs ? "#7289da" : "#007BC8"),
+            currentTheme?.colors?.["statusBar.background"] ||
+            (useHljs ? "#7289da" : "#007BC8"),
         accentFgColor: currentTheme?.colors?.["statusBar.foreground"] || "#FFF",
         backgroundColor:
-            currentTheme?.colors?.["editor.background"] || "var(--background-secondary)",
+            currentTheme?.colors?.["editor.background"] ||
+            "var(--background-secondary)",
     };
 
     let langName;
-    if (lang) langName = useHljs ? hljs?.getLanguage?.(lang)?.name : shikiLang?.name;
+    if (lang)
+        langName = useHljs ? hljs?.getLanguage?.(lang)?.name : shikiLang?.name;
 
     return (
         <div
@@ -97,8 +102,8 @@ export const Highlighter = ({
                 backgroundColor: useHljs
                     ? themeBase.backgroundColor
                     : `rgba(${hex2Rgb(themeBase.backgroundColor)
-                        .concat(bgOpacity / 100)
-                        .join(", ")})`,
+                          .concat(bgOpacity / 100)
+                          .join(", ")})`,
                 color: themeBase.plainColor,
             }}
         >
@@ -115,12 +120,10 @@ export const Highlighter = ({
                     content={content}
                     tokens={tokens}
                 />
-                {!isPreview && <ButtonRow
-                    content={content}
-                    theme={themeBase}
-                />}
+                {!isPreview && (
+                    <ButtonRow content={content} theme={themeBase} />
+                )}
             </code>
         </div>
     );
 };
-

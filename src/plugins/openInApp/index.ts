@@ -14,11 +14,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
-import definePlugin, { OptionType, PluginNative, SettingsDefinition } from "@utils/types";
+import definePlugin, {
+    OptionType,
+    PluginNative,
+    SettingsDefinition,
+} from "@utils/types";
 import { showToast, Toasts } from "@webpack/common";
 import type { MouseEvent } from "react";
 
@@ -37,14 +41,15 @@ const UrlReplacementRules: Record<string, URLReplacementRule> = {
         replace: (_, type, id) => `spotify://${type}/${id}`,
         description: "Open Spotify links in the Spotify app",
         shortlinkMatch: /^https:\/\/spotify\.link\/.+$/,
-        accountViewReplace: userId => `spotify:user:${userId}`,
+        accountViewReplace: (userId) => `spotify:user:${userId}`,
     },
     steam: {
         match: /^https:\/\/(steamcommunity\.com|(?:help|store)\.steampowered\.com)\/.+$/,
-        replace: match => `steam://openurl/${match}`,
+        replace: (match) => `steam://openurl/${match}`,
         description: "Open Steam links in the Steam app",
         shortlinkMatch: /^https:\/\/s.team\/.+$/,
-        accountViewReplace: userId => `steam://openurl/https://steamcommunity.com/profiles/${userId}`,
+        accountViewReplace: (userId) =>
+            `steam://openurl/https://steamcommunity.com/profiles/${userId}`,
     },
     epic: {
         match: /^https:\/\/store\.epicgames\.com\/(.+)$/,
@@ -58,8 +63,11 @@ const UrlReplacementRules: Record<string, URLReplacementRule> = {
     },
     itunes: {
         match: /^https:\/\/music\.apple\.com\/([a-z]{2}\/)?(album|artist|playlist|song|curator)\/([^/?#]+)\/?([^/?#]+)?(?:\?.*)?(?:#.*)?$/,
-        replace: (_, lang, type, name, id) => id ? `itunes://music.apple.com/us/${type}/${name}/${id}` : `itunes://music.apple.com/us/${type}/${name}`,
-        description: "Open Apple Music links in the iTunes app"
+        replace: (_, lang, type, name, id) =>
+            id
+                ? `itunes://music.apple.com/us/${type}/${name}/${id}`
+                : `itunes://music.apple.com/us/${type}/${name}`,
+        description: "Open Apple Music links in the iTunes app",
     },
 };
 
@@ -71,11 +79,12 @@ const pluginSettings = definePluginSettings(
             default: true,
         };
         return acc;
-    }, {} as SettingsDefinition)
+    }, {} as SettingsDefinition),
 );
 
-
-const Native = VencordNative.pluginHelpers.OpenInApp as PluginNative<typeof import("./native")>;
+const Native = VencordNative.pluginHelpers.OpenInApp as PluginNative<
+    typeof import("./native")
+>;
 
 export default definePlugin({
     name: "OpenInApp",
@@ -88,28 +97,31 @@ export default definePlugin({
             find: "trackAnnouncementMessageLinkClicked({",
             replacement: {
                 match: /function (\i\(\i,\i\)\{)(?=.{0,100}trusted:)/,
-                replace: "async function $1 if(await $self.handleLink(...arguments)) return;"
-            }
+                replace:
+                    "async function $1 if(await $self.handleLink(...arguments)) return;",
+            },
         },
         // Make Spotify profile activity links open in app on web
         {
             find: "WEB_OPEN(",
-            predicate: () => !IS_DISCORD_DESKTOP && pluginSettings.store.spotify,
+            predicate: () =>
+                !IS_DISCORD_DESKTOP && pluginSettings.store.spotify,
             replacement: {
                 match: /\i\.\i\.isProtocolRegistered\(\)(.{0,100})window.open/g,
-                replace: "true$1VencordNative.native.openExternal"
-            }
+                replace: "true$1VencordNative.native.openExternal",
+            },
         },
         {
             find: ".CONNECTED_ACCOUNT_VIEWED,",
             replacement: {
                 match: /(?<=href:\i,onClick:(\i)=>\{)(?=.{0,10}\i=(\i)\.type,.{0,100}CONNECTED_ACCOUNT_VIEWED)/,
-                replace: "if($self.handleAccountView($1,$2.type,$2.id)) return;"
-            }
-        }
+                replace:
+                    "if($self.handleAccountView($1,$2.type,$2.id)) return;",
+            },
+        },
     ],
 
-    async handleLink(data: { href: string; }, event?: MouseEvent) {
+    async handleLink(data: { href: string }, event?: MouseEvent) {
         if (!data) return false;
 
         let url = data.href;
@@ -150,5 +162,5 @@ export default definePlugin({
             e.preventDefault();
             return true;
         }
-    }
+    },
 });

@@ -14,13 +14,14 @@ const settings = definePluginSettings({
         description: "Notification volume",
         markers: [0, 25, 50, 75, 100],
         default: 100,
-        stickToMarkers: false
-    }
+        stickToMarkers: false,
+    },
 });
 
 export default definePlugin({
     name: "NotificationVolume",
-    description: "Save your ears and set a separate volume for notifications and in-app sounds",
+    description:
+        "Save your ears and set a separate volume for notifications and in-app sounds",
     authors: [Devs.philipbry],
     settings,
     patches: [
@@ -28,7 +29,7 @@ export default definePlugin({
             find: "_ensureAudio(){",
             replacement: {
                 match: /(?=Math\.min\(\i\.\i\.getOutputVolume\(\)\/100)/,
-                replace: "$self.settings.store.notificationVolume/100*"
+                replace: "$self.settings.store.notificationVolume/100*",
             },
         },
     ],

@@ -14,18 +14,20 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Patch, PatchReplacement, ReplaceFn } from "./types";
 
 export function canonicalizeMatch<T extends RegExp | string>(match: T): T {
     if (typeof match === "string") return match;
-    const canonSource = match.source
-        .replaceAll("\\i", "[A-Za-z_$][\\w$]*");
+    const canonSource = match.source.replaceAll("\\i", "[A-Za-z_$][\\w$]*");
     return new RegExp(canonSource, match.flags) as T;
 }
 
-export function canonicalizeReplace<T extends string | ReplaceFn>(replace: T, pluginName: string): T {
+export function canonicalizeReplace<T extends string | ReplaceFn>(
+    replace: T,
+    pluginName: string,
+): T {
     const self = `Vencord.Plugins.plugins[${JSON.stringify(pluginName)}]`;
 
     if (typeof replace !== "function")
@@ -34,7 +36,10 @@ export function canonicalizeReplace<T extends string | ReplaceFn>(replace: T, pl
     return ((...args) => replace(...args).replaceAll("$self", self)) as T;
 }
 
-export function canonicalizeDescriptor<T>(descriptor: TypedPropertyDescriptor<T>, canonicalize: (value: T) => T) {
+export function canonicalizeDescriptor<T>(
+    descriptor: TypedPropertyDescriptor<T>,
+    canonicalize: (value: T) => T,
+) {
     if (descriptor.get) {
         const original = descriptor.get;
         descriptor.get = function () {
@@ -46,18 +51,27 @@ export function canonicalizeDescriptor<T>(descriptor: TypedPropertyDescriptor<T>
     return descriptor;
 }
 
-export function canonicalizeReplacement(replacement: Pick<PatchReplacement, "match" | "replace">, plugin: string) {
+export function canonicalizeReplacement(
+    replacement: Pick<PatchReplacement, "match" | "replace">,
+    plugin: string,
+) {
     const descriptors = Object.getOwnPropertyDescriptors(replacement);
-    descriptors.match = canonicalizeDescriptor(descriptors.match, canonicalizeMatch);
+    descriptors.match = canonicalizeDescriptor(
+        descriptors.match,
+        canonicalizeMatch,
+    );
     descriptors.replace = canonicalizeDescriptor(
         descriptors.replace,
-        replace => canonicalizeReplace(replace, plugin),
+        (replace) => canonicalizeReplace(replace, plugin),
     );
     Object.defineProperties(replacement, descriptors);
 }
 
 export function canonicalizeFind(patch: Patch) {
     const descriptors = Object.getOwnPropertyDescriptors(patch);
-    descriptors.find = canonicalizeDescriptor(descriptors.find, canonicalizeMatch);
+    descriptors.find = canonicalizeDescriptor(
+        descriptors.find,
+        canonicalizeMatch,
+    );
     Object.defineProperties(patch, descriptors);
 }

@@ -9,7 +9,8 @@ import definePlugin from "@utils/types";
 
 export default definePlugin({
     name: "ImageLink",
-    description: "Never hide image links in messages, even if it's the only content",
+    description:
+        "Never hide image links in messages, even if it's the only content",
     authors: [Devs.Kyuuhachi, Devs.Sqaaakoi],
 
     patches: [
@@ -19,7 +20,7 @@ export default definePlugin({
                 // SimpleEmbedTypes.has(embed.type) && isEmbedInline(embed)
                 match: /\i\.has\(\i\.type\)&&\(0,\i\.\i\)\(\i\)/,
                 replace: "false",
-            }
-        }
-    ]
+            },
+        },
+    ],
 });

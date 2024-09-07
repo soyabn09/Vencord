@@ -14,10 +14,12 @@ export default definePlugin({
     patches: [
         {
             find: '"state",{resultType:',
-            replacement: [{
-                match: /(?<="state",{resultType:)null/,
-                replace: '"Favorites"'
-            }]
-        }
-    ]
+            replacement: [
+                {
+                    match: /(?<="state",{resultType:)null/,
+                    replace: '"Favorites"',
+                },
+            ],
+        },
+    ],
 });

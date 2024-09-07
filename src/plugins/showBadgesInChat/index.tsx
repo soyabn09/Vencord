@@ -11,7 +11,9 @@ import definePlugin from "@utils/types";
 import { findByPropsLazy, findComponentByCodeLazy } from "@webpack";
 import badges from "plugins/_api/badges";
 const roleIconClassName = findByPropsLazy("roleIcon", "separator").roleIcon;
-const RoleIconComponent = findComponentByCodeLazy(".Messages.ROLE_ICON_ALT_TEXT");
+const RoleIconComponent = findComponentByCodeLazy(
+    ".Messages.ROLE_ICON_ALT_TEXT",
+);
 import "./styles.css";
 
 import { User } from "discord-types/general";
@@ -30,29 +32,37 @@ const discordBadges: readonly [number, string, string][] = Object.freeze([
     [22, "Active Developer", "6bdc42827a38498929a4920da12695d9"],
     [17, "Early Verified Bot Developer", "6df5892e0f35b051f8b61eace34f4967"],
     [9, "Early Supporter", "7060786766c9c840eb3019e725d2b358"],
-    [18, "Moderator Programs Alumni", "fee1624003e2fee35cb398e125dc479b"]
+    [18, "Moderator Programs Alumni", "fee1624003e2fee35cb398e125dc479b"],
 ]);
 
-function CheckBadge({ badge, author }: { badge: string; author: User; }): JSX.Element | null {
-
+function CheckBadge({
+    badge,
+    author,
+}: {
+    badge: string;
+    author: User;
+}): JSX.Element | null {
     switch (badge) {
         case "VencordDonor":
             return (
                 <span style={{ order: settings.store.VencordDonorPosition }}>
-                    {badges.getDonorBadges(author.id)?.map(badge => (
-
-                        <RoleIconComponent
-                            className={roleIconClassName}
-                            name={badge.description}
-                            size={20}
-                            src={badge.image}
-                        />
-                    ))}
+                    {badges
+                        .getDonorBadges(author.id)
+                        ?.map((badge) => (
+                            <RoleIconComponent
+                                className={roleIconClassName}
+                                name={badge.description}
+                                size={20}
+                                src={badge.image}
+                            />
+                        ))}
                 </span>
             );
         case "VencordContributer":
             return isPluginDev(author.id) ? (
-                <span style={{ order: settings.store.VencordContributorPosition }}>
+                <span
+                    style={{ order: settings.store.VencordContributorPosition }}
+                >
                     <RoleIconComponent
                         className={roleIconClassName}
                         name={"Vencord Contributor"}
@@ -63,10 +73,12 @@ function CheckBadge({ badge, author }: { badge: string; author: User; }): JSX.El
             ) : null;
         case "DiscordProfile":
             const chatBadges = discordBadges
-                .filter(badge => (author.flags || author.publicFlags) & (1 << badge[0]))
+                .filter(
+                    (badge) =>
+                        (author.flags || author.publicFlags) & (1 << badge[0]),
+                )
 
-                .map(badge => (
-
+                .map((badge) => (
                     <RoleIconComponent
                         className={roleIconClassName}
                         name={badge[1]}
@@ -86,10 +98,16 @@ function CheckBadge({ badge, author }: { badge: string; author: User; }): JSX.El
                         className={roleIconClassName}
                         name={
                             "Discord Nitro" +
-                            (author.premiumType === 3 ? " Basic" : author.premiumType === 1 ? " Classic" : "")
+                            (author.premiumType === 3
+                                ? " Basic"
+                                : author.premiumType === 1
+                                  ? " Classic"
+                                  : "")
                         }
                         size={20}
-                        src={"https://cdn.discordapp.com/badge-icons/2ba85e8026a8614b640c2837bcdfe21b.png"}
+                        src={
+                            "https://cdn.discordapp.com/badge-icons/2ba85e8026a8614b640c2837bcdfe21b.png"
+                        }
                     />
                 </span>
             ) : null;
@@ -98,14 +116,21 @@ function CheckBadge({ badge, author }: { badge: string; author: User; }): JSX.El
     }
 }
 
-function ChatBadges({ author }: { author: User; }) {
-
+function ChatBadges({ author }: { author: User }) {
     return (
         <span className="vc-sbic-badge-row">
-            {settings.store.showVencordDonor && <CheckBadge badge={"VencordDonor"} author={author} />}
-            {settings.store.showVencordContributor && <CheckBadge badge={"VencordContributer"} author={author} />}
-            {settings.store.showDiscordProfile && <CheckBadge badge={"DiscordProfile"} author={author} />}
-            {settings.store.showDiscordNitro && <CheckBadge badge={"DiscordNitro"} author={author} />}
+            {settings.store.showVencordDonor && (
+                <CheckBadge badge={"VencordDonor"} author={author} />
+            )}
+            {settings.store.showVencordContributor && (
+                <CheckBadge badge={"VencordContributer"} author={author} />
+            )}
+            {settings.store.showDiscordProfile && (
+                <CheckBadge badge={"DiscordProfile"} author={author} />
+            )}
+            {settings.store.showDiscordNitro && (
+                <CheckBadge badge={"DiscordNitro"} author={author} />
+            )}
         </span>
     );
 }
@@ -117,10 +142,13 @@ export default definePlugin({
     dependencies: ["MessageDecorationsAPI"],
     settings,
     start: () => {
-        addDecoration("vc-show-badges-in-chat", props => props.message?.author ? <ChatBadges author={props.message.author} /> : null);
-
+        addDecoration("vc-show-badges-in-chat", (props) =>
+            props.message?.author ? (
+                <ChatBadges author={props.message.author} />
+            ) : null,
+        );
     },
     stop: () => {
         removeDecoration("vc-show-badges-in-chat");
-    }
+    },
 });

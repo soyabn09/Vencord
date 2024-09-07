@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { DraftType } from "@webpack/common";
 import { Channel, Guild, Role } from "discord-types/general";
@@ -24,7 +24,10 @@ import { FluxDispatcher, FluxEvents } from "./utils";
 type GenericFunction = (...args: any[]) => any;
 
 export class FluxStore {
-    constructor(dispatcher: FluxDispatcher, eventHandlers?: Partial<Record<FluxEvents, (data: any) => void>>);
+    constructor(
+        dispatcher: FluxDispatcher,
+        eventHandlers?: Partial<Record<FluxEvents, (data: any) => void>>,
+    );
 
     addChangeListener(callback: () => void): void;
     addReactChangeListener(callback: () => void): void;
@@ -123,17 +126,20 @@ export interface UnicodeEmoji {
 export class EmojiStore extends FluxStore {
     getCustomEmojiById(id?: string | null): CustomEmoji;
     getUsableCustomEmojiById(id?: string | null): CustomEmoji;
-    getGuilds(): Record<string, {
-        id: string;
-        _emojiMap: Record<string, CustomEmoji>;
-        _emojis: CustomEmoji[];
-        get emojis(): CustomEmoji[];
-        get rawEmojis(): CustomEmoji[];
-        _usableEmojis: CustomEmoji[];
-        get usableEmojis(): CustomEmoji[];
-        _emoticons: any[];
-        get emoticons(): any[];
-    }>;
+    getGuilds(): Record<
+        string,
+        {
+            id: string;
+            _emojiMap: Record<string, CustomEmoji>;
+            _emojis: CustomEmoji[];
+            get emojis(): CustomEmoji[];
+            get rawEmojis(): CustomEmoji[];
+            _usableEmojis: CustomEmoji[];
+            get usableEmojis(): CustomEmoji[];
+            _emoticons: any[];
+            get emoticons(): any[];
+        }
+    >;
     getGuildEmoji(guildId?: string | null): CustomEmoji[];
     getNewlyAddedEmoji(guildId?: string | null): CustomEmoji[];
     getTopEmoji(guildId?: string | null): CustomEmoji[];
@@ -146,10 +152,10 @@ export class EmojiStore extends FluxStore {
     searchWithoutFetchingLatest(data: any): any;
     getSearchResultsOrder(...args: any[]): any;
     getState(): {
-        pendingUsages: { key: string, timestamp: number; }[];
+        pendingUsages: { key: string; timestamp: number }[];
     };
     searchWithoutFetchingLatest(data: {
-        channel: Channel,
+        channel: Channel;
         query: string;
         count?: number;
         intention: number;
@@ -185,13 +191,16 @@ export interface DraftObject {
 }
 
 interface DraftState {
-    [userId: string]: {
-        [channelId: string]: {
-            [key in DraftType]?: Omit<DraftObject, "channelId">;
-        } | undefined;
-    } | undefined;
+    [userId: string]:
+        | {
+              [channelId: string]:
+                  | {
+                        [key in DraftType]?: Omit<DraftObject, "channelId">;
+                    }
+                  | undefined;
+          }
+        | undefined;
 }
-
 
 export class DraftStore extends FluxStore {
     getDraft(channelId: string, type: DraftType): string;
@@ -232,5 +241,5 @@ export type useStateFromStores = <T>(
     stores: t.FluxStore[],
     mapper: () => T,
     dependencies?: any,
-    isEqual?: (old: T, newer: T) => boolean
+    isEqual?: (old: T, newer: T) => boolean,
 ) => T;

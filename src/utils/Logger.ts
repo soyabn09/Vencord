@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 export class Logger {
     /**
@@ -26,12 +26,25 @@ export class Logger {
      * @example logger.errorCustomFmt(...Logger.makeTitleElements("white", "Hello"), "World");
      */
     static makeTitle(color: string, title: string): [string, ...string[]] {
-        return ["%c %c %s ", "", `background: ${color}; color: black; font-weight: bold; border-radius: 5px;`, title];
+        return [
+            "%c %c %s ",
+            "",
+            `background: ${color}; color: black; font-weight: bold; border-radius: 5px;`,
+            title,
+        ];
     }
 
-    constructor(public name: string, public color: string = "white") { }
+    constructor(
+        public name: string,
+        public color: string = "white",
+    ) {}
 
-    private _log(level: "log" | "error" | "warn" | "info" | "debug", levelColor: string, args: any[], customFmt = "") {
+    private _log(
+        level: "log" | "error" | "warn" | "info" | "debug",
+        levelColor: string,
+        args: any[],
+        customFmt = "",
+    ) {
         if (IS_REPORTER && IS_WEB) {
             console[level]("[Vencord]", this.name + ":", ...args);
             return;
@@ -41,8 +54,8 @@ export class Logger {
             `%c Vencord %c %c ${this.name} ${customFmt}`,
             `background: ${levelColor}; color: black; font-weight: bold; border-radius: 5px;`,
             "",
-            `background: ${this.color}; color: black; font-weight: bold; border-radius: 5px;`
-            , ...args
+            `background: ${this.color}; color: black; font-weight: bold; border-radius: 5px;`,
+            ...args,
         );
     }
 

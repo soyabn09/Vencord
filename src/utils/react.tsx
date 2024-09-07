@@ -14,9 +14,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
-import { React, useEffect, useMemo, useReducer, useState } from "@webpack/common";
+import {
+    React,
+    useEffect,
+    useMemo,
+    useReducer,
+    useState,
+} from "@webpack/common";
 
 import { checkIntersecting } from "./misc";
 
@@ -29,10 +35,9 @@ export const NoopComponent = () => null;
  * @param intersectOnly If `true`, will only update the state when the element comes into view
  * @returns [refCallback, isIntersecting]
  */
-export const useIntersection = (intersectOnly = false): [
-    refCallback: React.RefCallback<Element>,
-    isIntersecting: boolean,
-] => {
+export const useIntersection = (
+    intersectOnly = false,
+): [refCallback: React.RefCallback<Element>, isIntersecting: boolean] => {
     const observerRef = React.useRef<IntersectionObserver | null>(null);
     const [isIntersecting, setIntersecting] = useState(false);
 
@@ -47,7 +52,7 @@ export const useIntersection = (intersectOnly = false): [
             if (intersectOnly) return;
         }
 
-        observerRef.current = new IntersectionObserver(entries => {
+        observerRef.current = new IntersectionObserver((entries) => {
             for (const entry of entries) {
                 if (entry.target !== element) continue;
                 if (entry.isIntersecting && intersectOnly) {
@@ -79,17 +84,26 @@ interface AwaiterOpts<T> {
  * @returns [value, error, isPending]
  */
 export function useAwaiter<T>(factory: () => Promise<T>): AwaiterRes<T | null>;
-export function useAwaiter<T>(factory: () => Promise<T>, providedOpts: AwaiterOpts<T>): AwaiterRes<T>;
-export function useAwaiter<T>(factory: () => Promise<T>, providedOpts?: AwaiterOpts<T | null>): AwaiterRes<T | null> {
-    const opts: Required<AwaiterOpts<T | null>> = Object.assign({
-        fallbackValue: null,
-        deps: [],
-        onError: null,
-    }, providedOpts);
+export function useAwaiter<T>(
+    factory: () => Promise<T>,
+    providedOpts: AwaiterOpts<T>,
+): AwaiterRes<T>;
+export function useAwaiter<T>(
+    factory: () => Promise<T>,
+    providedOpts?: AwaiterOpts<T | null>,
+): AwaiterRes<T | null> {
+    const opts: Required<AwaiterOpts<T | null>> = Object.assign(
+        {
+            fallbackValue: null,
+            deps: [],
+            onError: null,
+        },
+        providedOpts,
+    );
     const [state, setState] = useState({
         value: opts.fallbackValue,
         error: null,
-        pending: true
+        pending: true,
     });
 
     useEffect(() => {
@@ -97,12 +111,12 @@ export function useAwaiter<T>(factory: () => Promise<T>, providedOpts?: AwaiterO
         if (!state.pending) setState({ ...state, pending: true });
 
         factory()
-            .then(value => {
+            .then((value) => {
                 if (!isAlive) return;
                 setState({ value, error: null, pending: false });
                 opts.onSuccess?.(value);
             })
-            .catch(error => {
+            .catch((error) => {
                 if (!isAlive) return;
                 setState({ value: null, error, pending: false });
                 opts.onError?.(error);
@@ -120,7 +134,7 @@ export function useAwaiter<T>(factory: () => Promise<T>, providedOpts?: AwaiterO
 export function useForceUpdater(): () => void;
 export function useForceUpdater(withDep: true): [unknown, () => void];
 export function useForceUpdater(withDep?: true) {
-    const r = useReducer(x => x + 1, 0);
+    const r = useReducer((x) => x + 1, 0);
     return withDep ? r : r[1];
 }
 
@@ -134,7 +148,10 @@ export function useTimer({ interval = 1000, deps = [] }: TimerOpts) {
     const start = useMemo(() => Date.now(), deps);
 
     useEffect(() => {
-        const intervalId = setInterval(() => setTime(Date.now() - start), interval);
+        const intervalId = setInterval(
+            () => setTime(Date.now() - start),
+            interval,
+        );
 
         return () => {
             setTime(0);

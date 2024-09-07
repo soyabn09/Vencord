@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { definePluginSettings } from "@api/Settings";
 import { Link } from "@components/Link";
@@ -30,7 +30,6 @@ interface ActivityAssets {
     small_image?: string;
     small_text?: string;
 }
-
 
 interface ActivityButton {
     label: string;
@@ -78,7 +77,7 @@ const enum NameFormat {
     SongFirst = "song-first",
     ArtistOnly = "artist",
     SongOnly = "song",
-    AlbumName = "album"
+    AlbumName = "album",
 }
 
 const applicationId = "1108588077900898414";
@@ -136,28 +135,28 @@ const settings = definePluginSettings({
             {
                 label: "Use custom status name",
                 value: NameFormat.StatusName,
-                default: true
+                default: true,
             },
             {
                 label: "Use format 'artist - song'",
-                value: NameFormat.ArtistFirst
+                value: NameFormat.ArtistFirst,
             },
             {
                 label: "Use format 'song - artist'",
-                value: NameFormat.SongFirst
+                value: NameFormat.SongFirst,
             },
             {
                 label: "Use artist name only",
-                value: NameFormat.ArtistOnly
+                value: NameFormat.ArtistOnly,
             },
             {
                 label: "Use song name only",
-                value: NameFormat.SongOnly
+                value: NameFormat.SongOnly,
             },
             {
                 label: "Use album name (falls back to custom status text if song has no album)",
-                value: NameFormat.AlbumName
-            }
+                value: NameFormat.AlbumName,
+            },
         ],
     },
     useListeningStatus: {
@@ -172,19 +171,19 @@ const settings = definePluginSettings({
             {
                 label: "Use large Last.fm logo",
                 value: "lastfmLogo",
-                default: true
+                default: true,
             },
             {
                 label: "Use generic placeholder",
-                value: "placeholder"
-            }
+                value: "placeholder",
+            },
         ],
     },
     showLastFmLogo: {
         description: "show the Last.fm logo by the album cover",
         type: OptionType.BOOLEAN,
         default: true,
-    }
+    },
 });
 
 export default definePlugin({
@@ -196,13 +195,14 @@ export default definePlugin({
         <>
             <Forms.FormTitle tag="h3">How to get an API key</Forms.FormTitle>
             <Forms.FormText>
-                An API key is required to fetch your current track. To get one, you can
-                visit <Link href="https://www.last.fm/api/account/create">this page</Link> and
-                fill in the following information: <br /> <br />
-
+                An API key is required to fetch your current track. To get one,
+                you can visit{" "}
+                <Link href="https://www.last.fm/api/account/create">
+                    this page
+                </Link>{" "}
+                and fill in the following information: <br /> <br />
                 Application name: Discord Rich Presence <br />
                 Application description: (personal use) <br /> <br />
-
                 And copy the API key (not the shared secret!)
             </Forms.FormText>
         </>
@@ -212,7 +212,9 @@ export default definePlugin({
 
     start() {
         this.updatePresence();
-        this.updateInterval = setInterval(() => { this.updatePresence(); }, 16000);
+        this.updateInterval = setInterval(() => {
+            this.updatePresence();
+        }, 16000);
     },
 
     stop() {
@@ -220,8 +222,7 @@ export default definePlugin({
     },
 
     async fetchTrackData(): Promise<TrackData | null> {
-        if (!settings.store.username || !settings.store.apiKey)
-            return null;
+        if (!settings.store.username || !settings.store.apiKey) return null;
 
         try {
             const params = new URLSearchParams({
@@ -229,22 +230,26 @@ export default definePlugin({
                 api_key: settings.store.apiKey,
                 user: settings.store.username,
                 limit: "1",
-                format: "json"
+                format: "json",
             });
 
-            const res = await fetch(`https://ws.audioscrobbler.com/2.0/?${params}`);
+            const res = await fetch(
+                `https://ws.audioscrobbler.com/2.0/?${params}`,
+            );
             if (!res.ok) throw `${res.status} ${res.statusText}`;
 
             const json = await res.json();
             if (json.error) {
-                logger.error("Error from Last.fm API", `${json.error}: ${json.message}`);
+                logger.error(
+                    "Error from Last.fm API",
+                    `${json.error}: ${json.message}`,
+                );
                 return null;
             }
 
             const trackData = json.recenttracks?.track[0];
 
-            if (!trackData?.["@attr"]?.nowplaying)
-                return null;
+            if (!trackData?.["@attr"]?.nowplaying) return null;
 
             // why does the json api have xml structure
             return {
@@ -252,7 +257,9 @@ export default definePlugin({
                 album: trackData.album["#text"],
                 artist: trackData.artist["#text"] || "Unknown",
                 url: trackData.url,
-                imageUrl: trackData.image?.find((x: any) => x.size === "large")?.["#text"]
+                imageUrl: trackData.image?.find(
+                    (x: any) => x.size === "large",
+                )?.["#text"],
             };
         } catch (e) {
             logger.error("Failed to query Last.fm API", e);
@@ -269,14 +276,16 @@ export default definePlugin({
         if (track.imageUrl && !track.imageUrl.includes(placeholderId))
             return track.imageUrl;
 
-        if (settings.store.missingArt === "placeholder")
-            return "placeholder";
+        if (settings.store.missingArt === "placeholder") return "placeholder";
     },
 
     async getActivity(): Promise<Activity | null> {
         if (settings.store.hideWithSpotify) {
             for (const activity of presenceStore.getActivities()) {
-                if (activity.type === ActivityType.LISTENING && activity.application_id !== applicationId) {
+                if (
+                    activity.type === ActivityType.LISTENING &&
+                    activity.application_id !== applicationId
+                ) {
                     // there is already music status because of Spotify or richerCider (probably more)
                     return null;
                 }
@@ -287,18 +296,19 @@ export default definePlugin({
         if (!trackData) return null;
 
         const largeImage = this.getLargeImage(trackData);
-        const assets: ActivityAssets = largeImage ?
-            {
-                large_image: await getApplicationAsset(largeImage),
-                large_text: trackData.album || undefined,
-                ...(settings.store.showLastFmLogo && {
-                    small_image: await getApplicationAsset("lastfm-small"),
-                    small_text: "Last.fm"
-                }),
-            } : {
-                large_image: await getApplicationAsset("lastfm-large"),
-                large_text: trackData.album || undefined,
-            };
+        const assets: ActivityAssets = largeImage
+            ? {
+                  large_image: await getApplicationAsset(largeImage),
+                  large_text: trackData.album || undefined,
+                  ...(settings.store.showLastFmLogo && {
+                      small_image: await getApplicationAsset("lastfm-small"),
+                      small_text: "Last.fm",
+                  }),
+              }
+            : {
+                  large_image: await getApplicationAsset("lastfm-large"),
+                  large_text: trackData.album || undefined,
+              };
 
         const buttons: ActivityButton[] = [];
 
@@ -339,13 +349,15 @@ export default definePlugin({
             state: trackData.artist,
             assets,
 
-            buttons: buttons.length ? buttons.map(v => v.label) : undefined,
+            buttons: buttons.length ? buttons.map((v) => v.label) : undefined,
             metadata: {
-                button_urls: buttons.map(v => v.url),
+                button_urls: buttons.map((v) => v.url),
             },
 
-            type: settings.store.useListeningStatus ? ActivityType.LISTENING : ActivityType.PLAYING,
+            type: settings.store.useListeningStatus
+                ? ActivityType.LISTENING
+                : ActivityType.PLAYING,
             flags: ActivityFlag.INSTANCE,
         };
-    }
+    },
 });

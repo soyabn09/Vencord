@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import gitHash from "~git-hash";
 
@@ -39,7 +39,7 @@ async function Unwrap<T>(p: Promise<IpcRes<T>>) {
 
 export async function checkForUpdates() {
     changes = await Unwrap(VencordNative.updater.getUpdates());
-    if (changes.some(c => c.hash === gitHash)) {
+    if (changes.some((c) => c.hash === gitHash)) {
         isNewer = true;
         return (isOutdated = false);
     }
@@ -53,8 +53,10 @@ export async function update() {
 
     if (res) {
         isOutdated = false;
-        if (!await Unwrap(VencordNative.updater.rebuild()))
-            throw new Error("The Build failed. Please try manually building the new update");
+        if (!(await Unwrap(VencordNative.updater.rebuild())))
+            throw new Error(
+                "The Build failed. Please try manually building the new update",
+            );
     }
 
     return res;
@@ -62,7 +64,10 @@ export async function update() {
 
 export const getRepo = () => Unwrap(VencordNative.updater.getRepo());
 
-export async function maybePromptToUpdate(confirmMessage: string, checkForDev = false) {
+export async function maybePromptToUpdate(
+    confirmMessage: string,
+    checkForDev = false,
+) {
     if (IS_WEB || IS_UPDATER_DISABLED) return;
     if (checkForDev && IS_DEV) return;
 
@@ -70,7 +75,10 @@ export async function maybePromptToUpdate(confirmMessage: string, checkForDev = 
         const isOutdated = await checkForUpdates();
         if (isOutdated) {
             const wantsUpdate = confirm(confirmMessage);
-            if (wantsUpdate && isNewer) return alert("Your local copy has more recent commits. Please stash or reset them.");
+            if (wantsUpdate && isNewer)
+                return alert(
+                    "Your local copy has more recent commits. Please stash or reset them.",
+                );
             if (wantsUpdate) {
                 await update();
                 relaunch();
@@ -78,6 +86,8 @@ export async function maybePromptToUpdate(confirmMessage: string, checkForDev = 
         }
     } catch (err) {
         UpdateLogger.error(err);
-        alert("That also failed :( Try updating or re-installing with the installer!");
+        alert(
+            "That also failed :( Try updating or re-installing with the installer!",
+        );
     }
 }

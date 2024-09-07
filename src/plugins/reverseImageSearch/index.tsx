@@ -14,9 +14,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
-import { findGroupChildrenByChildId, NavContextMenuPatchCallback } from "@api/ContextMenu";
+import {
+    findGroupChildrenByChildId,
+    NavContextMenuPatchCallback,
+} from "@api/ContextMenu";
 import { Flex } from "@components/Flex";
 import { OpenExternalIcon } from "@components/Icons";
 import { Devs } from "@utils/constants";
@@ -29,7 +32,7 @@ const Engines = {
     SauceNAO: "https://saucenao.com/search.php?url=",
     IQDB: "https://iqdb.org/?url=",
     TinEye: "https://www.tineye.com/search?url=",
-    ImgOps: "https://imgops.com/start?url="
+    ImgOps: "https://imgops.com/start?url=",
 } as const;
 
 function search(src: string, engine: string) {
@@ -50,17 +53,25 @@ function makeSearchItem(src: string) {
                         key={key}
                         id={key}
                         label={
-                            <Flex style={{ alignItems: "center", gap: "0.5em" }}>
+                            <Flex
+                                style={{ alignItems: "center", gap: "0.5em" }}
+                            >
                                 <img
                                     style={{
-                                        borderRadius: i >= 3 // Do not round Google, Yandex & SauceNAO
-                                            ? "50%"
-                                            : void 0
+                                        borderRadius:
+                                            i >= 3 // Do not round Google, Yandex & SauceNAO
+                                                ? "50%"
+                                                : void 0,
                                     }}
                                     aria-hidden="true"
                                     height={16}
                                     width={16}
-                                    src={new URL("/favicon.ico", Engines[engine]).toString().replace("lens.", "")}
+                                    src={new URL(
+                                        "/favicon.ico",
+                                        Engines[engine],
+                                    )
+                                        .toString()
+                                        .replace("lens.", "")}
                                 />
                                 {engine}
                             </Flex>
@@ -78,13 +89,18 @@ function makeSearchItem(src: string) {
                         All
                     </Flex>
                 }
-                action={() => Object.values(Engines).forEach(e => search(src, e))}
+                action={() =>
+                    Object.values(Engines).forEach((e) => search(src, e))
+                }
             />
         </Menu.MenuItem>
     );
 }
 
-const messageContextMenuPatch: NavContextMenuPatchCallback = (children, props) => {
+const messageContextMenuPatch: NavContextMenuPatchCallback = (
+    children,
+    props,
+) => {
     if (props?.reverseImageSearchType !== "img") return;
 
     const src = props.itemHref ?? props.itemSrc;
@@ -93,10 +109,14 @@ const messageContextMenuPatch: NavContextMenuPatchCallback = (children, props) =
     group?.push(makeSearchItem(src));
 };
 
-const imageContextMenuPatch: NavContextMenuPatchCallback = (children, props) => {
+const imageContextMenuPatch: NavContextMenuPatchCallback = (
+    children,
+    props,
+) => {
     if (!props?.src) return;
 
-    const group = findGroupChildrenByChildId("copy-native-link", children) ?? children;
+    const group =
+        findGroupChildrenByChildId("copy-native-link", children) ?? children;
     group.push(makeSearchItem(props.src));
 };
 
@@ -111,12 +131,13 @@ export default definePlugin({
             find: ".Messages.MESSAGE_ACTIONS_MENU_LABEL,shouldHideMediaOptions",
             replacement: {
                 match: /favoriteableType:\i,(?<=(\i)\.getAttribute\("data-type"\).+?)/,
-                replace: (m, target) => `${m}reverseImageSearchType:${target}.getAttribute("data-role"),`
-            }
-        }
+                replace: (m, target) =>
+                    `${m}reverseImageSearchType:${target}.getAttribute("data-role"),`,
+            },
+        },
     ],
     contextMenus: {
-        "message": messageContextMenuPatch,
-        "image-context": imageContextMenuPatch
-    }
+        message: messageContextMenuPatch,
+        "image-context": imageContextMenuPatch,
+    },
 });

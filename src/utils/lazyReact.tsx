@@ -16,7 +16,10 @@ const NoopComponent = () => null;
  * @param attempts How many times to try to get the component before giving up
  * @returns Result of factory function
  */
-export function LazyComponent<T extends object = any>(factory: () => React.ComponentType<T>, attempts = 5) {
+export function LazyComponent<T extends object = any>(
+    factory: () => React.ComponentType<T>,
+    attempts = 5,
+) {
     const get = makeLazy(factory, attempts);
     const LazyComponent = (props: T) => {
         const Component = get() ?? NoopComponent;

@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { definePluginSettings, Settings } from "@api/Settings";
 import { getUserSettingLazy } from "@api/UserSettings";
@@ -26,18 +26,46 @@ import { Margins } from "@utils/margins";
 import { classes } from "@utils/misc";
 import { useAwaiter } from "@utils/react";
 import definePlugin, { OptionType } from "@utils/types";
-import { findByCodeLazy, findByPropsLazy, findComponentByCodeLazy } from "@webpack";
-import { ApplicationAssetUtils, Button, FluxDispatcher, Forms, GuildStore, React, SelectedChannelStore, SelectedGuildStore, UserStore } from "@webpack/common";
+import {
+    findByCodeLazy,
+    findByPropsLazy,
+    findComponentByCodeLazy,
+} from "@webpack";
+import {
+    ApplicationAssetUtils,
+    Button,
+    FluxDispatcher,
+    Forms,
+    GuildStore,
+    React,
+    SelectedChannelStore,
+    SelectedGuildStore,
+    UserStore,
+} from "@webpack/common";
 
-const useProfileThemeStyle = findByCodeLazy("profileThemeStyle:", "--profile-gradient-primary-color");
+const useProfileThemeStyle = findByCodeLazy(
+    "profileThemeStyle:",
+    "--profile-gradient-primary-color",
+);
 const ActivityComponent = findComponentByCodeLazy("onOpenGameProfile");
 const ActivityClassName = findByPropsLazy("activity", "buttonColor");
 
-const ShowCurrentGame = getUserSettingLazy<boolean>("status", "showCurrentGame")!;
+const ShowCurrentGame = getUserSettingLazy<boolean>(
+    "status",
+    "showCurrentGame",
+)!;
 
 async function getApplicationAsset(key: string): Promise<string> {
-    if (/https?:\/\/(cdn|media)\.discordapp\.(com|net)\/attachments\//.test(key)) return "mp:" + key.replace(/https?:\/\/(cdn|media)\.discordapp\.(com|net)\//, "");
-    return (await ApplicationAssetUtils.fetchAssetIds(settings.store.appID!, [key]))[0];
+    if (
+        /https?:\/\/(cdn|media)\.discordapp\.(com|net)\/attachments\//.test(key)
+    )
+        return (
+            "mp:" +
+            key.replace(/https?:\/\/(cdn|media)\.discordapp\.(com|net)\//, "")
+        );
+    return (
+        await ApplicationAssetUtils.fetchAssetIds(settings.store.appID!, [key])
+    )[0];
 }
 
 interface ActivityAssets {
@@ -71,7 +99,7 @@ const enum ActivityType {
     STREAMING = 1,
     LISTENING = 2,
     WATCHING = 3,
-    COMPETING = 5
+    COMPETING = 5,
 }
 
 const enum TimestampMode {
@@ -88,9 +116,10 @@ const settings = definePluginSettings({
         onChange: onChange,
         isValid: (value: string) => {
             if (!value) return "Application ID is required.";
-            if (value && !/^\d+$/.test(value)) return "Application ID must be a number.";
+            if (value && !/^\d+$/.test(value))
+                return "Application ID must be a number.";
             return true;
-        }
+        },
     },
     appName: {
         type: OptionType.STRING,
@@ -98,27 +127,30 @@ const settings = definePluginSettings({
         onChange: onChange,
         isValid: (value: string) => {
             if (!value) return "Application name is required.";
-            if (value.length > 128) return "Application name must be not longer than 128 characters.";
+            if (value.length > 128)
+                return "Application name must be not longer than 128 characters.";
             return true;
-        }
+        },
     },
     details: {
         type: OptionType.STRING,
         description: "Details (line 1)",
         onChange: onChange,
         isValid: (value: string) => {
-            if (value && value.length > 128) return "Details (line 1) must be not longer than 128 characters.";
+            if (value && value.length > 128)
+                return "Details (line 1) must be not longer than 128 characters.";
             return true;
-        }
+        },
     },
     state: {
         type: OptionType.STRING,
         description: "State (line 2)",
         onChange: onChange,
         isValid: (value: string) => {
-            if (value && value.length > 128) return "State (line 2) must be not longer than 128 characters.";
+            if (value && value.length > 128)
+                return "State (line 2) must be not longer than 128 characters.";
             return true;
-        }
+        },
     },
     type: {
         type: OptionType.SELECT,
@@ -128,32 +160,33 @@ const settings = definePluginSettings({
             {
                 label: "Playing",
                 value: ActivityType.PLAYING,
-                default: true
+                default: true,
             },
             {
                 label: "Streaming",
-                value: ActivityType.STREAMING
+                value: ActivityType.STREAMING,
             },
             {
                 label: "Listening",
-                value: ActivityType.LISTENING
+                value: ActivityType.LISTENING,
             },
             {
                 label: "Watching",
-                value: ActivityType.WATCHING
+                value: ActivityType.WATCHING,
             },
             {
                 label: "Competing",
-                value: ActivityType.COMPETING
-            }
-        ]
+                value: ActivityType.COMPETING,
+            },
+        ],
     },
     streamLink: {
         type: OptionType.STRING,
-        description: "Twitch.tv or Youtube.com link (only for Streaming activity type)",
+        description:
+            "Twitch.tv or Youtube.com link (only for Streaming activity type)",
         onChange: onChange,
         disabled: isStreamLinkDisabled,
-        isValid: isStreamLinkValid
+        isValid: isStreamLinkValid,
     },
     timestampMode: {
         type: OptionType.SELECT,
@@ -163,100 +196,108 @@ const settings = definePluginSettings({
             {
                 label: "None",
                 value: TimestampMode.NONE,
-                default: true
+                default: true,
             },
             {
                 label: "Since discord open",
-                value: TimestampMode.NOW
+                value: TimestampMode.NOW,
             },
             {
                 label: "Same as your current time",
-                value: TimestampMode.TIME
+                value: TimestampMode.TIME,
             },
             {
                 label: "Custom",
-                value: TimestampMode.CUSTOM
-            }
-        ]
+                value: TimestampMode.CUSTOM,
+            },
+        ],
     },
     startTime: {
         type: OptionType.NUMBER,
-        description: "Start timestamp in milliseconds (only for custom timestamp mode)",
+        description:
+            "Start timestamp in milliseconds (only for custom timestamp mode)",
         onChange: onChange,
         disabled: isTimestampDisabled,
         isValid: (value: number) => {
-            if (value && value < 0) return "Start timestamp must be greater than 0.";
+            if (value && value < 0)
+                return "Start timestamp must be greater than 0.";
             return true;
-        }
+        },
     },
     endTime: {
         type: OptionType.NUMBER,
-        description: "End timestamp in milliseconds (only for custom timestamp mode)",
+        description:
+            "End timestamp in milliseconds (only for custom timestamp mode)",
         onChange: onChange,
         disabled: isTimestampDisabled,
         isValid: (value: number) => {
-            if (value && value < 0) return "End timestamp must be greater than 0.";
+            if (value && value < 0)
+                return "End timestamp must be greater than 0.";
             return true;
-        }
+        },
     },
     imageBig: {
         type: OptionType.STRING,
         description: "Big image key/link",
         onChange: onChange,
-        isValid: isImageKeyValid
+        isValid: isImageKeyValid,
     },
     imageBigTooltip: {
         type: OptionType.STRING,
         description: "Big image tooltip",
         onChange: onChange,
         isValid: (value: string) => {
-            if (value && value.length > 128) return "Big image tooltip must be not longer than 128 characters.";
+            if (value && value.length > 128)
+                return "Big image tooltip must be not longer than 128 characters.";
             return true;
-        }
+        },
     },
     imageSmall: {
         type: OptionType.STRING,
         description: "Small image key/link",
         onChange: onChange,
-        isValid: isImageKeyValid
+        isValid: isImageKeyValid,
     },
     imageSmallTooltip: {
         type: OptionType.STRING,
         description: "Small image tooltip",
         onChange: onChange,
         isValid: (value: string) => {
-            if (value && value.length > 128) return "Small image tooltip must be not longer than 128 characters.";
+            if (value && value.length > 128)
+                return "Small image tooltip must be not longer than 128 characters.";
             return true;
-        }
+        },
     },
     buttonOneText: {
         type: OptionType.STRING,
         description: "Button 1 text",
         onChange: onChange,
         isValid: (value: string) => {
-            if (value && value.length > 31) return "Button 1 text must be not longer than 31 characters.";
+            if (value && value.length > 31)
+                return "Button 1 text must be not longer than 31 characters.";
             return true;
-        }
+        },
     },
     buttonOneURL: {
         type: OptionType.STRING,
         description: "Button 1 URL",
-        onChange: onChange
+        onChange: onChange,
     },
     buttonTwoText: {
         type: OptionType.STRING,
         description: "Button 2 text",
         onChange: onChange,
         isValid: (value: string) => {
-            if (value && value.length > 31) return "Button 2 text must be not longer than 31 characters.";
+            if (value && value.length > 31)
+                return "Button 2 text must be not longer than 31 characters.";
             return true;
-        }
+        },
     },
     buttonTwoURL: {
         type: OptionType.STRING,
         description: "Button 2 URL",
-        onChange: onChange
-    }
+        onChange: onChange,
+    },
 });
 
 function onChange() {
@@ -269,7 +310,11 @@ function isStreamLinkDisabled() {
 }
 
 function isStreamLinkValid(value: string) {
-    if (!isStreamLinkDisabled() && !/https?:\/\/(www\.)?(twitch\.tv|youtube\.com)\/\w+/.test(value)) return "Streaming link must be a valid URL.";
+    if (
+        !isStreamLinkDisabled() &&
+        !/https?:\/\/(www\.)?(twitch\.tv|youtube\.com)\/\w+/.test(value)
+    )
+        return "Streaming link must be a valid URL.";
     return true;
 }
 
@@ -278,8 +323,10 @@ function isTimestampDisabled() {
 }
 
 function isImageKeyValid(value: string) {
-    if (/https?:\/\/(?!i\.)?imgur\.com\//.test(value)) return "Imgur link must be a direct link to the image. (e.g. https://i.imgur.com/...)";
-    if (/https?:\/\/(?!media\.)?tenor\.com\//.test(value)) return "Tenor link must be a direct link to the image. (e.g. https://media.tenor.com/...)";
+    if (/https?:\/\/(?!i\.)?imgur\.com\//.test(value))
+        return "Imgur link must be a direct link to the image. (e.g. https://i.imgur.com/...)";
+    if (/https?:\/\/(?!media\.)?tenor\.com\//.test(value))
+        return "Tenor link must be a direct link to the image. (e.g. https://media.tenor.com/...)";
     return true;
 }
 
@@ -300,7 +347,7 @@ async function createActivity(): Promise<Activity | undefined> {
         buttonOneText,
         buttonOneURL,
         buttonTwoText,
-        buttonTwoURL
+        buttonTwoURL,
     } = settings.store;
 
     if (!appName) return;
@@ -319,12 +366,17 @@ async function createActivity(): Promise<Activity | undefined> {
     switch (settings.store.timestampMode) {
         case TimestampMode.NOW:
             activity.timestamps = {
-                start: Date.now()
+                start: Date.now(),
             };
             break;
         case TimestampMode.TIME:
             activity.timestamps = {
-                start: Date.now() - (new Date().getHours() * 3600 + new Date().getMinutes() * 60 + new Date().getSeconds()) * 1000
+                start:
+                    Date.now() -
+                    (new Date().getHours() * 3600 +
+                        new Date().getMinutes() * 60 +
+                        new Date().getSeconds()) *
+                        1000,
             };
             break;
         case TimestampMode.CUSTOM:
@@ -340,23 +392,17 @@ async function createActivity(): Promise<Activity | undefined> {
     }
 
     if (buttonOneText) {
-        activity.buttons = [
-            buttonOneText,
-            buttonTwoText
-        ].filter(isTruthy);
+        activity.buttons = [buttonOneText, buttonTwoText].filter(isTruthy);
 
         activity.metadata = {
-            button_urls: [
-                buttonOneURL,
-                buttonTwoURL
-            ].filter(isTruthy)
+            button_urls: [buttonOneURL, buttonTwoURL].filter(isTruthy),
         };
     }
 
     if (imageBig) {
         activity.assets = {
             large_image: await getApplicationAsset(imageBig),
-            large_text: imageBigTooltip || undefined
+            large_text: imageBigTooltip || undefined,
         };
     }
 
@@ -364,16 +410,14 @@ async function createActivity(): Promise<Activity | undefined> {
         activity.assets = {
             ...activity.assets,
             small_image: await getApplicationAsset(imageSmall),
-            small_text: imageSmallTooltip || undefined
+            small_text: imageSmallTooltip || undefined,
         };
     }
-
 
     for (const k in activity) {
         if (k === "type") continue;
         const v = activity[k];
-        if (!v || v.length === 0)
-            delete activity[k];
+        if (!v || v.length === 0) delete activity[k];
     }
 
     return activity;
@@ -411,7 +455,10 @@ export default definePlugin({
                         style={{ padding: "1em" }}
                     >
                         <Forms.FormTitle>Notice</Forms.FormTitle>
-                        <Forms.FormText>Game activity isn't enabled, people won't be able to see your custom rich presence!</Forms.FormText>
+                        <Forms.FormText>
+                            Game activity isn't enabled, people won't be able to
+                            see your custom rich presence!
+                        </Forms.FormText>
 
                         <Button
                             color={Button.Colors.TRANSPARENT}
@@ -424,25 +471,41 @@ export default definePlugin({
                 )}
 
                 <Forms.FormText>
-                    Go to <Link href="https://discord.com/developers/applications">Discord Developer Portal</Link> to create an application and
-                    get the application ID.
+                    Go to{" "}
+                    <Link href="https://discord.com/developers/applications">
+                        Discord Developer Portal
+                    </Link>{" "}
+                    to create an application and get the application ID.
                 </Forms.FormText>
                 <Forms.FormText>
-                    Upload images in the Rich Presence tab to get the image keys.
+                    Upload images in the Rich Presence tab to get the image
+                    keys.
                 </Forms.FormText>
                 <Forms.FormText>
-                    If you want to use image link, download your image and reupload the image to <Link href="https://imgur.com">Imgur</Link> and get the image link by right-clicking the image and select "Copy image address".
+                    If you want to use image link, download your image and
+                    reupload the image to{" "}
+                    <Link href="https://imgur.com">Imgur</Link> and get the
+                    image link by right-clicking the image and select "Copy
+                    image address".
                 </Forms.FormText>
 
                 <Forms.FormDivider className={Margins.top8} />
 
                 <div style={{ width: "284px", ...profileThemeStyle }}>
-                    {activity[0] && <ActivityComponent activity={activity[0]} className={ActivityClassName.activity} channelId={SelectedChannelStore.getChannelId()}
-                        guild={GuildStore.getGuild(SelectedGuildStore.getLastSelectedGuildId())}
-                        application={{ id: settings.store.appID }}
-                        user={UserStore.getCurrentUser()} />}
+                    {activity[0] && (
+                        <ActivityComponent
+                            activity={activity[0]}
+                            className={ActivityClassName.activity}
+                            channelId={SelectedChannelStore.getChannelId()}
+                            guild={GuildStore.getGuild(
+                                SelectedGuildStore.getLastSelectedGuildId(),
+                            )}
+                            application={{ id: settings.store.appID }}
+                            user={UserStore.getCurrentUser()}
+                        />
+                    )}
                 </div>
             </>
         );
-    }
+    },
 });

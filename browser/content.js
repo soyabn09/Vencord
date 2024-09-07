@@ -16,8 +16,8 @@ document.addEventListener(
             meta: {
                 EXTENSION_VERSION: browser.runtime.getManifest().version,
                 EXTENSION_BASE_URL: browser.runtime.getURL(""),
-            }
+            },
         });
     },
-    { once: true }
+    { once: true },
 );

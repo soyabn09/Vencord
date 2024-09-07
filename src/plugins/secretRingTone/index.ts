@@ -13,13 +13,14 @@ const settings = definePluginSettings({
         type: OptionType.BOOLEAN,
         description: "Only play the Snow Halation Theme",
         default: false,
-        restartNeeded: true
-    }
+        restartNeeded: true,
+    },
 });
 
 export default definePlugin({
     name: "SecretRingToneEnabler",
-    description: "Always play the secret version of the discord ringtone (except during special ringtone events)",
+    description:
+        "Always play the secret version of the discord ringtone (except during special ringtone events)",
     authors: [Devs.AndrewDLO, Devs.FieryFlames, Devs.RamziAH],
     settings,
     patches: [
@@ -28,14 +29,14 @@ export default definePlugin({
             replacement: [
                 {
                     match: /500!==\i\(\)\.random\(1,1e3\)/,
-                    replace: "false"
+                    replace: "false",
                 },
                 {
                     predicate: () => settings.store.onlySnow,
                     match: /"call_ringing_beat",/,
-                    replace: ""
-                }
-            ]
-        }
-    ]
+                    replace: "",
+                },
+            ],
+        },
+    ],
 });

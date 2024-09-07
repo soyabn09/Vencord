@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 export const VENCORD_FILES = [
     IS_DISCORD_DESKTOP ? "patcher.js" : "vencordDesktopMain.js",
@@ -28,15 +28,18 @@ export function serializeErrors(func: (...args: any[]) => any) {
         try {
             return {
                 ok: true,
-                value: await func(...arguments)
+                value: await func(...arguments),
             };
         } catch (e: any) {
             return {
                 ok: false,
-                error: e instanceof Error ? {
-                    // prototypes get lost, so turn error into plain object
-                    ...e
-                } : e
+                error:
+                    e instanceof Error
+                        ? {
+                              // prototypes get lost, so turn error into plain object
+                              ...e,
+                          }
+                        : e,
             };
         }
     };

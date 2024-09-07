@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import "./VoiceChannelSection.css";
 
@@ -32,26 +32,34 @@ interface VoiceChannelFieldProps {
     showHeader: boolean;
 }
 
-export const VoiceChannelSection = ({ channel, label, showHeader }: VoiceChannelFieldProps) => (
+export const VoiceChannelSection = ({
+    channel,
+    label,
+    showHeader,
+}: VoiceChannelFieldProps) => (
     // @TODO The div is supposed to be a UserPopoutSection
     <div>
-        {showHeader && <Forms.FormTitle className="vc-uvs-header">In a voice channel</Forms.FormTitle>}
+        {showHeader && (
+            <Forms.FormTitle className="vc-uvs-header">
+                In a voice channel
+            </Forms.FormTitle>
+        )}
         <Button
             className="vc-uvs-button"
             color={Button.Colors.TRANSPARENT}
             size={Button.Sizes.SMALL}
-
             onClick={() => {
                 if (PermissionStore.can(CONNECT, channel))
                     ChannelActions.selectVoiceChannel(channel.id);
                 else
                     Toasts.show({
-                        message: "Insufficient permissions to enter the channel.",
+                        message:
+                            "Insufficient permissions to enter the channel.",
                         id: "user-voice-show-insufficient-permissions",
                         type: Toasts.Type.FAILURE,
                         options: {
                             position: Toasts.Position.BOTTOM,
-                        }
+                        },
                     });
             }}
         >

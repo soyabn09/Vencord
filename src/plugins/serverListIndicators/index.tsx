@@ -14,9 +14,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
-import { addServerListElement, removeServerListElement, ServerListRenderPosition } from "@api/ServerList";
+import {
+    addServerListElement,
+    removeServerListElement,
+    ServerListRenderPosition,
+} from "@api/ServerList";
 import { Settings } from "@api/Settings";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Devs } from "@utils/constants";
@@ -39,15 +43,18 @@ function FriendsIndicator() {
     forceUpdateFriendCount = useForceUpdater();
 
     return (
-        <span id="vc-friendcount" style={{
-            display: "inline-block",
-            width: "100%",
-            fontSize: "12px",
-            fontWeight: "600",
-            color: "var(--header-secondary)",
-            textTransform: "uppercase",
-            textAlign: "center",
-        }}>
+        <span
+            id="vc-friendcount"
+            style={{
+                display: "inline-block",
+                width: "100%",
+                fontSize: "12px",
+                fontWeight: "600",
+                color: "var(--header-secondary)",
+                textTransform: "uppercase",
+                textAlign: "center",
+            }}
+        >
             {onlineFriends} online
         </span>
     );
@@ -57,15 +64,18 @@ function ServersIndicator() {
     forceUpdateGuildCount = useForceUpdater();
 
     return (
-        <span id="vc-guildcount" style={{
-            display: "inline-block",
-            width: "100%",
-            fontSize: "12px",
-            fontWeight: "600",
-            color: "var(--header-secondary)",
-            textTransform: "uppercase",
-            textAlign: "center",
-        }}>
+        <span
+            id="vc-guildcount"
+            style={{
+                display: "inline-block",
+                width: "100%",
+                fontSize: "12px",
+                fontWeight: "600",
+                color: "var(--header-secondary)",
+                textTransform: "uppercase",
+                textAlign: "center",
+            }}
+        >
             {guildCount} servers
         </span>
     );
@@ -100,21 +110,30 @@ export default definePlugin({
             description: "mode",
             type: OptionType.SELECT,
             options: [
-                { label: "Only online friend count", value: IndicatorType.FRIEND, default: true },
+                {
+                    label: "Only online friend count",
+                    value: IndicatorType.FRIEND,
+                    default: true,
+                },
                 { label: "Only server count", value: IndicatorType.SERVER },
-                { label: "Both server and online friend counts", value: IndicatorType.BOTH },
-            ]
-        }
+                {
+                    label: "Both server and online friend counts",
+                    value: IndicatorType.BOTH,
+                },
+            ],
+        },
     },
 
     renderIndicator: () => {
         const { mode } = Settings.plugins.ServerListIndicators;
-        return <ErrorBoundary noop>
-            <div style={{ marginBottom: "4px" }}>
-                {!!(mode & IndicatorType.FRIEND) && <FriendsIndicator />}
-                {!!(mode & IndicatorType.SERVER) && <ServersIndicator />}
-            </div>
-        </ErrorBoundary>;
+        return (
+            <ErrorBoundary noop>
+                <div style={{ marginBottom: "4px" }}>
+                    {!!(mode & IndicatorType.FRIEND) && <FriendsIndicator />}
+                    {!!(mode & IndicatorType.SERVER) && <ServersIndicator />}
+                </div>
+            </ErrorBoundary>
+        );
     },
 
     flux: {
@@ -123,15 +142,20 @@ export default definePlugin({
         GUILD_DELETE: handleGuildUpdate,
     },
 
-
     start() {
-        addServerListElement(ServerListRenderPosition.Above, this.renderIndicator);
+        addServerListElement(
+            ServerListRenderPosition.Above,
+            this.renderIndicator,
+        );
 
         handlePresenceUpdate();
         handleGuildUpdate();
     },
 
     stop() {
-        removeServerListElement(ServerListRenderPosition.Above, this.renderIndicator);
-    }
+        removeServerListElement(
+            ServerListRenderPosition.Above,
+            this.renderIndicator,
+        );
+    },
 });

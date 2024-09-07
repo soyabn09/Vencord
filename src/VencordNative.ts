@@ -19,28 +19,42 @@ export function sendSync<T = any>(event: IpcEvents, ...args: any[]) {
     return ipcRenderer.sendSync(event, ...args) as T;
 }
 
-const PluginHelpers = {} as Record<string, Record<string, (...args: any[]) => Promise<any>>>;
-const pluginIpcMap = sendSync<PluginIpcMappings>(IpcEvents.GET_PLUGIN_IPC_METHOD_MAP);
+const PluginHelpers = {} as Record<
+    string,
+    Record<string, (...args: any[]) => Promise<any>>
+>;
+const pluginIpcMap = sendSync<PluginIpcMappings>(
+    IpcEvents.GET_PLUGIN_IPC_METHOD_MAP,
+);
 
 for (const [plugin, methods] of Object.entries(pluginIpcMap)) {
-    const map = PluginHelpers[plugin] = {};
+    const map = (PluginHelpers[plugin] = {});
     for (const [methodName, method] of Object.entries(methods)) {
-        map[methodName] = (...args: any[]) => invoke(method as IpcEvents, ...args);
+        map[methodName] = (...args: any[]) =>
+            invoke(method as IpcEvents, ...args);
     }
 }
 
 export default {
     themes: {
-        uploadTheme: (fileName: string, fileData: string) => invoke<void>(IpcEvents.UPLOAD_THEME, fileName, fileData),
-        deleteTheme: (fileName: string) => invoke<void>(IpcEvents.DELETE_THEME, fileName),
+        uploadTheme: (fileName: string, fileData: string) =>
+            invoke<void>(IpcEvents.UPLOAD_THEME, fileName, fileData),
+        deleteTheme: (fileName: string) =>
+            invoke<void>(IpcEvents.DELETE_THEME, fileName),
         getThemesDir: () => invoke<string>(IpcEvents.GET_THEMES_DIR),
-        getThemesList: () => invoke<Array<UserThemeHeader>>(IpcEvents.GET_THEMES_LIST),
-        getThemeData: (fileName: string) => invoke<string | undefined>(IpcEvents.GET_THEME_DATA, fileName),
-        getSystemValues: () => invoke<Record<string, string>>(IpcEvents.GET_THEME_SYSTEM_VALUES),
+        getThemesList: () =>
+            invoke<Array<UserThemeHeader>>(IpcEvents.GET_THEMES_LIST),
+        getThemeData: (fileName: string) =>
+            invoke<string | undefined>(IpcEvents.GET_THEME_DATA, fileName),
+        getSystemValues: () =>
+            invoke<Record<string, string>>(IpcEvents.GET_THEME_SYSTEM_VALUES),
     },
 
     updater: {
-        getUpdates: () => invoke<IpcRes<Record<"hash" | "author" | "message", string>[]>>(IpcEvents.GET_UPDATES),
+        getUpdates: () =>
+            invoke<IpcRes<Record<"hash" | "author" | "message", string>[]>>(
+                IpcEvents.GET_UPDATES,
+            ),
         update: () => invoke<IpcRes<boolean>>(IpcEvents.UPDATE),
         rebuild: () => invoke<IpcRes<boolean>>(IpcEvents.BUILD),
         getRepo: () => invoke<IpcRes<string>>(IpcEvents.GET_REPO),
@@ -48,7 +62,8 @@ export default {
 
     settings: {
         get: () => sendSync<Settings>(IpcEvents.GET_SETTINGS),
-        set: (settings: Settings, pathToNotify?: string) => invoke<void>(IpcEvents.SET_SETTINGS, settings, pathToNotify),
+        set: (settings: Settings, pathToNotify?: string) =>
+            invoke<void>(IpcEvents.SET_SETTINGS, settings, pathToNotify),
         getSettingsDir: () => invoke<string>(IpcEvents.GET_SETTINGS_DIR),
     },
 
@@ -70,8 +85,9 @@ export default {
 
     native: {
         getVersions: () => process.versions as Partial<NodeJS.ProcessVersions>,
-        openExternal: (url: string) => invoke<void>(IpcEvents.OPEN_EXTERNAL, url)
+        openExternal: (url: string) =>
+            invoke<void>(IpcEvents.OPEN_EXTERNAL, url),
     },
 
-    pluginHelpers: PluginHelpers
+    pluginHelpers: PluginHelpers,
 };

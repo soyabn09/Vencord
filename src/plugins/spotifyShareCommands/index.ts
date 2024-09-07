@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { ApplicationCommandInputType, sendBotMessage } from "@api/Commands";
 import { Devs } from "@utils/constants";
@@ -61,20 +61,28 @@ function sendMessage(channelId, message) {
         invalidEmojis: [],
         tts: false,
         validNonShortcutEmojis: [],
-        ...message
+        ...message,
     };
     const reply = PendingReplyStore.getPendingReply(channelId);
-    MessageActions.sendMessage(channelId, message, void 0, MessageActions.getSendMessageOptionsForReply(reply))
-        .then(() => {
-            if (reply) {
-                FluxDispatcher.dispatch({ type: "DELETE_PENDING_REPLY", channelId });
-            }
-        });
+    MessageActions.sendMessage(
+        channelId,
+        message,
+        void 0,
+        MessageActions.getSendMessageOptionsForReply(reply),
+    ).then(() => {
+        if (reply) {
+            FluxDispatcher.dispatch({
+                type: "DELETE_PENDING_REPLY",
+                channelId,
+            });
+        }
+    });
 }
 
 export default definePlugin({
     name: "SpotifyShareCommands",
-    description: "Share your current Spotify track, album or artist via slash command (/track, /album, /artist)",
+    description:
+        "Share your current Spotify track, album or artist via slash command (/track, /album, /artist)",
     authors: [Devs.katlyn],
     dependencies: ["CommandsAPI"],
     commands: [
@@ -87,15 +95,15 @@ export default definePlugin({
                 const track: Track | null = Spotify.getTrack();
                 if (track === null) {
                     sendBotMessage(ctx.channel.id, {
-                        content: "You're not listening to any music."
+                        content: "You're not listening to any music.",
                     });
                     return;
                 }
                 // Note: Due to how Discord handles commands, we need to manually create and send the message
                 sendMessage(ctx.channel.id, {
-                    content: `https://open.spotify.com/track/${track.id}`
+                    content: `https://open.spotify.com/track/${track.id}`,
                 });
-            }
+            },
         },
         {
             name: "album",
@@ -106,14 +114,14 @@ export default definePlugin({
                 const track: Track | null = Spotify.getTrack();
                 if (track === null) {
                     sendBotMessage(ctx.channel.id, {
-                        content: "You're not listening to any music."
+                        content: "You're not listening to any music.",
                     });
                     return;
                 }
                 sendMessage(ctx.channel.id, {
-                    content: `https://open.spotify.com/album/${track.album.id}`
+                    content: `https://open.spotify.com/album/${track.album.id}`,
                 });
-            }
+            },
         },
         {
             name: "artist",
@@ -124,14 +132,14 @@ export default definePlugin({
                 const track: Track | null = Spotify.getTrack();
                 if (track === null) {
                     sendBotMessage(ctx.channel.id, {
-                        content: "You're not listening to any music."
+                        content: "You're not listening to any music.",
                     });
                     return;
                 }
                 sendMessage(ctx.channel.id, {
-                    content: track.artists[0].external_urls.spotify
+                    content: track.artists[0].external_urls.spotify,
                 });
-            }
-        }
-    ]
+            },
+        },
+    ],
 });

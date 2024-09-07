@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import "./addonCard.css";
 
@@ -41,7 +41,19 @@ interface Props {
     author?: ReactNode;
 }
 
-export function AddonCard({ disabled, isNew, name, infoButton, footer, author, enabled, setEnabled, description, onMouseEnter, onMouseLeave }: Props) {
+export function AddonCard({
+    disabled,
+    isNew,
+    name,
+    infoButton,
+    footer,
+    author,
+    enabled,
+    setEnabled,
+    description,
+    onMouseEnter,
+    onMouseLeave,
+}: Props) {
     const titleRef = useRef<HTMLDivElement>(null);
     const titleContainerRef = useRef<HTMLDivElement>(null);
     return (
@@ -53,21 +65,32 @@ export function AddonCard({ disabled, isNew, name, infoButton, footer, author, e
             <div className={cl("header")}>
                 <div className={cl("name-author")}>
                     <Text variant="text-md/bold" className={cl("name")}>
-                        <div ref={titleContainerRef} className={cl("title-container")}>
+                        <div
+                            ref={titleContainerRef}
+                            className={cl("title-container")}
+                        >
                             <div
                                 ref={titleRef}
                                 className={cl("title")}
                                 onMouseOver={() => {
                                     const title = titleRef.current!;
-                                    const titleContainer = titleContainerRef.current!;
+                                    const titleContainer =
+                                        titleContainerRef.current!;
 
-                                    title.style.setProperty("--offset", `${titleContainer.clientWidth - title.scrollWidth}px`);
-                                    title.style.setProperty("--duration", `${Math.max(0.5, (title.scrollWidth - titleContainer.clientWidth) / 7)}s`);
+                                    title.style.setProperty(
+                                        "--offset",
+                                        `${titleContainer.clientWidth - title.scrollWidth}px`,
+                                    );
+                                    title.style.setProperty(
+                                        "--duration",
+                                        `${Math.max(0.5, (title.scrollWidth - titleContainer.clientWidth) / 7)}s`,
+                                    );
                                 }}
                             >
                                 {name}
                             </div>
-                        </div>{isNew && <Badge text="NEW" color="#ED4245" />}
+                        </div>
+                        {isNew && <Badge text="NEW" color="#ED4245" />}
                     </Text>
                     {!!author && (
                         <Text variant="text-md/normal" className={cl("author")}>
@@ -85,7 +108,9 @@ export function AddonCard({ disabled, isNew, name, infoButton, footer, author, e
                 />
             </div>
 
-            <Text className={cl("note")} variant="text-sm/normal">{description}</Text>
+            <Text className={cl("note")} variant="text-sm/normal">
+                {description}
+            </Text>
 
             {footer}
         </div>

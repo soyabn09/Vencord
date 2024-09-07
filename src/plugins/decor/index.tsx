@@ -14,9 +14,15 @@ import { UserStore } from "@webpack/common";
 import { CDN_URL, RAW_SKU_ID, SKU_ID } from "./lib/constants";
 import { useAuthorizationStore } from "./lib/stores/AuthorizationStore";
 import { useCurrentUserDecorationsStore } from "./lib/stores/CurrentUserDecorationsStore";
-import { useUserDecorAvatarDecoration, useUsersDecorationsStore } from "./lib/stores/UsersDecorationsStore";
+import {
+    useUserDecorAvatarDecoration,
+    useUsersDecorationsStore,
+} from "./lib/stores/UsersDecorationsStore";
 import { settings } from "./settings";
-import { setDecorationGridDecoration, setDecorationGridItem } from "./ui/components";
+import {
+    setDecorationGridDecoration,
+    setDecorationGridItem,
+} from "./ui/components";
 import DecorSection from "./ui/components/DecorSection";
 
 export interface AvatarDecoration {
@@ -26,7 +32,8 @@ export interface AvatarDecoration {
 
 export default definePlugin({
     name: "Decor",
-    description: "Create and use your own custom avatar decorations, or pick your favorite from the presets.",
+    description:
+        "Create and use your own custom avatar decorations, or pick your favorite from the presets.",
     authors: [Devs.FieryFlames],
     patches: [
         // Patch MediaResolver to return correct URL for Decor avatar decorations
@@ -34,16 +41,17 @@ export default definePlugin({
             find: "getAvatarDecorationURL:",
             replacement: {
                 match: /(?<=function \i\(\i\){)(?=let{avatarDecoration)/,
-                replace: "const vcDecorDecoration=$self.getDecorAvatarDecorationURL(arguments[0]);if(vcDecorDecoration)return vcDecorDecoration;"
-            }
+                replace:
+                    "const vcDecorDecoration=$self.getDecorAvatarDecorationURL(arguments[0]);if(vcDecorDecoration)return vcDecorDecoration;",
+            },
         },
         // Patch profile customization settings to include Decor section
         {
             find: "DefaultCustomizationSections",
             replacement: {
                 match: /(?<=USER_SETTINGS_AVATAR_DECORATION},"decoration"\),)/,
-                replace: "$self.DecorSection(),"
-            }
+                replace: "$self.DecorSection(),",
+            },
         },
         // Decoration modal module
         {
@@ -51,18 +59,18 @@ export default definePlugin({
             replacement: [
                 {
                     match: /(?<==)\i=>{let{children.{20,100}decorationGridItem/,
-                    replace: "$self.DecorationGridItem=$&"
+                    replace: "$self.DecorationGridItem=$&",
                 },
                 {
                     match: /(?<==)\i=>{let{user:\i,avatarDecoration.{300,600}decorationGridItemChurned/,
-                    replace: "$self.DecorationGridDecoration=$&"
+                    replace: "$self.DecorationGridDecoration=$&",
                 },
                 // Remove NEW label from decor avatar decorations
                 {
                     match: /(?<=\.\i\.PREMIUM_PURCHASE&&\i)(?<=avatarDecoration:(\i).+?)/,
-                    replace: "||$1.skuId===$self.SKU_ID"
-                }
-            ]
+                    replace: "||$1.skuId===$self.SKU_ID",
+                },
+            ],
         },
         {
             find: "isAvatarDecorationAnimating:",
@@ -71,19 +79,20 @@ export default definePlugin({
                 // Add Decor avatar decoration hook to avatar decoration hook
                 {
                     match: /(?<=TryItOut:\i,guildId:\i}\),)(?<=user:(\i).+?)/,
-                    replace: "vcDecorAvatarDecoration=$self.useUserDecorAvatarDecoration($1),"
+                    replace:
+                        "vcDecorAvatarDecoration=$self.useUserDecorAvatarDecoration($1),",
                 },
                 // Use added hook
                 {
                     match: /(?<={avatarDecoration:).{1,20}?(?=,)(?<=avatarDecorationOverride:(\i).+?)/,
-                    replace: "$1??vcDecorAvatarDecoration??($&)"
+                    replace: "$1??vcDecorAvatarDecoration??($&)",
                 },
                 // Make memo depend on added hook
                 {
                     match: /(?<=size:\i}\),\[)/,
-                    replace: "vcDecorAvatarDecoration,"
-                }
-            ]
+                    replace: "vcDecorAvatarDecoration,",
+                },
+            ],
         },
         // Current user area, at bottom of channels/dm list
         {
@@ -92,10 +101,10 @@ export default definePlugin({
                 // Use Decor avatar decoration hook
                 {
                     match: /(?<=\i\)\({avatarDecoration:)(\i)(?=,)(?<=currentUser:(\i).+?)/,
-                    replace: "$self.useUserDecorAvatarDecoration($1)??$&"
-                }
-            ]
-        }
+                    replace: "$self.useUserDecorAvatarDecoration($1)??$&",
+                },
+            ],
+        },
     ],
     settings,
 
@@ -103,9 +112,11 @@ export default definePlugin({
         CONNECTION_OPEN: () => {
             useAuthorizationStore.getState().init();
             useCurrentUserDecorationsStore.getState().clear();
-            useUsersDecorationsStore.getState().fetch(UserStore.getCurrentUser().id, true);
+            useUsersDecorationsStore
+                .getState()
+                .fetch(UserStore.getCurrentUser().id, true);
         },
-        USER_PROFILE_MODAL_OPEN: data => {
+        USER_PROFILE_MODAL_OPEN: (data) => {
             useUsersDecorationsStore.getState().fetch(data.userId, true);
         },
     },
@@ -123,20 +134,29 @@ export default definePlugin({
     useUserDecorAvatarDecoration,
 
     async start() {
-        useUsersDecorationsStore.getState().fetch(UserStore.getCurrentUser().id, true);
+        useUsersDecorationsStore
+            .getState()
+            .fetch(UserStore.getCurrentUser().id, true);
     },
 
-    getDecorAvatarDecorationURL({ avatarDecoration, canAnimate }: { avatarDecoration: AvatarDecoration | null; canAnimate?: boolean; }) {
+    getDecorAvatarDecorationURL({
+        avatarDecoration,
+        canAnimate,
+    }: {
+        avatarDecoration: AvatarDecoration | null;
+        canAnimate?: boolean;
+    }) {
         // Only Decor avatar decorations have this SKU ID
         if (avatarDecoration?.skuId === SKU_ID) {
             const parts = avatarDecoration.asset.split("_");
             // Remove a_ prefix if it's animated and animation is disabled
-            if (avatarDecoration.asset.startsWith("a_") && !canAnimate) parts.shift();
+            if (avatarDecoration.asset.startsWith("a_") && !canAnimate)
+                parts.shift();
             return `${CDN_URL}/${parts.join("_")}.png`;
         } else if (avatarDecoration?.skuId === RAW_SKU_ID) {
             return avatarDecoration.asset;
         }
     },
 
-    DecorSection: ErrorBoundary.wrap(DecorSection)
+    DecorSection: ErrorBoundary.wrap(DecorSection),
 });

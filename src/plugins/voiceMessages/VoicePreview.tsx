@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { useTimer } from "@utils/react";
 import { findComponentByCodeLazy } from "@webpack";
@@ -25,7 +25,10 @@ interface VoiceMessageProps {
     src: string;
     waveform: string;
 }
-const VoiceMessage = findComponentByCodeLazy<VoiceMessageProps>("waveform:", "onVolumeChange");
+const VoiceMessage = findComponentByCodeLazy<VoiceMessageProps>(
+    "waveform:",
+    "onVolumeChange",
+);
 
 export type VoicePreviewOptions = {
     src?: string;
@@ -38,11 +41,14 @@ export const VoicePreview = ({
     recording,
 }: VoicePreviewOptions) => {
     const durationMs = useTimer({
-        deps: [recording]
+        deps: [recording],
     });
 
     const durationSeconds = recording ? Math.floor(durationMs / 1000) : 0;
-    const durationDisplay = Math.floor(durationSeconds / 60) + ":" + (durationSeconds % 60).toString().padStart(2, "0");
+    const durationDisplay =
+        Math.floor(durationSeconds / 60) +
+        ":" +
+        (durationSeconds % 60).toString().padStart(2, "0");
 
     if (src && !recording)
         return <VoiceMessage key={src} src={src} waveform={waveform} />;
@@ -51,7 +57,9 @@ export const VoicePreview = ({
         <div className={cl("preview", recording ? "preview-recording" : [])}>
             <div className={cl("preview-indicator")} />
             <div className={cl("preview-time")}>{durationDisplay}</div>
-            <div className={cl("preview-label")}>{recording ? "RECORDING" : "----"}</div>
+            <div className={cl("preview-label")}>
+                {recording ? "RECORDING" : "----"}
+            </div>
         </div>
     );
 };

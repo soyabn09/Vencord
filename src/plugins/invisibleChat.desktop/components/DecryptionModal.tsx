@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import {
     ModalContent,
@@ -38,9 +38,16 @@ export function DecModal(props: any) {
             </ModalHeader>
 
             <ModalContent>
-                <Forms.FormTitle tag="h5" style={{ marginTop: "10px" }}>Message with Encryption</Forms.FormTitle>
-                <TextInput defaultValue={encryptedMessage} disabled={true}></TextInput>
-                <Forms.FormTitle tag="h5" style={{ marginTop: "10px" }}>Password</Forms.FormTitle>
+                <Forms.FormTitle tag="h5" style={{ marginTop: "10px" }}>
+                    Message with Encryption
+                </Forms.FormTitle>
+                <TextInput
+                    defaultValue={encryptedMessage}
+                    disabled={true}
+                ></TextInput>
+                <Forms.FormTitle tag="h5" style={{ marginTop: "10px" }}>
+                    Password
+                </Forms.FormTitle>
                 <TextInput
                     style={{ marginBottom: "20px" }}
                     onChange={setPassword}
@@ -51,12 +58,20 @@ export function DecModal(props: any) {
                 <Button
                     color={Button.Colors.GREEN}
                     onClick={() => {
-                        const toSend = decrypt(encryptedMessage, password, true);
+                        const toSend = decrypt(
+                            encryptedMessage,
+                            password,
+                            true,
+                        );
                         if (!toSend || !props?.message) return;
                         // @ts-expect-error
-                        Vencord.Plugins.plugins.InvisibleChat.buildEmbed(props?.message, toSend);
+                        Vencord.Plugins.plugins.InvisibleChat.buildEmbed(
+                            props?.message,
+                            toSend,
+                        );
                         props.onClose();
-                    }}>
+                    }}
+                >
                     Decrypt
                 </Button>
                 <Button

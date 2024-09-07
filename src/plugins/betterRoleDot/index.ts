@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Settings } from "@api/Settings";
 import { Devs } from "@utils/constants";
@@ -32,7 +32,8 @@ export default definePlugin({
             find: ".dotBorderBase",
             replacement: {
                 match: /,viewBox:"0 0 20 20"/,
-                replace: "$&,onClick:()=>$self.copyToClipBoard(arguments[0].color),style:{cursor:'pointer'}",
+                replace:
+                    "$&,onClick:()=>$self.copyToClipBoard(arguments[0].color),style:{cursor:'pointer'}",
             },
         },
         {
@@ -49,23 +50,27 @@ export default definePlugin({
         {
             find: ".ADD_ROLE_A11Y_LABEL",
             all: true,
-            predicate: () => Settings.plugins.BetterRoleDot.copyRoleColorInProfilePopout && !Settings.plugins.BetterRoleDot.bothStyles,
+            predicate: () =>
+                Settings.plugins.BetterRoleDot.copyRoleColorInProfilePopout &&
+                !Settings.plugins.BetterRoleDot.bothStyles,
             noWarn: true,
             replacement: {
                 match: /"dot"===\i/,
-                replace: "true"
-            }
+                replace: "true",
+            },
         },
         {
             find: ".roleVerifiedIcon",
             all: true,
-            predicate: () => Settings.plugins.BetterRoleDot.copyRoleColorInProfilePopout && !Settings.plugins.BetterRoleDot.bothStyles,
+            predicate: () =>
+                Settings.plugins.BetterRoleDot.copyRoleColorInProfilePopout &&
+                !Settings.plugins.BetterRoleDot.bothStyles,
             noWarn: true,
             replacement: {
                 match: /"dot"===\i/,
-                replace: "true"
-            }
-        }
+                replace: "true",
+            },
+        },
     ],
 
     options: {
@@ -77,10 +82,11 @@ export default definePlugin({
         },
         copyRoleColorInProfilePopout: {
             type: OptionType.BOOLEAN,
-            description: "Allow click on role dot in profile popout to copy role color",
+            description:
+                "Allow click on role dot in profile popout to copy role color",
             restartNeeded: true,
-            default: false
-        }
+            default: false,
+        },
     },
 
     copyToClipBoard(color: string) {
@@ -91,8 +97,8 @@ export default definePlugin({
             id: Toasts.genId(),
             options: {
                 duration: 1000,
-                position: Toasts.Position.BOTTOM
-            }
+                position: Toasts.Position.BOTTOM,
+            },
         });
     },
 });

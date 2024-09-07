@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { NavContextMenuPatchCallback } from "@api/ContextMenu";
 import { definePluginSettings } from "@api/Settings";
@@ -79,9 +79,11 @@ export const settings = definePluginSettings({
     },
 });
 
-
-const imageContextMenuPatch: NavContextMenuPatchCallback = children => {
-    const { square, nearestNeighbour } = settings.use(["square", "nearestNeighbour"]);
+const imageContextMenuPatch: NavContextMenuPatchCallback = (children) => {
+    const { square, nearestNeighbour } = settings.use([
+        "square",
+        "nearestNeighbour",
+    ]);
 
     children.push(
         <Menu.MenuGroup id="image-zoom">
@@ -111,7 +113,10 @@ const imageContextMenuPatch: NavContextMenuPatchCallback = children => {
                         minValue={1}
                         maxValue={50}
                         value={settings.store.zoom}
-                        onChange={debounce((value: number) => settings.store.zoom = value, 100)}
+                        onChange={debounce(
+                            (value: number) => (settings.store.zoom = value),
+                            100,
+                        )}
                     />
                 )}
             />
@@ -125,7 +130,10 @@ const imageContextMenuPatch: NavContextMenuPatchCallback = children => {
                         minValue={50}
                         maxValue={1000}
                         value={settings.store.size}
-                        onChange={debounce((value: number) => settings.store.size = value, 100)}
+                        onChange={debounce(
+                            (value: number) => (settings.store.size = value),
+                            100,
+                        )}
                     />
                 )}
             />
@@ -139,18 +147,23 @@ const imageContextMenuPatch: NavContextMenuPatchCallback = children => {
                         minValue={0.1}
                         maxValue={5}
                         value={settings.store.zoomSpeed}
-                        onChange={debounce((value: number) => settings.store.zoomSpeed = value, 100)}
+                        onChange={debounce(
+                            (value: number) =>
+                                (settings.store.zoomSpeed = value),
+                            100,
+                        )}
                         renderValue={(value: number) => `${value.toFixed(3)}x`}
                     />
                 )}
             />
-        </Menu.MenuGroup>
+        </Menu.MenuGroup>,
     );
 };
 
 export default definePlugin({
     name: "ImageZoom",
-    description: "Lets you zoom in to images and gifs. Use scroll wheel to zoom in and shift + scroll wheel to increase lens radius / size",
+    description:
+        "Lets you zoom in to images and gifs. Use scroll wheel to zoom in and shift + scroll wheel to increase lens radius / size",
     authors: [Devs.Aria],
     tags: ["ImageUtilities"],
 
@@ -163,8 +176,8 @@ export default definePlugin({
                 // also idk if this patch is good, should it be more specific?
                 // https://regex101.com/r/xfvNvV/1
                 match: /return.{1,200}\.wrapper.{1,200}src:\i,/g,
-                replace: `$&id: '${ELEMENT_ID}',`
-            }
+                replace: `$&id: '${ELEMENT_ID}',`,
+            },
         },
 
         {
@@ -172,7 +185,7 @@ export default definePlugin({
             replacement: [
                 {
                     match: /placeholderVersion:\i,(?=.{0,50}children:)/,
-                    replace: "...$self.makeProps(this),$&"
+                    replace: "...$self.makeProps(this),$&",
                 },
 
                 {
@@ -182,26 +195,28 @@ export default definePlugin({
 
                 {
                     match: /componentWillUnmount\(\){/,
-                    replace: "$&$self.unMountMagnifier();"
-                }
-            ]
+                    replace: "$&$self.unMountMagnifier();",
+                },
+            ],
         },
         {
             find: ".carouselModal",
             replacement: {
                 match: /(?<=\.carouselModal.{0,100}onClick:)\i,/,
-                replace: "()=>{},"
-            }
-        }
+                replace: "()=>{},",
+            },
+        },
     ],
 
     settings,
     contextMenus: {
-        "image-context": imageContextMenuPatch
+        "image-context": imageContextMenuPatch,
     },
 
     // to stop from rendering twice /shrug
-    currentMagnifierElement: null as React.FunctionComponentElement<MagnifierProps & JSX.IntrinsicAttributes> | null,
+    currentMagnifierElement: null as React.FunctionComponentElement<
+        MagnifierProps & JSX.IntrinsicAttributes
+    > | null,
     element: null as HTMLDivElement | null,
 
     Magnifier,
@@ -219,7 +234,13 @@ export default definePlugin({
     renderMagnifier(instance) {
         if (instance.props.id === ELEMENT_ID) {
             if (!this.currentMagnifierElement) {
-                this.currentMagnifierElement = <Magnifier size={settings.store.size} zoom={settings.store.zoom} instance={instance} />;
+                this.currentMagnifierElement = (
+                    <Magnifier
+                        size={settings.store.size}
+                        zoom={settings.store.zoom}
+                        instance={instance}
+                    />
+                );
                 this.root = ReactDOM.createRoot(this.element!);
                 this.root.render(this.currentMagnifierElement);
             }
@@ -258,5 +279,5 @@ export default definePlugin({
         // so componenetWillUnMount gets called if Magnifier component is still alive
         this.root && this.root.unmount();
         this.element?.remove();
-    }
+    },
 });

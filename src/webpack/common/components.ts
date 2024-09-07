@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { filters, findByPropsLazy, waitFor } from "@webpack";
 
@@ -22,10 +22,10 @@ import { waitForComponent } from "./internal";
 import * as t from "./types/components";
 
 export let Forms = {} as {
-    FormTitle: t.FormTitle,
-    FormSection: t.FormSection,
-    FormDivider: t.FormDivider,
-    FormText: t.FormText,
+    FormTitle: t.FormTitle;
+    FormSection: t.FormSection;
+    FormDivider: t.FormDivider;
+    FormText: t.FormText;
 };
 
 export let Card: t.Card;
@@ -53,13 +53,23 @@ export let FocusLock: t.FocusLock;
 /** css colour resolver stuff, no clue what exactly this does, just copied usage from Discord */
 export let useToken: t.useToken;
 
-export const MaskedLink = waitForComponent<t.MaskedLink>("MaskedLink", filters.componentByCode("MASKED_LINK)"));
-export const Timestamp = waitForComponent<t.Timestamp>("Timestamp", filters.byCode(".Messages.MESSAGE_EDITED_TIMESTAMP_A11Y_LABEL.format"));
-export const Flex = waitForComponent<t.Flex>("Flex", ["Justify", "Align", "Wrap"]);
+export const MaskedLink = waitForComponent<t.MaskedLink>(
+    "MaskedLink",
+    filters.componentByCode("MASKED_LINK)"),
+);
+export const Timestamp = waitForComponent<t.Timestamp>(
+    "Timestamp",
+    filters.byCode(".Messages.MESSAGE_EDITED_TIMESTAMP_A11Y_LABEL.format"),
+);
+export const Flex = waitForComponent<t.Flex>("Flex", [
+    "Justify",
+    "Align",
+    "Wrap",
+]);
 
 export const { OAuth2AuthorizeModal } = findByPropsLazy("OAuth2AuthorizeModal");
 
-waitFor(["FormItem", "Button"], m => {
+waitFor(["FormItem", "Button"], (m) => {
     ({
         useToken,
         Card,
@@ -82,7 +92,7 @@ waitFor(["FormItem", "Button"], m => {
         Clickable,
         Avatar,
         FocusLock,
-        Heading
+        Heading,
     } = m);
     Forms = m;
 });

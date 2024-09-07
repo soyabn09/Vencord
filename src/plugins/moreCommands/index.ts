@@ -14,12 +14,17 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
-import { ApplicationCommandInputType, findOption, OptionalMessageOption, RequiredMessageOption, sendBotMessage } from "@api/Commands";
+import {
+    ApplicationCommandInputType,
+    findOption,
+    OptionalMessageOption,
+    RequiredMessageOption,
+    sendBotMessage,
+} from "@api/Commands";
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
-
 
 function mock(input: string): string {
     let output = "";
@@ -50,17 +55,17 @@ export default definePlugin({
             name: "lenny",
             description: "Sends a lenny face",
             options: [OptionalMessageOption],
-            execute: opts => ({
-                content: findOption(opts, "message", "") + " ( ͡° ͜ʖ ͡°)"
+            execute: (opts) => ({
+                content: findOption(opts, "message", "") + " ( ͡° ͜ʖ ͡°)",
             }),
         },
         {
             name: "mock",
             description: "mOcK PeOpLe",
             options: [RequiredMessageOption],
-            execute: opts => ({
-                content: mock(findOption(opts, "message", ""))
+            execute: (opts) => ({
+                content: mock(findOption(opts, "message", "")),
             }),
         },
-    ]
+    ],
 });

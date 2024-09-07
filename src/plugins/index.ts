@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { registerCommand, unregisterCommand } from "@api/Commands";
 import { addContextMenuPatch, removeContextMenuPatch } from "@api/ContextMenu";
@@ -44,10 +44,11 @@ const settings = Settings.plugins;
 
 export function isPluginEnabled(p: string) {
     return (
-        Plugins[p]?.required ||
-        Plugins[p]?.isDependency ||
-        settings[p]?.enabled
-    ) ?? false;
+        (Plugins[p]?.required ||
+            Plugins[p]?.isDependency ||
+            settings[p]?.enabled) ??
+        false
+    );
 }
 
 export function addPatch(newPatch: Omit<Patch, "plugin">, pluginName: string) {
@@ -66,10 +67,12 @@ export function addPatch(newPatch: Omit<Patch, "plugin">, pluginName: string) {
         patch.replacement = [patch.replacement];
     }
 
-    patch.replacement = patch.replacement.filter(({ predicate }) => !predicate || predicate());
+    patch.replacement = patch.replacement.filter(
+        ({ predicate }) => !predicate || predicate(),
+    );
 
     if (IS_REPORTER) {
-        patch.replacement.forEach(r => {
+        patch.replacement.forEach((r) => {
             delete r.predicate;
         });
     }
@@ -87,25 +90,28 @@ function isReporterTestable(p: Plugin, part: ReporterTestable) {
 //
 // FIXME: might need to revisit this if there's ever nested (dependencies of dependencies) dependencies since this only
 // goes for the top level and their children, but for now this works okay with the current API plugins
-for (const p of pluginsValues) if (isPluginEnabled(p.name)) {
-    p.dependencies?.forEach(d => {
-        const dep = Plugins[d];
+for (const p of pluginsValues)
+    if (isPluginEnabled(p.name)) {
+        p.dependencies?.forEach((d) => {
+            const dep = Plugins[d];
 
-        if (!dep) {
-            const error = new Error(`Plugin ${p.name} has unresolved dependency ${d}`);
+            if (!dep) {
+                const error = new Error(
+                    `Plugin ${p.name} has unresolved dependency ${d}`,
+                );
 
-            if (IS_DEV) {
-                throw error;
+                if (IS_DEV) {
+                    throw error;
+                }
+
+                logger.warn(error);
+                return;
             }
 
-            logger.warn(error);
-            return;
-        }
-
-        settings[d].enabled = true;
-        dep.isDependency = true;
-    });
-}
+            settings[d].enabled = true;
+            dep.isDependency = true;
+        });
+    }
 
 for (const p of pluginsValues) {
     if (p.settings) {
@@ -126,25 +132,32 @@ for (const p of pluginsValues) {
     }
 }
 
-export const startAllPlugins = traceFunction("startAllPlugins", function startAllPlugins(target: StartAt) {
-    logger.info(`Starting plugins (stage ${target})`);
-    for (const name in Plugins) {
-        if (isPluginEnabled(name) && (!IS_REPORTER || isReporterTestable(Plugins[name], ReporterTestable.Start))) {
-            const p = Plugins[name];
+export const startAllPlugins = traceFunction(
+    "startAllPlugins",
+    function startAllPlugins(target: StartAt) {
+        logger.info(`Starting plugins (stage ${target})`);
+        for (const name in Plugins) {
+            if (
+                isPluginEnabled(name) &&
+                (!IS_REPORTER ||
+                    isReporterTestable(Plugins[name], ReporterTestable.Start))
+            ) {
+                const p = Plugins[name];
 
-            const startAt = p.startAt ?? StartAt.WebpackReady;
-            if (startAt !== target) continue;
+                const startAt = p.startAt ?? StartAt.WebpackReady;
+                if (startAt !== target) continue;
 
-            startPlugin(Plugins[name]);
+                startPlugin(Plugins[name]);
+            }
         }
-    }
-});
+    },
+);
 
 export function startDependenciesRecursive(p: Plugin) {
     let restartNeeded = false;
     const failures: string[] = [];
 
-    p.dependencies?.forEach(d => {
+    p.dependencies?.forEach((d) => {
         if (!settings[d].enabled) {
             const dep = Plugins[d];
             startDependenciesRecursive(dep);
@@ -167,29 +180,47 @@ export function startDependenciesRecursive(p: Plugin) {
     return { restartNeeded, failures };
 }
 
-export function subscribePluginFluxEvents(p: Plugin, fluxDispatcher: typeof FluxDispatcher) {
-    if (p.flux && !subscribedFluxEventsPlugins.has(p.name) && (!IS_REPORTER || isReporterTestable(p, ReporterTestable.FluxEvents))) {
+export function subscribePluginFluxEvents(
+    p: Plugin,
+    fluxDispatcher: typeof FluxDispatcher,
+) {
+    if (
+        p.flux &&
+        !subscribedFluxEventsPlugins.has(p.name) &&
+        (!IS_REPORTER || isReporterTestable(p, ReporterTestable.FluxEvents))
+    ) {
         subscribedFluxEventsPlugins.add(p.name);
 
         logger.debug("Subscribing to flux events of plugin", p.name);
         for (const [event, handler] of Object.entries(p.flux)) {
-            const wrappedHandler = p.flux[event] = function () {
+            const wrappedHandler = (p.flux[event] = function () {
                 try {
                     const res = handler.apply(p, arguments as any);
                     return res instanceof Promise
-                        ? res.catch(e => logger.error(`${p.name}: Error while handling ${event}\n`, e))
+                        ? res.catch((e) =>
+                              logger.error(
+                                  `${p.name}: Error while handling ${event}\n`,
+                                  e,
+                              ),
+                          )
                         : res;
                 } catch (e) {
-                    logger.error(`${p.name}: Error while handling ${event}\n`, e);
+                    logger.error(
+                        `${p.name}: Error while handling ${event}\n`,
+                        e,
+                    );
                 }
-            };
+            });
 
             fluxDispatcher.subscribe(event as FluxEvents, wrappedHandler);
         }
     }
 }
 
-export function unsubscribePluginFluxEvents(p: Plugin, fluxDispatcher: typeof FluxDispatcher) {
+export function unsubscribePluginFluxEvents(
+    p: Plugin,
+    fluxDispatcher: typeof FluxDispatcher,
+) {
     if (p.flux) {
         subscribedFluxEventsPlugins.delete(p.name);
 
@@ -200,7 +231,9 @@ export function unsubscribePluginFluxEvents(p: Plugin, fluxDispatcher: typeof Fl
     }
 }
 
-export function subscribeAllPluginsFluxEvents(fluxDispatcher: typeof FluxDispatcher) {
+export function subscribeAllPluginsFluxEvents(
+    fluxDispatcher: typeof FluxDispatcher,
+) {
     enabledPluginsSubscribedFlux = true;
 
     for (const name in Plugins) {
@@ -209,91 +242,101 @@ export function subscribeAllPluginsFluxEvents(fluxDispatcher: typeof FluxDispatc
     }
 }
 
-export const startPlugin = traceFunction("startPlugin", function startPlugin(p: Plugin) {
-    const { name, commands, contextMenus } = p;
+export const startPlugin = traceFunction(
+    "startPlugin",
+    function startPlugin(p: Plugin) {
+        const { name, commands, contextMenus } = p;
 
-    if (p.start) {
-        logger.info("Starting plugin", name);
-        if (p.started) {
-            logger.warn(`${name} already started`);
-            return false;
-        }
-        try {
-            p.start();
-        } catch (e) {
-            logger.error(`Failed to start ${name}\n`, e);
-            return false;
-        }
-    }
-
-    p.started = true;
-
-    if (commands?.length) {
-        logger.debug("Registering commands of plugin", name);
-        for (const cmd of commands) {
+        if (p.start) {
+            logger.info("Starting plugin", name);
+            if (p.started) {
+                logger.warn(`${name} already started`);
+                return false;
+            }
             try {
-                registerCommand(cmd, name);
+                p.start();
             } catch (e) {
-                logger.error(`Failed to register command ${cmd.name}\n`, e);
+                logger.error(`Failed to start ${name}\n`, e);
                 return false;
             }
         }
-    }
 
-    if (enabledPluginsSubscribedFlux) {
-        subscribePluginFluxEvents(p, FluxDispatcher);
-    }
+        p.started = true;
 
-
-    if (contextMenus) {
-        logger.debug("Adding context menus patches of plugin", name);
-        for (const navId in contextMenus) {
-            addContextMenuPatch(navId, contextMenus[navId]);
+        if (commands?.length) {
+            logger.debug("Registering commands of plugin", name);
+            for (const cmd of commands) {
+                try {
+                    registerCommand(cmd, name);
+                } catch (e) {
+                    logger.error(`Failed to register command ${cmd.name}\n`, e);
+                    return false;
+                }
+            }
         }
-    }
 
-    return true;
-}, p => `startPlugin ${p.name}`);
-
-export const stopPlugin = traceFunction("stopPlugin", function stopPlugin(p: Plugin) {
-    const { name, commands, contextMenus } = p;
-
-    if (p.stop) {
-        logger.info("Stopping plugin", name);
-        if (!p.started) {
-            logger.warn(`${name} already stopped`);
-            return false;
+        if (enabledPluginsSubscribedFlux) {
+            subscribePluginFluxEvents(p, FluxDispatcher);
         }
-        try {
-            p.stop();
-        } catch (e) {
-            logger.error(`Failed to stop ${name}\n`, e);
-            return false;
+
+        if (contextMenus) {
+            logger.debug("Adding context menus patches of plugin", name);
+            for (const navId in contextMenus) {
+                addContextMenuPatch(navId, contextMenus[navId]);
+            }
         }
-    }
 
-    p.started = false;
+        return true;
+    },
+    (p) => `startPlugin ${p.name}`,
+);
 
-    if (commands?.length) {
-        logger.debug("Unregistering commands of plugin", name);
-        for (const cmd of commands) {
+export const stopPlugin = traceFunction(
+    "stopPlugin",
+    function stopPlugin(p: Plugin) {
+        const { name, commands, contextMenus } = p;
+
+        if (p.stop) {
+            logger.info("Stopping plugin", name);
+            if (!p.started) {
+                logger.warn(`${name} already stopped`);
+                return false;
+            }
             try {
-                unregisterCommand(cmd.name);
+                p.stop();
             } catch (e) {
-                logger.error(`Failed to unregister command ${cmd.name}\n`, e);
+                logger.error(`Failed to stop ${name}\n`, e);
                 return false;
             }
         }
-    }
 
-    unsubscribePluginFluxEvents(p, FluxDispatcher);
+        p.started = false;
 
-    if (contextMenus) {
-        logger.debug("Removing context menus patches of plugin", name);
-        for (const navId in contextMenus) {
-            removeContextMenuPatch(navId, contextMenus[navId]);
+        if (commands?.length) {
+            logger.debug("Unregistering commands of plugin", name);
+            for (const cmd of commands) {
+                try {
+                    unregisterCommand(cmd.name);
+                } catch (e) {
+                    logger.error(
+                        `Failed to unregister command ${cmd.name}\n`,
+                        e,
+                    );
+                    return false;
+                }
+            }
         }
-    }
 
-    return true;
-}, p => `stopPlugin ${p.name}`);
+        unsubscribePluginFluxEvents(p, FluxDispatcher);
+
+        if (contextMenus) {
+            logger.debug("Removing context menus patches of plugin", name);
+            for (const navId in contextMenus) {
+                removeContextMenuPatch(navId, contextMenus[navId]);
+            }
+        }
+
+        return true;
+    },
+    (p) => `stopPlugin ${p.name}`,
+);

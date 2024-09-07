@@ -15,16 +15,12 @@ type DecorationGridCreateProps = HTMLProps<HTMLDivElement> & {
 };
 
 export default function DecorationGridCreate(props: DecorationGridCreateProps) {
-    return <DecorationGridItem
-        {...props}
-        isSelected={false}
-    >
-        <PlusIcon />
-        <Text
-            variant="text-xs/normal"
-            color="header-primary"
-        >
-            {i18n.Messages.CREATE}
-        </Text>
-    </DecorationGridItem >;
+    return (
+        <DecorationGridItem {...props} isSelected={false}>
+            <PlusIcon />
+            <Text variant="text-xs/normal" color="header-primary">
+                {i18n.Messages.CREATE}
+            </Text>
+        </DecorationGridItem>
+    );
 }

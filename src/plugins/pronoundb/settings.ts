@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { definePluginSettings } from "@api/Settings";
 import { OptionType } from "@utils/types";
@@ -29,13 +29,13 @@ export const settings = definePluginSettings({
             {
                 label: "Lowercase",
                 value: PronounsFormat.Lowercase,
-                default: true
+                default: true,
             },
             {
                 label: "Capitalized",
-                value: PronounsFormat.Capitalized
-            }
-        ]
+                value: PronounsFormat.Capitalized,
+            },
+        ],
     },
     pronounSource: {
         type: OptionType.SELECT,
@@ -44,27 +44,27 @@ export const settings = definePluginSettings({
             {
                 label: "Prefer PronounDB, fall back to Discord",
                 value: PronounSource.PreferPDB,
-                default: true
+                default: true,
             },
             {
                 label: "Prefer Discord, fall back to PronounDB (might lead to inconsistency between pronouns in chat and profile)",
-                value: PronounSource.PreferDiscord
-            }
-        ]
+                value: PronounSource.PreferDiscord,
+            },
+        ],
     },
     showSelf: {
         type: OptionType.BOOLEAN,
         description: "Enable or disable showing pronouns for the current user",
-        default: true
+        default: true,
     },
     showInMessages: {
         type: OptionType.BOOLEAN,
         description: "Show in messages",
-        default: true
+        default: true,
     },
     showInProfile: {
         type: OptionType.BOOLEAN,
         description: "Show in profile",
-        default: true
-    }
+        default: true,
+    },
 });

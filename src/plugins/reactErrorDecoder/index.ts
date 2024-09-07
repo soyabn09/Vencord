@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
@@ -41,8 +41,13 @@ export default definePlugin({
         const CODES_URL = `https://raw.githubusercontent.com/facebook/react/v${React.version}/scripts/error-codes/codes.json`;
 
         ERROR_CODES = await fetch(CODES_URL)
-            .then(res => res.json())
-            .catch(e => console.error("[ReactErrorDecoder] Failed to fetch React error codes\n", e));
+            .then((res) => res.json())
+            .catch((e) =>
+                console.error(
+                    "[ReactErrorDecoder] Failed to fetch React error codes\n",
+                    e,
+                ),
+            );
     },
 
     stop() {

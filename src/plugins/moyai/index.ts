@@ -14,14 +14,18 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { definePluginSettings } from "@api/Settings";
 import { makeRange } from "@components/PluginSettings/components/SettingSliderComponent";
 import { Devs } from "@utils/constants";
 import { sleep } from "@utils/misc";
 import definePlugin, { OptionType } from "@utils/types";
-import { RelationshipStore, SelectedChannelStore, UserStore } from "@webpack/common";
+import {
+    RelationshipStore,
+    SelectedChannelStore,
+    UserStore,
+} from "@webpack/common";
 import { Message, ReactionEmoji } from "discord-types/general";
 
 interface IMessageCreate {
@@ -63,31 +67,31 @@ const settings = definePluginSettings({
         type: OptionType.SLIDER,
         markers: makeRange(0, 1, 0.1),
         default: 0.5,
-        stickToMarkers: false
+        stickToMarkers: false,
     },
     quality: {
         description: "Quality of the 🗿🗿🗿",
         type: OptionType.SELECT,
         options: [
             { label: "Normal", value: "Normal", default: true },
-            { label: "HD", value: "HD" }
+            { label: "HD", value: "HD" },
         ],
     },
     triggerWhenUnfocused: {
         description: "Trigger the 🗿 even when the window is unfocused",
         type: OptionType.BOOLEAN,
-        default: true
+        default: true,
     },
     ignoreBots: {
         description: "Ignore bots",
         type: OptionType.BOOLEAN,
-        default: true
+        default: true,
     },
     ignoreBlocked: {
         description: "Ignore blocked users",
         type: OptionType.BOOLEAN,
-        default: true
-    }
+        default: true,
+    },
 });
 
 export default definePlugin({
@@ -97,11 +101,20 @@ export default definePlugin({
     settings,
 
     flux: {
-        async MESSAGE_CREATE({ optimistic, type, message, channelId }: IMessageCreate) {
+        async MESSAGE_CREATE({
+            optimistic,
+            type,
+            message,
+            channelId,
+        }: IMessageCreate) {
             if (optimistic || type !== "MESSAGE_CREATE") return;
             if (message.state === "SENDING") return;
             if (settings.store.ignoreBots && message.author?.bot) return;
-            if (settings.store.ignoreBlocked && RelationshipStore.isBlocked(message.author?.id)) return;
+            if (
+                settings.store.ignoreBlocked &&
+                RelationshipStore.isBlocked(message.author?.id)
+            )
+                return;
             if (!message.content) return;
             if (channelId !== SelectedChannelStore.getChannelId()) return;
 
@@ -113,14 +126,31 @@ export default definePlugin({
             }
         },
 
-        MESSAGE_REACTION_ADD({ optimistic, type, channelId, userId, messageAuthorId, emoji }: IReactionAdd) {
+        MESSAGE_REACTION_ADD({
+            optimistic,
+            type,
+            channelId,
+            userId,
+            messageAuthorId,
+            emoji,
+        }: IReactionAdd) {
             if (optimistic || type !== "MESSAGE_REACTION_ADD") return;
-            if (settings.store.ignoreBots && UserStore.getUser(userId)?.bot) return;
-            if (settings.store.ignoreBlocked && RelationshipStore.isBlocked(messageAuthorId)) return;
+            if (settings.store.ignoreBots && UserStore.getUser(userId)?.bot)
+                return;
+            if (
+                settings.store.ignoreBlocked &&
+                RelationshipStore.isBlocked(messageAuthorId)
+            )
+                return;
             if (channelId !== SelectedChannelStore.getChannelId()) return;
 
             const name = emoji.name.toLowerCase();
-            if (name !== MOYAI && !name.includes("moyai") && !name.includes("moai")) return;
+            if (
+                name !== MOYAI &&
+                !name.includes("moyai") &&
+                !name.includes("moai")
+            )
+                return;
 
             boom();
         },
@@ -128,29 +158,31 @@ export default definePlugin({
         VOICE_CHANNEL_EFFECT_SEND({ emoji }: IVoiceChannelEffectSendEvent) {
             if (!emoji?.name) return;
             const name = emoji.name.toLowerCase();
-            if (name !== MOYAI && !name.includes("moyai") && !name.includes("moai")) return;
+            if (
+                name !== MOYAI &&
+                !name.includes("moyai") &&
+                !name.includes("moai")
+            )
+                return;
 
             boom();
-        }
-    }
+        },
+    },
 });
 
 function countOccurrences(sourceString: string, subString: string) {
     let i = 0;
     let lastIdx = 0;
-    while ((lastIdx = sourceString.indexOf(subString, lastIdx) + 1) !== 0)
-        i++;
+    while ((lastIdx = sourceString.indexOf(subString, lastIdx) + 1) !== 0) i++;
 
     return i;
 }
 
 function countMatches(sourceString: string, pattern: RegExp) {
-    if (!pattern.global)
-        throw new Error("pattern must be global");
+    if (!pattern.global) throw new Error("pattern must be global");
 
     let i = 0;
-    while (pattern.test(sourceString))
-        i++;
+    while (pattern.test(sourceString)) i++;
 
     return i;
 }
@@ -158,8 +190,8 @@ function countMatches(sourceString: string, pattern: RegExp) {
 const customMoyaiRe = /<a?:\w*moy?ai\w*:\d{17,20}>/gi;
 
 function getMoyaiCount(message: string) {
-    const count = countOccurrences(message, MOYAI)
-        + countMatches(message, customMoyaiRe);
+    const count =
+        countOccurrences(message, MOYAI) + countMatches(message, customMoyaiRe);
 
     return Math.min(count, 10);
 }
@@ -168,9 +200,8 @@ function boom() {
     if (!settings.store.triggerWhenUnfocused && !document.hasFocus()) return;
     const audioElement = document.createElement("audio");
 
-    audioElement.src = settings.store.quality === "HD"
-        ? MOYAI_URL_HD
-        : MOYAI_URL;
+    audioElement.src =
+        settings.store.quality === "HD" ? MOYAI_URL_HD : MOYAI_URL;
 
     audioElement.volume = settings.store.volume;
     audioElement.play();

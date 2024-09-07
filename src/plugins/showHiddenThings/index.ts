@@ -14,32 +14,47 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { definePluginSettings, migratePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
 import definePlugin, { OptionType, PluginSettingDef } from "@utils/types";
 
-const opt = (description: string) => ({
-    type: OptionType.BOOLEAN,
-    description,
-    default: true,
-    restartNeeded: true
-} satisfies PluginSettingDef);
+const opt = (description: string) =>
+    ({
+        type: OptionType.BOOLEAN,
+        description,
+        default: true,
+        restartNeeded: true,
+    }) satisfies PluginSettingDef;
 
 const settings = definePluginSettings({
     showTimeouts: opt("Show member timeout icons in chat."),
-    showInvitesPaused: opt("Show the invites paused tooltip in the server list."),
-    showModView: opt("Show the member mod view context menu item in all servers."),
-    disableDiscoveryFilters: opt("Disable filters in Server Discovery search that hide servers that don't meet discovery criteria."),
-    disableDisallowedDiscoveryFilters: opt("Disable filters in Server Discovery search that hide NSFW & disallowed servers."),
+    showInvitesPaused: opt(
+        "Show the invites paused tooltip in the server list.",
+    ),
+    showModView: opt(
+        "Show the member mod view context menu item in all servers.",
+    ),
+    disableDiscoveryFilters: opt(
+        "Disable filters in Server Discovery search that hide servers that don't meet discovery criteria.",
+    ),
+    disableDisallowedDiscoveryFilters: opt(
+        "Disable filters in Server Discovery search that hide NSFW & disallowed servers.",
+    ),
 });
 
 migratePluginSettings("ShowHiddenThings", "ShowTimeouts");
 export default definePlugin({
     name: "ShowHiddenThings",
-    tags: ["ShowTimeouts", "ShowInvitesPaused", "ShowModView", "DisableDiscoveryFilters"],
-    description: "Displays various hidden & moderator-only things regardless of permissions.",
+    tags: [
+        "ShowTimeouts",
+        "ShowInvitesPaused",
+        "ShowModView",
+        "DisableDiscoveryFilters",
+    ],
+    description:
+        "Displays various hidden & moderator-only things regardless of permissions.",
     authors: [Devs.Dolfies],
     patches: [
         {
@@ -64,7 +79,7 @@ export default definePlugin({
             replacement: {
                 match: /return \i\.\i\(\i\.\i\(\{user:\i,context:\i,checkElevated:!1\}\),\i\.\i\)/,
                 replace: "return true",
-            }
+            },
         },
         // fixes a bug where Members page must be loaded to see highest role, why is Discord depending on MemberSafetyStore.getEnhancedMember for something that can be obtained here?
         {
@@ -73,15 +88,15 @@ export default definePlugin({
             replacement: {
                 match: /(role:)\i(?=,guildId.{0,100}role:(\i\[))/,
                 replace: "$1$2arguments[0].member.highestRoleId]",
-            }
+            },
         },
         {
             find: "prod_discoverable_guilds",
             predicate: () => settings.store.disableDiscoveryFilters,
             replacement: {
                 match: /\{"auto_removed:.*?\}/,
-                replace: "{}"
-            }
+                replace: "{}",
+            },
         },
         // remove the 200 server minimum
         {
@@ -89,8 +104,8 @@ export default definePlugin({
             predicate: () => settings.store.disableDiscoveryFilters,
             replacement: {
                 match: '">200"',
-                replace: '">0"'
-            }
+                replace: '">0"',
+            },
         },
         // empty word filter (why would anyone search "horny" in fucking server discovery... please... why are we patching this again??)
         {
@@ -98,8 +113,8 @@ export default definePlugin({
             predicate: () => settings.store.disableDisallowedDiscoveryFilters,
             replacement: {
                 match: /=\["egirl",.+?\]/,
-                replace: "=[]"
-            }
+                replace: "=[]",
+            },
         },
         // empty 2nd word filter
         {
@@ -117,9 +132,9 @@ export default definePlugin({
             all: true,
             replacement: {
                 match: /\i\.\i\.get\(\{url:\i\.\i\.GUILD_DISCOVERY_VALID_TERM,query:\{term:\i\},oldFormErrors:!0\}\);/g,
-                replace: "Promise.resolve({ body: { valid: true } });"
-            }
-        }
+                replace: "Promise.resolve({ body: { valid: true } });",
+            },
+        },
     ],
     settings,
 });

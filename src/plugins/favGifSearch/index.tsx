@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { definePluginSettings } from "@api/Settings";
 import ErrorBoundary from "@components/ErrorBoundary";
@@ -34,8 +34,9 @@ interface SearchBarComponentProps {
     placeholder: string;
 }
 
-type TSearchBarComponent =
-    React.FC<SearchBarComponentProps> & { Sizes: Record<"SMALL" | "MEDIUM" | "LARGE", string>; };
+type TSearchBarComponent = React.FC<SearchBarComponentProps> & {
+    Sizes: Record<"SMALL" | "MEDIUM" | "LARGE", string>;
+};
 
 interface Gif {
     format: number;
@@ -52,15 +53,17 @@ interface Instance {
         resultType?: string;
     };
     props: {
-        favCopy: Gif[],
+        favCopy: Gif[];
 
-        favorites: Gif[],
-    },
+        favorites: Gif[];
+    };
     forceUpdate: () => void;
 }
 
-
-const containerClasses: { searchBar: string; } = findByPropsLazy("searchBar", "searchBarFullRow");
+const containerClasses: { searchBar: string } = findByPropsLazy(
+    "searchBar",
+    "searchBarFullRow",
+);
 
 export const settings = definePluginSettings({
     searchOption: {
@@ -69,19 +72,19 @@ export const settings = definePluginSettings({
         options: [
             {
                 label: "Entire Url",
-                value: "url"
+                value: "url",
             },
             {
                 label: "Path Only (/somegif.gif)",
-                value: "path"
+                value: "path",
             },
             {
                 label: "Host & Path (tenor.com somgif.gif)",
                 value: "hostandpath",
-                default: true
-            }
-        ] as const
-    }
+                default: true,
+            },
+        ] as const,
+    },
 });
 
 export default definePlugin({
@@ -97,17 +100,17 @@ export default definePlugin({
                     // https://regex101.com/r/07gpzP/1
                     // ($1 renderHeaderContent=function { ... switch (x) ... case FAVORITES:return) ($2) ($3 case default:return r.jsx(($<searchComp>), {...props}))
                     match: /(renderHeaderContent\(\).{1,150}FAVORITES:return)(.{1,150});(case.{1,200}default:return\(0,\i\.jsx\)\((?<searchComp>\i\..{1,10}),)/,
-                    replace: "$1 this.state.resultType === 'Favorites' ? $self.renderSearchBar(this, $<searchComp>) : $2;$3"
+                    replace:
+                        "$1 this.state.resultType === 'Favorites' ? $self.renderSearchBar(this, $<searchComp>) : $2;$3",
                 },
                 {
                     // to persist filtered favorites when component re-renders.
                     // when resizing the window the component rerenders and we loose the filtered favorites and have to type in the search bar to get them again
                     match: /(,suggestions:\i,favorites:)(\i),/,
-                    replace: "$1$self.getFav($2),favCopy:$2,"
-                }
-
-            ]
-        }
+                    replace: "$1$self.getFav($2),favCopy:$2,",
+                },
+            ],
+        },
     ],
 
     settings,
@@ -115,11 +118,17 @@ export default definePlugin({
     getTargetString,
 
     instance: null as Instance | null,
-    renderSearchBar(instance: Instance, SearchBarComponent: TSearchBarComponent) {
+    renderSearchBar(
+        instance: Instance,
+        SearchBarComponent: TSearchBarComponent,
+    ) {
         this.instance = instance;
         return (
             <ErrorBoundary noop={true}>
-                <SearchBar instance={instance} SearchBarComponent={SearchBarComponent} />
+                <SearchBar
+                    instance={instance}
+                    SearchBarComponent={SearchBarComponent}
+                />
             </ErrorBoundary>
         );
     },
@@ -128,48 +137,65 @@ export default definePlugin({
         if (!this.instance || this.instance.dead) return favorites;
         const { favorites: filteredFavorites } = this.instance.props;
 
-        return filteredFavorites != null && filteredFavorites?.length !== favorites.length ? filteredFavorites : favorites;
-
-    }
+        return filteredFavorites != null &&
+            filteredFavorites?.length !== favorites.length
+            ? filteredFavorites
+            : favorites;
+    },
 });
 
-
-function SearchBar({ instance, SearchBarComponent }: { instance: Instance; SearchBarComponent: TSearchBarComponent; }) {
+function SearchBar({
+    instance,
+    SearchBarComponent,
+}: {
+    instance: Instance;
+    SearchBarComponent: TSearchBarComponent;
+}) {
     const [query, setQuery] = useState("");
-    const ref = useRef<{ containerRef?: React.MutableRefObject<HTMLDivElement>; } | null>(null);
+    const ref = useRef<{
+        containerRef?: React.MutableRefObject<HTMLDivElement>;
+    } | null>(null);
 
-    const onChange = useCallback((searchQuery: string) => {
-        setQuery(searchQuery);
-        const { props } = instance;
+    const onChange = useCallback(
+        (searchQuery: string) => {
+            setQuery(searchQuery);
+            const { props } = instance;
 
-        // return early
-        if (searchQuery === "") {
-            props.favorites = props.favCopy;
-            instance.forceUpdate();
-            return;
-        }
+            // return early
+            if (searchQuery === "") {
+                props.favorites = props.favCopy;
+                instance.forceUpdate();
+                return;
+            }
 
+            // scroll back to top
+            ref.current?.containerRef?.current
+                .closest("#gif-picker-tab-panel")
+                ?.querySelector('[class|="content"]')
+                ?.firstElementChild?.scrollTo(0, 0);
 
-        // scroll back to top
-        ref.current?.containerRef?.current
-            .closest("#gif-picker-tab-panel")
-            ?.querySelector("[class|=\"content\"]")
-            ?.firstElementChild?.scrollTo(0, 0);
-
-
-        const result =
-            props.favCopy
-                .map(gif => ({
-                    score: fuzzySearch(searchQuery.toLowerCase(), getTargetString(gif.url ?? gif.src).replace(/(%20|[_-])/g, " ").toLowerCase()),
+            const result = props.favCopy
+                .map((gif) => ({
+                    score: fuzzySearch(
+                        searchQuery.toLowerCase(),
+                        getTargetString(gif.url ?? gif.src)
+                            .replace(/(%20|[_-])/g, " ")
+                            .toLowerCase(),
+                    ),
                     gif,
                 }))
-                .filter(m => m.score != null) as { score: number; gif: Gif; }[];
+                .filter((m) => m.score != null) as {
+                score: number;
+                gif: Gif;
+            }[];
 
-        result.sort((a, b) => b.score - a.score);
-        props.favorites = result.map(e => e.gif);
+            result.sort((a, b) => b.score - a.score);
+            props.favorites = result.map((e) => e.gif);
 
-        instance.forceUpdate();
-    }, [instance.state]);
+            instance.forceUpdate();
+        },
+        [instance.state],
+    );
 
     useEffect(() => {
         return () => {
@@ -196,8 +222,6 @@ function SearchBar({ instance, SearchBarComponent }: { instance: Instance; Searc
         />
     );
 }
-
-
 
 export function getTargetString(urlStr: string) {
     let url: URL;

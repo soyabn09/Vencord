@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import "./settingsStyles.css";
 import "./themesStyles.css";
@@ -26,7 +26,10 @@ import { onlyOnce } from "@utils/onlyOnce";
 import { Forms, Text } from "@webpack/common";
 import type { ComponentType, PropsWithChildren } from "react";
 
-export function SettingsTab({ title, children }: PropsWithChildren<{ title: string; }>) {
+export function SettingsTab({
+    title,
+    children,
+}: PropsWithChildren<{ title: string }>) {
     return (
         <Forms.FormSection>
             <Text

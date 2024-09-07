@@ -34,7 +34,7 @@ function getEmojiMarkdown(target: Target, copyUnicode: boolean): string {
     }
 
     const extension = target?.firstChild.src.match(
-        /https:\/\/cdn\.discordapp\.com\/emojis\/\d+\.(\w+)/
+        /https:\/\/cdn\.discordapp\.com\/emojis\/\d+\.(\w+)/,
     )?.[1];
 
     return `<${extension === "gif" ? "a" : ""}:${emojiName.replace(/~\d+$/, "")}:${emojiId}>`;
@@ -43,14 +43,16 @@ function getEmojiMarkdown(target: Target, copyUnicode: boolean): string {
 const settings = definePluginSettings({
     copyUnicode: {
         type: OptionType.BOOLEAN,
-        description: "Copy the raw unicode character instead of :name: for default emojis (👽)",
+        description:
+            "Copy the raw unicode character instead of :name: for default emojis (👽)",
         default: true,
     },
 });
 
 export default definePlugin({
     name: "CopyEmojiMarkdown",
-    description: "Allows you to copy emojis as formatted string (<:blobcatcozy:1026533070955872337>)",
+    description:
+        "Allows you to copy emojis as formatted string (<:blobcatcozy:1026533070955872337>)",
     authors: [Devs.HappyEnderman, Devs.Vishnya],
     settings,
 
@@ -64,11 +66,14 @@ export default definePlugin({
                     label="Copy Emoji Markdown"
                     action={() => {
                         copyWithToast(
-                            getEmojiMarkdown(target, settings.store.copyUnicode),
-                            "Success! Copied emoji markdown."
+                            getEmojiMarkdown(
+                                target,
+                                settings.store.copyUnicode,
+                            ),
+                            "Success! Copied emoji markdown.",
                         );
                     }}
-                />
+                />,
             );
         },
     },

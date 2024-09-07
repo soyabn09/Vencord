@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { IpcEvents } from "@shared/IpcEvents";
 import { ipcMain } from "electron";
@@ -28,7 +28,7 @@ for (const [plugin, methods] of Object.entries(PluginNatives)) {
     const entries = Object.entries(methods);
     if (!entries.length) continue;
 
-    const mappings = PluginIpcMappings[plugin] = {};
+    const mappings = (PluginIpcMappings[plugin] = {});
 
     for (const [methodName, method] of entries) {
         const key = `VencordPluginNative_${plugin}_${methodName}`;
@@ -37,6 +37,6 @@ for (const [plugin, methods] of Object.entries(PluginNatives)) {
     }
 }
 
-ipcMain.on(IpcEvents.GET_PLUGIN_IPC_METHOD_MAP, e => {
+ipcMain.on(IpcEvents.GET_PLUGIN_IPC_METHOD_MAP, (e) => {
     e.returnValue = PluginIpcMappings;
 });

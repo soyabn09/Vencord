@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { wordsFromCamel, wordsToTitle } from "@utils/text";
 import { PluginOptionBoolean } from "@utils/types";
@@ -22,7 +22,14 @@ import { Forms, React, Switch } from "@webpack/common";
 
 import { ISettingElementProps } from ".";
 
-export function SettingBooleanComponent({ option, pluginSettings, definedSettings, id, onChange, onError }: ISettingElementProps<PluginOptionBoolean>) {
+export function SettingBooleanComponent({
+    option,
+    pluginSettings,
+    definedSettings,
+    id,
+    onChange,
+    onError,
+}: ISettingElementProps<PluginOptionBoolean>) {
     const def = pluginSettings[id] ?? option.default;
 
     const [state, setState] = React.useState(def ?? false);
@@ -56,8 +63,11 @@ export function SettingBooleanComponent({ option, pluginSettings, definedSetting
             >
                 {wordsToTitle(wordsFromCamel(id))}
             </Switch>
-            {error && <Forms.FormText style={{ color: "var(--text-danger)" }}>{error}</Forms.FormText>}
+            {error && (
+                <Forms.FormText style={{ color: "var(--text-danger)" }}>
+                    {error}
+                </Forms.FormText>
+            )}
         </Forms.FormSection>
     );
 }
-

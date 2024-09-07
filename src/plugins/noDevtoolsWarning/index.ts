@@ -14,20 +14,23 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 
 export default definePlugin({
     name: "NoDevtoolsWarning",
-    description: "Disables the 'HOLD UP' banner in the console. As a side effect, also prevents Discord from hiding your token, which prevents random logouts.",
+    description:
+        "Disables the 'HOLD UP' banner in the console. As a side effect, also prevents Discord from hiding your token, which prevents random logouts.",
     authors: [Devs.Ven],
-    patches: [{
-        find: "setDevtoolsCallbacks",
-        replacement: {
-            match: /if\(null!=\i&&"0.0.0"===\i\.remoteApp\.getVersion\(\)\)/,
-            replace: "if(true)"
-        }
-    }]
+    patches: [
+        {
+            find: "setDevtoolsCallbacks",
+            replacement: {
+                match: /if\(null!=\i&&"0.0.0"===\i\.remoteApp\.getVersion\(\)\)/,
+                replace: "if(true)",
+            },
+        },
+    ],
 });

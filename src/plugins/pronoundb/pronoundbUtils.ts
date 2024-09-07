@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Settings } from "@api/Settings";
 import { debounce } from "@shared/debounce";
@@ -25,21 +25,30 @@ import { findStoreLazy } from "@webpack";
 import { UserProfileStore, UserStore } from "@webpack/common";
 
 import { settings } from "./settings";
-import { CachePronouns, PronounCode, PronounMapping, PronounsResponse } from "./types";
+import {
+    CachePronouns,
+    PronounCode,
+    PronounMapping,
+    PronounsResponse,
+} from "./types";
 
 const UserSettingsAccountStore = findStoreLazy("UserSettingsAccountStore");
 
-type PronounsWithSource = [pronouns: string | null, source: string, hasPendingPronouns: boolean];
+type PronounsWithSource = [
+    pronouns: string | null,
+    source: string,
+    hasPendingPronouns: boolean,
+];
 const EmptyPronouns: PronounsWithSource = [null, "", false];
 
 export const enum PronounsFormat {
     Lowercase = "LOWERCASE",
-    Capitalized = "CAPITALIZED"
+    Capitalized = "CAPITALIZED",
 }
 
 export const enum PronounSource {
     PreferPDB,
-    PreferDiscord
+    PreferDiscord,
 }
 
 // A map of cached pronouns so the same request isn't sent twice
@@ -53,7 +62,9 @@ const bulkFetch = debounce(async () => {
     const pronouns = await bulkFetchPronouns(ids);
     for (const id of ids) {
         // Call all callbacks for the id
-        requestQueue[id]?.forEach(c => c(pronouns[id] ? extractPronouns(pronouns[id].sets) : ""));
+        requestQueue[id]?.forEach((c) =>
+            c(pronouns[id] ? extractPronouns(pronouns[id].sets) : ""),
+        );
         delete requestQueue[id];
     }
 });
@@ -64,23 +75,34 @@ function getDiscordPronouns(id: string, useGlobalProfile: boolean = false) {
     if (useGlobalProfile) return globalPronouns;
 
     return (
-        UserProfileStore.getGuildMemberProfile(id, getCurrentChannel()?.guild_id)?.pronouns
-        || globalPronouns
+        UserProfileStore.getGuildMemberProfile(
+            id,
+            getCurrentChannel()?.guild_id,
+        )?.pronouns || globalPronouns
     );
 }
 
-export function useFormattedPronouns(id: string, useGlobalProfile: boolean = false): PronounsWithSource {
+export function useFormattedPronouns(
+    id: string,
+    useGlobalProfile: boolean = false,
+): PronounsWithSource {
     // Discord is so stupid you can put tons of newlines in pronouns
-    const discordPronouns = getDiscordPronouns(id, useGlobalProfile)?.trim().replace(NewLineRe, " ");
+    const discordPronouns = getDiscordPronouns(id, useGlobalProfile)
+        ?.trim()
+        .replace(NewLineRe, " ");
 
     const [result] = useAwaiter(() => fetchPronouns(id), {
         fallbackValue: getCachedPronouns(id),
-        onError: e => console.error("Fetching pronouns failed: ", e)
+        onError: (e) => console.error("Fetching pronouns failed: ", e),
     });
 
-    const hasPendingPronouns = UserSettingsAccountStore.getPendingPronouns() != null;
+    const hasPendingPronouns =
+        UserSettingsAccountStore.getPendingPronouns() != null;
 
-    if (settings.store.pronounSource === PronounSource.PreferDiscord && discordPronouns)
+    if (
+        settings.store.pronounSource === PronounSource.PreferDiscord &&
+        discordPronouns
+    )
         return [discordPronouns, "Discord", hasPendingPronouns];
 
     if (result && result !== PronounMapping.unspecified)
@@ -89,15 +111,18 @@ export function useFormattedPronouns(id: string, useGlobalProfile: boolean = fal
     return [discordPronouns, "Discord", hasPendingPronouns];
 }
 
-export function useProfilePronouns(id: string, useGlobalProfile: boolean = false): PronounsWithSource {
+export function useProfilePronouns(
+    id: string,
+    useGlobalProfile: boolean = false,
+): PronounsWithSource {
     const pronouns = useFormattedPronouns(id, useGlobalProfile);
 
     if (!settings.store.showInProfile) return EmptyPronouns;
-    if (!settings.store.showSelf && id === UserStore.getCurrentUser().id) return EmptyPronouns;
+    if (!settings.store.showSelf && id === UserStore.getCurrentUser().id)
+        return EmptyPronouns;
 
     return pronouns;
 }
-
 
 const NewLineRe = /\n+/g;
 
@@ -112,7 +137,7 @@ export function getCachedPronouns(id: string): string | null {
 
 // Fetches the pronouns for one id, returning a promise that resolves if it was cached, or once the request is completed
 export function fetchPronouns(id: string): Promise<string> {
-    return new Promise(res => {
+    return new Promise((res) => {
         const cached = getCachedPronouns(id);
         if (cached) return res(cached);
 
@@ -131,39 +156,57 @@ async function bulkFetchPronouns(ids: string[]): Promise<PronounsResponse> {
     params.append("ids", ids.join(","));
 
     try {
-        const req = await fetch("https://pronoundb.org/api/v2/lookup?" + params.toString(), {
-            method: "GET",
-            headers: {
-                "Accept": "application/json",
-                "X-PronounDB-Source": VENCORD_USER_AGENT
-            }
+        const req = await fetch(
+            "https://pronoundb.org/api/v2/lookup?" + params.toString(),
+            {
+                method: "GET",
+                headers: {
+                    Accept: "application/json",
+                    "X-PronounDB-Source": VENCORD_USER_AGENT,
+                },
+            },
+        );
+        return await req.json().then((res: PronounsResponse) => {
+            Object.assign(cache, res);
+            return res;
         });
-        return await req.json()
-            .then((res: PronounsResponse) => {
-                Object.assign(cache, res);
-                return res;
-            });
     } catch (e) {
         // If the request errors, treat it as if no pronouns were found for all ids, and log it
         console.error("PronounDB fetching failed: ", e);
-        const dummyPronouns = Object.fromEntries(ids.map(id => [id, { sets: {} }] as const));
+        const dummyPronouns = Object.fromEntries(
+            ids.map((id) => [id, { sets: {} }] as const),
+        );
         Object.assign(cache, dummyPronouns);
         return dummyPronouns;
     }
 }
 
-export function extractPronouns(pronounSet?: { [locale: string]: PronounCode[]; }): string {
+export function extractPronouns(pronounSet?: {
+    [locale: string]: PronounCode[];
+}): string {
     if (!pronounSet || !pronounSet.en) return PronounMapping.unspecified;
     // PronounDB returns an empty set instead of {sets: {en: ["unspecified"]}}.
     const pronouns = pronounSet.en;
-    const { pronounsFormat } = Settings.plugins.PronounDB as { pronounsFormat: PronounsFormat, enabled: boolean; };
+    const { pronounsFormat } = Settings.plugins.PronounDB as {
+        pronounsFormat: PronounsFormat;
+        enabled: boolean;
+    };
 
     if (pronouns.length === 1) {
         // For capitalized pronouns or special codes (any, ask, avoid), we always return the normal (capitalized) string
-        if (pronounsFormat === PronounsFormat.Capitalized || ["any", "ask", "avoid", "other", "unspecified"].includes(pronouns[0]))
+        if (
+            pronounsFormat === PronounsFormat.Capitalized ||
+            ["any", "ask", "avoid", "other", "unspecified"].includes(
+                pronouns[0],
+            )
+        )
             return PronounMapping[pronouns[0]];
         else return PronounMapping[pronouns[0]].toLowerCase();
     }
-    const pronounString = pronouns.map(p => p[0].toUpperCase() + p.slice(1)).join("/");
-    return pronounsFormat === PronounsFormat.Capitalized ? pronounString : pronounString.toLowerCase();
+    const pronounString = pronouns
+        .map((p) => p[0].toUpperCase() + p.slice(1))
+        .join("/");
+    return pronounsFormat === PronounsFormat.Capitalized
+        ? pronounString
+        : pronounString.toLowerCase();
 }

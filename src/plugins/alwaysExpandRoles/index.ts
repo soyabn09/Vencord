@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { migratePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
@@ -30,8 +30,8 @@ export default definePlugin({
             find: 'action:"EXPAND_ROLES"',
             replacement: {
                 match: /(roles:\i(?=.+?(\i)\(!0\)[,;]\i\({action:"EXPAND_ROLES"}\)).+?\[\i,\2\]=\i\.useState\()!1\)/,
-                replace: (_, rest, setExpandedRoles) => `${rest}!0)`
-            }
-        }
-    ]
+                replace: (_, rest, setExpandedRoles) => `${rest}!0)`,
+            },
+        },
+    ],
 });

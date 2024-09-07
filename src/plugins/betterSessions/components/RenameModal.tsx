@@ -14,18 +14,38 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
-import { ModalContent, ModalFooter, ModalHeader, ModalProps, ModalRoot } from "@utils/modal";
+import {
+    ModalContent,
+    ModalFooter,
+    ModalHeader,
+    ModalProps,
+    ModalRoot,
+} from "@utils/modal";
 import { Button, Forms, React, TextInput } from "@webpack/common";
 import { KeyboardEvent } from "react";
 
 import { SessionInfo } from "../types";
-import { getDefaultName, savedSessionsCache, saveSessionsToDataStore } from "../utils";
+import {
+    getDefaultName,
+    savedSessionsCache,
+    saveSessionsToDataStore,
+} from "../utils";
 
-export function RenameModal({ props, session, state }: { props: ModalProps, session: SessionInfo["session"], state: [string, React.Dispatch<React.SetStateAction<string>>]; }) {
+export function RenameModal({
+    props,
+    session,
+    state,
+}: {
+    props: ModalProps;
+    session: SessionInfo["session"];
+    state: [string, React.Dispatch<React.SetStateAction<string>>];
+}) {
     const [title, setTitle] = state;
-    const [value, setValue] = React.useState(savedSessionsCache.get(session.id_hash)?.name ?? "");
+    const [value, setValue] = React.useState(
+        savedSessionsCache.get(session.id_hash)?.name ?? "",
+    );
 
     function onSaveClick() {
         savedSessionsCache.set(session.id_hash, { name: value, isNew: false });
@@ -46,7 +66,9 @@ export function RenameModal({ props, session, state }: { props: ModalProps, sess
             </ModalHeader>
 
             <ModalContent>
-                <Forms.FormTitle tag="h5" style={{ marginTop: "10px" }}>New device name</Forms.FormTitle>
+                <Forms.FormTitle tag="h5" style={{ marginTop: "10px" }}>
+                    New device name
+                </Forms.FormTitle>
                 <TextInput
                     style={{ marginBottom: "10px" }}
                     placeholder={getDefaultName(session.client_info)}
@@ -63,7 +85,7 @@ export function RenameModal({ props, session, state }: { props: ModalProps, sess
                         marginBottom: "20px",
                         paddingLeft: "1px",
                         paddingRight: "1px",
-                        opacity: 0.6
+                        opacity: 0.6,
                     }}
                     look={Button.Looks.LINK}
                     color={Button.Colors.LINK}
@@ -75,10 +97,7 @@ export function RenameModal({ props, session, state }: { props: ModalProps, sess
             </ModalContent>
 
             <ModalFooter>
-                <Button
-                    color={Button.Colors.BRAND}
-                    onClick={onSaveClick}
-                >
+                <Button color={Button.Colors.BRAND} onClick={onSaveClick}>
                     Save
                 </Button>
                 <Button
@@ -89,6 +108,6 @@ export function RenameModal({ props, session, state }: { props: ModalProps, sess
                     Cancel
                 </Button>
             </ModalFooter>
-        </ModalRoot >
+        </ModalRoot>
     );
 }

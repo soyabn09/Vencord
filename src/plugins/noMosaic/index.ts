@@ -13,8 +13,8 @@ const settings = definePluginSettings({
         description: "Play videos without carousel modal",
         type: OptionType.BOOLEAN,
         default: true,
-        restartNeeded: true
-    }
+        restartNeeded: true,
+    },
 });
 
 export default definePlugin({
@@ -30,16 +30,16 @@ export default definePlugin({
             find: '=>"IMAGE"===',
             replacement: {
                 match: /=>"IMAGE"===\i\|\|"VIDEO"===\i;/,
-                replace: "=>false;"
-            }
+                replace: "=>false;",
+            },
         },
         {
             find: "renderAttachments(",
             predicate: () => settings.store.inlineVideo,
             replacement: {
                 match: /url:(\i)\.url\}\);return /,
-                replace: "$&$1.content_type?.startsWith('image/')&&"
-            }
+                replace: "$&$1.content_type?.startsWith('image/')&&",
+            },
         },
-    ]
+    ],
 });

@@ -14,14 +14,16 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import "./ErrorCard.css";
 
 import { classes } from "@utils/misc";
 import type { HTMLProps } from "react";
 
-export function ErrorCard(props: React.PropsWithChildren<HTMLProps<HTMLDivElement>>) {
+export function ErrorCard(
+    props: React.PropsWithChildren<HTMLProps<HTMLDivElement>>,
+) {
     return (
         <div {...props} className={classes(props.className, "vc-error-card")}>
             {props.children}

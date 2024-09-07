@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Button, useState } from "@webpack/common";
 
@@ -22,7 +22,10 @@ import type { VoiceRecorder } from ".";
 import { settings } from "./settings";
 import { MediaEngineStore } from "./utils";
 
-export const VoiceRecorderWeb: VoiceRecorder = ({ setAudioBlob, onRecordingChange }) => {
+export const VoiceRecorderWeb: VoiceRecorder = ({
+    setAudioBlob,
+    onRecordingChange,
+}) => {
     const [recording, setRecording] = useState(false);
     const [paused, setPaused] = useState(false);
     const [recorder, setRecorder] = useState<MediaRecorder>();
@@ -37,29 +40,33 @@ export const VoiceRecorderWeb: VoiceRecorder = ({ setAudioBlob, onRecordingChang
         const nowRecording = !recording;
 
         if (nowRecording) {
-            navigator.mediaDevices.getUserMedia({
-                audio: {
-                    echoCancellation: settings.store.echoCancellation,
-                    noiseSuppression: settings.store.noiseSuppression,
-                    deviceId: MediaEngineStore.getInputDeviceId()
-                }
-            }).then(stream => {
-                const chunks = [] as Blob[];
-                setChunks(chunks);
+            navigator.mediaDevices
+                .getUserMedia({
+                    audio: {
+                        echoCancellation: settings.store.echoCancellation,
+                        noiseSuppression: settings.store.noiseSuppression,
+                        deviceId: MediaEngineStore.getInputDeviceId(),
+                    },
+                })
+                .then((stream) => {
+                    const chunks = [] as Blob[];
+                    setChunks(chunks);
 
-                const recorder = new MediaRecorder(stream);
-                setRecorder(recorder);
-                recorder.addEventListener("dataavailable", e => {
-                    chunks.push(e.data);
+                    const recorder = new MediaRecorder(stream);
+                    setRecorder(recorder);
+                    recorder.addEventListener("dataavailable", (e) => {
+                        chunks.push(e.data);
+                    });
+                    recorder.start();
+
+                    changeRecording(true);
                 });
-                recorder.start();
-
-                changeRecording(true);
-            });
         } else {
             if (recorder) {
                 recorder.addEventListener("stop", () => {
-                    setAudioBlob(new Blob(chunks, { type: "audio/ogg; codecs=opus" }));
+                    setAudioBlob(
+                        new Blob(chunks, { type: "audio/ogg; codecs=opus" }),
+                    );
 
                     changeRecording(false);
                 });

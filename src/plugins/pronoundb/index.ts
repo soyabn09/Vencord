@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import "./styles.css";
 
@@ -22,7 +22,10 @@ import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 
 import PronounsAboutComponent from "./components/PronounsAboutComponent";
-import { CompactPronounsChatComponentWrapper, PronounsChatComponentWrapper } from "./components/PronounsChatComponent";
+import {
+    CompactPronounsChatComponentWrapper,
+    PronounsChatComponentWrapper,
+} from "./components/PronounsChatComponent";
 import { useProfilePronouns } from "./pronoundbUtils";
 import { settings } from "./settings";
 
@@ -37,14 +40,16 @@ export default definePlugin({
                 // Add next to username (compact mode)
                 {
                     match: /("span",{id:\i,className:\i,children:\i}\))/,
-                    replace: "$1, $self.CompactPronounsChatComponentWrapper(arguments[0])"
+                    replace:
+                        "$1, $self.CompactPronounsChatComponentWrapper(arguments[0])",
                 },
                 // Patch the chat timestamp element (normal mode)
                 {
                     match: /(?<=return\s*\(0,\i\.jsxs?\)\(.+!\i&&)(\(0,\i.jsxs?\)\(.+?\{.+?\}\))/,
-                    replace: "[$1, $self.PronounsChatComponentWrapper(arguments[0])]"
-                }
-            ]
+                    replace:
+                        "[$1, $self.PronounsChatComponentWrapper(arguments[0])]",
+                },
+            ],
         },
 
         {
@@ -53,18 +58,20 @@ export default definePlugin({
             replacement: [
                 {
                     match: /\.PANEL},/,
-                    replace: "$&[vcPronoun,vcPronounSource,vcHasPendingPronouns]=$self.useProfilePronouns(arguments[0].user?.id),"
+                    replace:
+                        "$&[vcPronoun,vcPronounSource,vcHasPendingPronouns]=$self.useProfilePronouns(arguments[0].user?.id),",
                 },
                 {
                     match: /text:\i\.\i.Messages.USER_PROFILE_PRONOUNS/,
-                    replace: '$&+(vcHasPendingPronouns?"":` (${vcPronounSource})`)'
+                    replace:
+                        '$&+(vcHasPendingPronouns?"":` (${vcPronounSource})`)',
                 },
                 {
                     match: /(\.pronounsText.+?children:)(\i)/,
-                    replace: "$1vcHasPendingPronouns?$2:vcPronoun"
-                }
-            ]
-        }
+                    replace: "$1vcHasPendingPronouns?$2:vcPronoun",
+                },
+            ],
+        },
     ],
 
     settings,
@@ -74,5 +81,5 @@ export default definePlugin({
     // Re-export the components on the plugin object so it is easily accessible in patches
     PronounsChatComponentWrapper,
     CompactPronounsChatComponentWrapper,
-    useProfilePronouns
+    useProfilePronouns,
 });

@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { definePluginSettings } from "@api/Settings";
 import { OptionType } from "@utils/types";
@@ -29,10 +29,8 @@ export const settings = definePluginSettings({
         type: OptionType.COMPONENT,
         description: "Authorize with ReviewDB",
         component: () => (
-            <Button onClick={() => authorize()}>
-                Authorize with ReviewDB
-            </Button>
-        )
+            <Button onClick={() => authorize()}>Authorize with ReviewDB</Button>
+        ),
     },
     notifyReviews: {
         type: OptionType.BOOLEAN,
@@ -41,7 +39,8 @@ export const settings = definePluginSettings({
     },
     showWarning: {
         type: OptionType.BOOLEAN,
-        description: "Display warning to be respectful at the top of the reviews list",
+        description:
+            "Display warning to be respectful at the top of the reviews list",
         default: true,
     },
     hideTimestamps: {
@@ -58,38 +57,47 @@ export const settings = definePluginSettings({
         type: OptionType.COMPONENT,
         description: "ReviewDB buttons",
         component: () => (
-            <div className={cl("button-grid")} >
+            <div className={cl("button-grid")}>
                 <Button onClick={openBlockModal}>Manage Blocked Users</Button>
 
                 <Button
                     color={Button.Colors.GREEN}
                     onClick={() => {
-                        VencordNative.native.openExternal("https://github.com/sponsors/mantikafasi");
+                        VencordNative.native.openExternal(
+                            "https://github.com/sponsors/mantikafasi",
+                        );
                     }}
                 >
                     Support ReviewDB development
                 </Button>
 
-                <Button onClick={async () => {
-                    let url = "https://reviewdb.mantikafasi.dev";
-                    const token = await getToken();
-                    if (token)
-                        url += "/api/redirect?token=" + encodeURIComponent(token);
+                <Button
+                    onClick={async () => {
+                        let url = "https://reviewdb.mantikafasi.dev";
+                        const token = await getToken();
+                        if (token)
+                            url +=
+                                "/api/redirect?token=" +
+                                encodeURIComponent(token);
 
-                    VencordNative.native.openExternal(url);
-                }}>
+                        VencordNative.native.openExternal(url);
+                    }}
+                >
                     ReviewDB website
                 </Button>
 
-
-                <Button onClick={() => {
-                    VencordNative.native.openExternal("https://discord.gg/eWPBSbvznt");
-                }}>
+                <Button
+                    onClick={() => {
+                        VencordNative.native.openExternal(
+                            "https://discord.gg/eWPBSbvznt",
+                        );
+                    }}
+                >
                     ReviewDB Support Server
                 </Button>
-            </div >
-        )
-    }
+            </div>
+        ),
+    },
 }).withPrivateSettings<{
     lastReviewId?: number;
     reviewsDropdownState?: boolean;

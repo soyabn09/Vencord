@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Channel, Message } from "discord-types/general/index.js";
 
@@ -56,8 +56,10 @@ export function removeDecoration(identifier: string) {
     decorations.delete(identifier);
 }
 
-export function __addDecorationsToMessage(props: DecorationProps): (JSX.Element | null)[] {
-    return [...decorations.values()].map(decoration => {
+export function __addDecorationsToMessage(
+    props: DecorationProps,
+): (JSX.Element | null)[] {
+    return [...decorations.values()].map((decoration) => {
         return decoration(props);
     });
 }

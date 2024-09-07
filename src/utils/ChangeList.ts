@@ -14,9 +14,9 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
-export class ChangeList<T>{
+export class ChangeList<T> {
     private set = new Set<T>();
 
     public get changeCount() {
@@ -28,8 +28,7 @@ export class ChangeList<T>{
     }
 
     public handleChange(item: T) {
-        if (!this.set.delete(item))
-            this.set.add(item);
+        if (!this.set.delete(item)) this.set.add(item);
     }
 
     public add(item: T) {

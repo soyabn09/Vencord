@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
@@ -28,8 +28,9 @@ export default definePlugin({
             find: '"Message Username"',
             replacement: {
                 match: /\.Messages\.GUILD_COMMUNICATION_DISABLED_BOTTOM_SHEET_TITLE.+?}\),\i(?=\])/,
-                replace: "$&,...Vencord.Api.MessageDecorations.__addDecorationsToMessage(arguments[0])"
-            }
-        }
+                replace:
+                    "$&,...Vencord.Api.MessageDecorations.__addDecorationsToMessage(arguments[0])",
+            },
+        },
     ],
 });

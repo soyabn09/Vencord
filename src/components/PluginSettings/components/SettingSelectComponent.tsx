@@ -14,15 +14,23 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { PluginOptionSelect } from "@utils/types";
 import { Forms, React, Select } from "@webpack/common";
 
 import { ISettingElementProps } from ".";
 
-export function SettingSelectComponent({ option, pluginSettings, definedSettings, onChange, onError, id }: ISettingElementProps<PluginOptionSelect>) {
-    const def = pluginSettings[id] ?? option.options?.find(o => o.default)?.value;
+export function SettingSelectComponent({
+    option,
+    pluginSettings,
+    definedSettings,
+    onChange,
+    onError,
+    id,
+}: ISettingElementProps<PluginOptionSelect>) {
+    const def =
+        pluginSettings[id] ?? option.options?.find((o) => o.default)?.value;
 
     const [state, setState] = React.useState<any>(def ?? null);
     const [error, setError] = React.useState<string | null>(null);
@@ -52,11 +60,15 @@ export function SettingSelectComponent({ option, pluginSettings, definedSettings
                 maxVisibleItems={5}
                 closeOnSelect={true}
                 select={handleChange}
-                isSelected={v => v === state}
-                serialize={v => String(v)}
+                isSelected={(v) => v === state}
+                serialize={(v) => String(v)}
                 {...option.componentProps}
             />
-            {error && <Forms.FormText style={{ color: "var(--text-danger)" }}>{error}</Forms.FormText>}
+            {error && (
+                <Forms.FormText style={{ color: "var(--text-danger)" }}>
+                    {error}
+                </Forms.FormText>
+            )}
         </Forms.FormSection>
     );
 }

@@ -10,7 +10,13 @@ import { Button } from "@webpack/common";
 import { SessionInfo } from "../types";
 import { RenameModal } from "./RenameModal";
 
-export function RenameButton({ session, state }: { session: SessionInfo["session"], state: [string, React.Dispatch<React.SetStateAction<string>>]; }) {
+export function RenameButton({
+    session,
+    state,
+}: {
+    session: SessionInfo["session"];
+    state: [string, React.Dispatch<React.SetStateAction<string>>];
+}) {
     return (
         <Button
             look={Button.Looks.LINK}
@@ -19,10 +25,10 @@ export function RenameButton({ session, state }: { session: SessionInfo["session
             style={{
                 paddingTop: "0px",
                 paddingBottom: "0px",
-                top: "-2px"
+                top: "-2px",
             }}
             onClick={() =>
-                openModal(props => (
+                openModal((props) => (
                     <RenameModal
                         props={props}
                         session={session}

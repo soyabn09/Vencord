@@ -62,7 +62,7 @@ export function getSortedRoles({ id }: Guild, member: GuildMember) {
     const roles = GuildStore.getRoles(id);
 
     return [...member.roles, id]
-        .map(id => roles[id])
+        .map((id) => roles[id])
         .sort((a, b) => b.position - a.position);
 }
 
@@ -78,7 +78,7 @@ export function sortUserRoles(roles: Role[]) {
 }
 
 export function sortPermissionOverwrites<
-    T extends { id: string; type: number }
+    T extends { id: string; type: number },
 >(overwrites: T[], guildId: string) {
     const roles = GuildStore.getRoles(guildId);
 

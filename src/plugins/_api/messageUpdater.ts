@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
@@ -30,8 +30,8 @@ export default definePlugin({
             find: "}renderEmbeds(",
             replacement: {
                 match: /(?<=this.props,\i,\[)"message",/,
-                replace: ""
-            }
-        }
-    ]
+                replace: "",
+            },
+        },
+    ],
 });

@@ -8,44 +8,54 @@ import { definePluginSettings } from "@api/Settings";
 import { makeRange } from "@components/PluginSettings/components";
 import { Devs } from "@utils/constants";
 import { Logger } from "@utils/Logger";
-import definePlugin, { OptionType, PluginNative, ReporterTestable } from "@utils/types";
+import definePlugin, {
+    OptionType,
+    PluginNative,
+    ReporterTestable,
+} from "@utils/types";
 import { findByCodeLazy, findLazy } from "@webpack";
 import { Button, ChannelStore, GuildStore, UserStore } from "@webpack/common";
-import type { Channel, Embed, GuildMember, MessageAttachment, User } from "discord-types/general";
+import type {
+    Channel,
+    Embed,
+    GuildMember,
+    MessageAttachment,
+    User,
+} from "discord-types/general";
 
-const ChannelTypes = findLazy(m => m.ANNOUNCEMENT_THREAD === 10);
+const ChannelTypes = findLazy((m) => m.ANNOUNCEMENT_THREAD === 10);
 
 interface Message {
-    guild_id: string,
-    attachments: MessageAttachment[],
-    author: User,
-    channel_id: string,
-    components: any[],
-    content: string,
-    edited_timestamp: string,
-    embeds: Embed[],
-    sticker_items?: Sticker[],
-    flags: number,
-    id: string,
-    member: GuildMember,
-    mention_everyone: boolean,
-    mention_roles: string[],
-    mentions: Mention[],
-    nonce: string,
-    pinned: false,
-    referenced_message: any,
-    timestamp: string,
-    tts: boolean,
+    guild_id: string;
+    attachments: MessageAttachment[];
+    author: User;
+    channel_id: string;
+    components: any[];
+    content: string;
+    edited_timestamp: string;
+    embeds: Embed[];
+    sticker_items?: Sticker[];
+    flags: number;
+    id: string;
+    member: GuildMember;
+    mention_everyone: boolean;
+    mention_roles: string[];
+    mentions: Mention[];
+    nonce: string;
+    pinned: false;
+    referenced_message: any;
+    timestamp: string;
+    tts: boolean;
     type: number;
 }
 
 interface Mention {
-    avatar: string,
-    avatar_decoration_data: any,
-    discriminator: string,
-    global_name: string,
-    id: string,
-    public_flags: number,
+    avatar: string;
+    avatar_decoration_data: any;
+    discriminator: string;
+    global_name: string;
+    id: string;
+    public_flags: number;
     username: string;
 }
 
@@ -61,19 +71,19 @@ interface Sticker {
 }
 
 interface Call {
-    channel_id: string,
-    guild_id: string,
-    message_id: string,
-    region: string,
+    channel_id: string;
+    guild_id: string;
+    message_id: string;
+    region: string;
     ringing: string[];
 }
 
 interface ApiObject {
-    sender: string,
-    target: string,
-    command: string,
-    jsonData: string,
-    rawData: string | null,
+    sender: string;
+    target: string;
+    command: string;
+    jsonData: string;
+    rawData: string | null;
 }
 
 interface NotificationObject {
@@ -90,7 +100,9 @@ interface NotificationObject {
     sourceApp: string;
 }
 
-const notificationsShouldNotify = findByCodeLazy(".SUPPRESS_NOTIFICATIONS))return!1");
+const notificationsShouldNotify = findByCodeLazy(
+    ".SUPPRESS_NOTIFICATIONS))return!1",
+);
 const logger = new Logger("XSOverlay");
 
 const settings = definePluginSettings({
@@ -100,53 +112,54 @@ const settings = definePluginSettings({
         default: 42070,
         async onChange() {
             await start();
-        }
+        },
     },
     preferUDP: {
         type: OptionType.BOOLEAN,
-        description: "Enable if you use an older build of XSOverlay unable to connect through websockets. This setting is ignored on web.",
+        description:
+            "Enable if you use an older build of XSOverlay unable to connect through websockets. This setting is ignored on web.",
         default: false,
-        disabled: () => IS_WEB
+        disabled: () => IS_WEB,
     },
     botNotifications: {
         type: OptionType.BOOLEAN,
         description: "Allow bot notifications",
-        default: false
+        default: false,
     },
     serverNotifications: {
         type: OptionType.BOOLEAN,
         description: "Allow server notifications",
-        default: true
+        default: true,
     },
     dmNotifications: {
         type: OptionType.BOOLEAN,
         description: "Allow Direct Message notifications",
-        default: true
+        default: true,
     },
     groupDmNotifications: {
         type: OptionType.BOOLEAN,
         description: "Allow Group DM notifications",
-        default: true
+        default: true,
     },
     callNotifications: {
         type: OptionType.BOOLEAN,
         description: "Allow call notifications",
-        default: true
+        default: true,
     },
     pingColor: {
         type: OptionType.STRING,
         description: "User mention color",
-        default: "#7289da"
+        default: "#7289da",
     },
     channelPingColor: {
         type: OptionType.STRING,
         description: "Channel mention color",
-        default: "#8a2be2"
+        default: "#8a2be2",
     },
     soundPath: {
         type: OptionType.STRING,
         description: "Notification sound (default/warning/error)",
-        default: "default"
+        default: "default",
     },
     timeout: {
         type: OptionType.NUMBER,
@@ -156,19 +169,19 @@ const settings = definePluginSettings({
     lengthBasedTimeout: {
         type: OptionType.BOOLEAN,
         description: "Extend duration with message length",
-        default: true
+        default: true,
     },
     opacity: {
         type: OptionType.SLIDER,
         description: "Notif opacity",
         default: 1,
-        markers: makeRange(0, 1, 0.1)
+        markers: makeRange(0, 1, 0.1),
     },
     volume: {
         type: OptionType.SLIDER,
         description: "Volume",
         default: 0.2,
-        markers: makeRange(0, 1, 0.1)
+        markers: makeRange(0, 1, 0.1),
     },
 });
 
@@ -176,7 +189,9 @@ let socket: WebSocket;
 
 async function start() {
     if (socket) socket.close();
-    socket = new WebSocket(`ws://127.0.0.1:${settings.store.webSocketPort ?? 42070}/?client=Vencord`);
+    socket = new WebSocket(
+        `ws://127.0.0.1:${settings.store.webSocketPort ?? 42070}/?client=Vencord`,
+    );
     return new Promise((resolve, reject) => {
         socket.onopen = resolve;
         socket.onerror = reject;
@@ -184,30 +199,49 @@ async function start() {
     });
 }
 
-const Native = VencordNative.pluginHelpers.XSOverlay as PluginNative<typeof import("./native")>;
+const Native = VencordNative.pluginHelpers.XSOverlay as PluginNative<
+    typeof import("./native")
+>;
 
 export default definePlugin({
     name: "XSOverlay",
-    description: "Forwards discord notifications to XSOverlay, for easy viewing in VR",
+    description:
+        "Forwards discord notifications to XSOverlay, for easy viewing in VR",
     authors: [Devs.Nyako],
     tags: ["vr", "notify"],
     reporterTestable: ReporterTestable.None,
     settings,
 
     flux: {
-        CALL_UPDATE({ call }: { call: Call; }) {
-            if (call?.ringing?.includes(UserStore.getCurrentUser().id) && settings.store.callNotifications) {
+        CALL_UPDATE({ call }: { call: Call }) {
+            if (
+                call?.ringing?.includes(UserStore.getCurrentUser().id) &&
+                settings.store.callNotifications
+            ) {
                 const channel = ChannelStore.getChannel(call.channel_id);
-                sendOtherNotif("Incoming call", `${channel.name} is calling you...`);
+                sendOtherNotif(
+                    "Incoming call",
+                    `${channel.name} is calling you...`,
+                );
             }
         },
-        MESSAGE_CREATE({ message, optimistic }: { message: Message; optimistic: boolean; }) {
+        MESSAGE_CREATE({
+            message,
+            optimistic,
+        }: {
+            message: Message;
+            optimistic: boolean;
+        }) {
             if (optimistic) return;
             const channel = ChannelStore.getChannel(message.channel_id);
             if (!shouldNotify(message, message.channel_id)) return;
 
-            const pingColor = settings.store.pingColor.replaceAll("#", "").trim();
-            const channelPingColor = settings.store.channelPingColor.replaceAll("#", "").trim();
+            const pingColor = settings.store.pingColor
+                .replaceAll("#", "")
+                .trim();
+            const channelPingColor = settings.store.channelPingColor
+                .replaceAll("#", "")
+                .trim();
             let finalMsg = message.content;
             let titleString = "";
 
@@ -216,13 +250,14 @@ export default definePlugin({
                 titleString = `${message.author.username} (${guild.name}, #${channel.name})`;
             }
 
-
             switch (channel.type) {
                 case ChannelTypes.DM:
                     titleString = message.author.username.trim();
                     break;
                 case ChannelTypes.GROUP_DM:
-                    const channelName = channel.name.trim() ?? channel.rawRecipients.map(e => e.username).join(", ");
+                    const channelName =
+                        channel.name.trim() ??
+                        channel.rawRecipients.map((e) => e.username).join(", ");
                     titleString = `${message.author.username} (${channelName})`;
                     break;
             }
@@ -245,23 +280,29 @@ export default definePlugin({
                 }
             }
 
-            const images = message.attachments.filter(e =>
-                typeof e?.content_type === "string"
-                && e?.content_type.startsWith("image")
+            const images = message.attachments.filter(
+                (e) =>
+                    typeof e?.content_type === "string" &&
+                    e?.content_type.startsWith("image"),
             );
 
-
-            images.forEach(img => {
+            images.forEach((img) => {
                 finalMsg += ` [image: ${img.filename}] `;
             });
 
-            message.attachments.filter(a => a && !a.content_type?.startsWith("image")).forEach(a => {
-                finalMsg += ` [attachment: ${a.filename}] `;
-            });
+            message.attachments
+                .filter((a) => a && !a.content_type?.startsWith("image"))
+                .forEach((a) => {
+                    finalMsg += ` [attachment: ${a.filename}] `;
+                });
 
             // make mentions readable
             if (message.mentions.length > 0) {
-                finalMsg = finalMsg.replace(/<@!?(\d{17,20})>/g, (_, id) => `<color=#${pingColor}><b>@${UserStore.getUser(id)?.username || "unknown-user"}</color></b>`);
+                finalMsg = finalMsg.replace(
+                    /<@!?(\d{17,20})>/g,
+                    (_, id) =>
+                        `<color=#${pingColor}><b>@${UserStore.getUser(id)?.username || "unknown-user"}</color></b>`,
+                );
             }
 
             // color role mentions (unity styling btw lol)
@@ -270,17 +311,25 @@ export default definePlugin({
                     const role = GuildStore.getRole(channel.guild_id, roleId);
                     if (!role) continue;
                     const roleColor = role.colorString ?? `#${pingColor}`;
-                    finalMsg = finalMsg.replace(`<@&${roleId}>`, `<b><color=${roleColor}>@${role.name}</color></b>`);
+                    finalMsg = finalMsg.replace(
+                        `<@&${roleId}>`,
+                        `<b><color=${roleColor}>@${role.name}</color></b>`,
+                    );
                 }
             }
 
             // make emotes and channel mentions readable
-            const emoteMatches = finalMsg.match(new RegExp("(<a?:\\w+:\\d+>)", "g"));
+            const emoteMatches = finalMsg.match(
+                new RegExp("(<a?:\\w+:\\d+>)", "g"),
+            );
             const channelMatches = finalMsg.match(new RegExp("<(#\\d+)>", "g"));
 
             if (emoteMatches) {
                 for (const eMatch of emoteMatches) {
-                    finalMsg = finalMsg.replace(new RegExp(`${eMatch}`, "g"), `:${eMatch.split(":")[1]}:`);
+                    finalMsg = finalMsg.replace(
+                        new RegExp(`${eMatch}`, "g"),
+                        `:${eMatch.split(":")[1]}:`,
+                    );
                 }
             }
 
@@ -289,13 +338,16 @@ export default definePlugin({
                 for (const cMatch of channelMatches) {
                     let channelId = cMatch.split("<#")[1];
                     channelId = channelId.substring(0, channelId.length - 1);
-                    finalMsg = finalMsg.replace(new RegExp(`${cMatch}`, "g"), `<b><color=#${channelPingColor}>#${ChannelStore.getChannel(channelId).name}</color></b>`);
+                    finalMsg = finalMsg.replace(
+                        new RegExp(`${cMatch}`, "g"),
+                        `<b><color=#${channelPingColor}>#${ChannelStore.getChannel(channelId).name}</color></b>`,
+                    );
                 }
             }
 
             if (shouldIgnoreForChannelType(channel)) return;
             sendMsgNotif(titleString, finalMsg, message);
-        }
+        },
     },
 
     start,
@@ -306,30 +358,51 @@ export default definePlugin({
 
     settingsAboutComponent: () => (
         <>
-            <Button onClick={() => sendOtherNotif("This is a test notification! explode", "Hello from Vendor!")}>
+            <Button
+                onClick={() =>
+                    sendOtherNotif(
+                        "This is a test notification! explode",
+                        "Hello from Vendor!",
+                    )
+                }
+            >
                 Send test notification
             </Button>
         </>
-    )
+    ),
 });
 
 function shouldIgnoreForChannelType(channel: Channel) {
-    if (channel.type === ChannelTypes.DM && settings.store.dmNotifications) return false;
-    if (channel.type === ChannelTypes.GROUP_DM && settings.store.groupDmNotifications) return false;
+    if (channel.type === ChannelTypes.DM && settings.store.dmNotifications)
+        return false;
+    if (
+        channel.type === ChannelTypes.GROUP_DM &&
+        settings.store.groupDmNotifications
+    )
+        return false;
     else return !settings.store.serverNotifications;
 }
 
 function sendMsgNotif(titleString: string, content: string, message: Message) {
-    fetch(`https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}.png?size=128`)
-        .then(response => response.blob())
-        .then(blob => new Promise<string>(resolve => {
-            const r = new FileReader();
-            r.onload = () => resolve((r.result as string).split(",")[1]);
-            r.readAsDataURL(blob);
-        })).then(result => {
+    fetch(
+        `https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}.png?size=128`,
+    )
+        .then((response) => response.blob())
+        .then(
+            (blob) =>
+                new Promise<string>((resolve) => {
+                    const r = new FileReader();
+                    r.onload = () =>
+                        resolve((r.result as string).split(",")[1]);
+                    r.readAsDataURL(blob);
+                }),
+        )
+        .then((result) => {
             const msgData: NotificationObject = {
                 type: 1,
-                timeout: settings.store.lengthBasedTimeout ? calculateTimeout(content) : settings.store.timeout,
+                timeout: settings.store.lengthBasedTimeout
+                    ? calculateTimeout(content)
+                    : settings.store.timeout,
                 height: calculateHeight(content),
                 opacity: settings.store.opacity,
                 volume: settings.store.volume,
@@ -338,7 +411,7 @@ function sendMsgNotif(titleString: string, content: string, message: Message) {
                 content: content,
                 useBase64Icon: true,
                 icon: result,
-                sourceApp: "Vencord"
+                sourceApp: "Vencord",
             };
 
             sendToOverlay(msgData);
@@ -348,7 +421,9 @@ function sendMsgNotif(titleString: string, content: string, message: Message) {
 function sendOtherNotif(content: string, titleString: string) {
     const msgData: NotificationObject = {
         type: 1,
-        timeout: settings.store.lengthBasedTimeout ? calculateTimeout(content) : settings.store.timeout,
+        timeout: settings.store.lengthBasedTimeout
+            ? calculateTimeout(content)
+            : settings.store.timeout,
         height: calculateHeight(content),
         opacity: settings.store.opacity,
         volume: settings.store.volume,
@@ -357,7 +432,7 @@ function sendOtherNotif(content: string, titleString: string) {
         content: content,
         useBase64Icon: false,
         icon: "default",
-        sourceApp: "Vencord"
+        sourceApp: "Vencord",
     };
     sendToOverlay(msgData);
 }
@@ -372,7 +447,7 @@ async function sendToOverlay(notif: NotificationObject) {
         target: "xsoverlay",
         command: "SendNotification",
         jsonData: JSON.stringify(notif),
-        rawData: null
+        rawData: null,
     };
     if (socket.readyState !== socket.OPEN) await start();
     socket.send(JSON.stringify(apiObject));

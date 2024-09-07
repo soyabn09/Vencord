@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
@@ -23,7 +23,8 @@ import { moment } from "@webpack/common";
 export default definePlugin({
     name: "DontRoundMyTimestamps",
     authors: [Devs.Lexi],
-    description: "Always rounds relative timestamps down, so 7.6y becomes 7y instead of 8y",
+    description:
+        "Always rounds relative timestamps down, so 7.6y becomes 7y instead of 8y",
 
     start() {
         moment.relativeTimeRounding(Math.floor);
@@ -31,5 +32,5 @@ export default definePlugin({
 
     stop() {
         moment.relativeTimeRounding(Math.round);
-    }
+    },
 });

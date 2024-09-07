@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Settings } from "@api/Settings";
 import { Devs } from "@utils/constants";
@@ -44,11 +44,13 @@ export default definePlugin({
     patches: [
         {
             find: ".embedWrapper,embed",
-            replacement: [{
-                match: /\.embedWrapper(?=.+?channel_id:(\i)\.id)/g,
-                replace: "$&+($1.nsfw?' vc-nsfw-img':'')"
-            }]
-        }
+            replacement: [
+                {
+                    match: /\.embedWrapper(?=.+?channel_id:(\i)\.id)/g,
+                    replace: "$&+($1.nsfw?' vc-nsfw-img':'')",
+                },
+            ],
+        },
     ],
 
     options: {
@@ -56,8 +58,8 @@ export default definePlugin({
             type: OptionType.NUMBER,
             description: "Blur Amount",
             default: 10,
-            onChange: setCss
-        }
+            onChange: setCss,
+        },
     },
 
     start() {
@@ -70,5 +72,5 @@ export default definePlugin({
 
     stop() {
         style?.remove();
-    }
+    },
 });

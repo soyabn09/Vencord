@@ -6,10 +6,15 @@
 
 import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
-import definePlugin, { OptionType, PluginNative, ReporterTestable } from "@utils/types";
+import definePlugin, {
+    OptionType,
+    PluginNative,
+    ReporterTestable,
+} from "@utils/types";
 import { ApplicationAssetUtils, FluxDispatcher, Forms } from "@webpack/common";
 
-const Native = VencordNative.pluginHelpers.AppleMusicRichPresence as PluginNative<typeof import("./native")>;
+const Native = VencordNative.pluginHelpers
+    .AppleMusicRichPresence as PluginNative<typeof import("./native")>;
 
 interface ActivityAssets {
     large_image?: string;
@@ -68,7 +73,7 @@ export interface TrackData {
 const enum AssetImageType {
     Album = "Album",
     Artist = "Artist",
-    Disabled = "Disabled"
+    Disabled = "Disabled",
 }
 
 const applicationId = "1239490006054207550";
@@ -87,7 +92,7 @@ const settings = definePluginSettings({
         description: "Which type of activity",
         options: [
             { label: "Playing", value: ActivityType.PLAYING, default: true },
-            { label: "Listening", value: ActivityType.LISTENING }
+            { label: "Listening", value: ActivityType.LISTENING },
         ],
     },
     refreshInterval: {
@@ -110,45 +115,53 @@ const settings = definePluginSettings({
     nameString: {
         type: OptionType.STRING,
         description: "Activity name format string",
-        default: "Apple Music"
+        default: "Apple Music",
     },
     detailsString: {
         type: OptionType.STRING,
         description: "Activity details format string",
-        default: "{name}"
+        default: "{name}",
     },
     stateString: {
         type: OptionType.STRING,
         description: "Activity state format string",
-        default: "{artist}"
+        default: "{artist}",
     },
     largeImageType: {
         type: OptionType.SELECT,
         description: "Activity assets large image type",
         options: [
-            { label: "Album artwork", value: AssetImageType.Album, default: true },
+            {
+                label: "Album artwork",
+                value: AssetImageType.Album,
+                default: true,
+            },
             { label: "Artist artwork", value: AssetImageType.Artist },
-            { label: "Disabled", value: AssetImageType.Disabled }
+            { label: "Disabled", value: AssetImageType.Disabled },
         ],
     },
     largeTextString: {
         type: OptionType.STRING,
         description: "Activity assets large text format string",
-        default: "{album}"
+        default: "{album}",
     },
     smallImageType: {
         type: OptionType.SELECT,
         description: "Activity assets small image type",
         options: [
             { label: "Album artwork", value: AssetImageType.Album },
-            { label: "Artist artwork", value: AssetImageType.Artist, default: true },
-            { label: "Disabled", value: AssetImageType.Disabled }
+            {
+                label: "Artist artwork",
+                value: AssetImageType.Artist,
+                default: true,
+            },
+            { label: "Disabled", value: AssetImageType.Disabled },
         ],
     },
     smallTextString: {
         type: OptionType.STRING,
         description: "Activity assets small text format string",
-        default: "{artist}"
+        default: "{artist}",
     },
 });
 
@@ -160,13 +173,14 @@ function customFormat(formatStr: string, data: TrackData) {
 }
 
 function getImageAsset(type: AssetImageType, data: TrackData) {
-    const source = type === AssetImageType.Album
-        ? data.albumArtwork
-        : data.artistArtwork;
+    const source =
+        type === AssetImageType.Album ? data.albumArtwork : data.artistArtwork;
 
     if (!source) return undefined;
 
-    return ApplicationAssetUtils.fetchAssetIds(applicationId, [source]).then(ids => ids[0]);
+    return ApplicationAssetUtils.fetchAssetIds(applicationId, [source]).then(
+        (ids) => ids[0],
+    );
 }
 
 export default definePlugin({
@@ -177,28 +191,41 @@ export default definePlugin({
     reporterTestable: ReporterTestable.None,
 
     settingsAboutComponent() {
-        return <>
-            <Forms.FormText>
-                For the customizable activity format strings, you can use several special strings to include track data in activities!{" "}
-                <code>{"{name}"}</code> is replaced with the track name; <code>{"{artist}"}</code> is replaced with the artist(s)' name(s); and <code>{"{album}"}</code> is replaced with the album name.
-            </Forms.FormText>
-        </>;
+        return (
+            <>
+                <Forms.FormText>
+                    For the customizable activity format strings, you can use
+                    several special strings to include track data in activities!{" "}
+                    <code>{"{name}"}</code> is replaced with the track name;{" "}
+                    <code>{"{artist}"}</code> is replaced with the artist(s)'
+                    name(s); and <code>{"{album}"}</code> is replaced with the
+                    album name.
+                </Forms.FormText>
+            </>
+        );
     },
 
     settings,
 
     start() {
         this.updatePresence();
-        this.updateInterval = setInterval(() => { this.updatePresence(); }, settings.store.refreshInterval * 1000);
+        this.updateInterval = setInterval(() => {
+            this.updatePresence();
+        }, settings.store.refreshInterval * 1000);
     },
 
     stop() {
         clearInterval(this.updateInterval);
-        FluxDispatcher.dispatch({ type: "LOCAL_ACTIVITY_UPDATE", activity: null });
+        FluxDispatcher.dispatch({
+            type: "LOCAL_ACTIVITY_UPDATE",
+            activity: null,
+        });
     },
 
     updatePresence() {
-        this.getActivity().then(activity => { setActivity(activity); });
+        this.getActivity().then((activity) => {
+            setActivity(activity);
+        });
     },
 
     async getActivity(): Promise<Activity | null> {
@@ -207,19 +234,25 @@ export default definePlugin({
 
         const [largeImageAsset, smallImageAsset] = await Promise.all([
             getImageAsset(settings.store.largeImageType, trackData),
-            getImageAsset(settings.store.smallImageType, trackData)
+            getImageAsset(settings.store.smallImageType, trackData),
         ]);
 
         const assets: ActivityAssets = {};
 
         if (settings.store.largeImageType !== AssetImageType.Disabled) {
             assets.large_image = largeImageAsset;
-            assets.large_text = customFormat(settings.store.largeTextString, trackData);
+            assets.large_text = customFormat(
+                settings.store.largeTextString,
+                trackData,
+            );
         }
 
         if (settings.store.smallImageType !== AssetImageType.Disabled) {
             assets.small_image = smallImageAsset;
-            assets.small_text = customFormat(settings.store.smallTextString, trackData);
+            assets.small_text = customFormat(
+                settings.store.smallTextString,
+                trackData,
+            );
         }
 
         const buttons: ActivityButton[] = [];
@@ -245,18 +278,23 @@ export default definePlugin({
             details: customFormat(settings.store.detailsString, trackData),
             state: customFormat(settings.store.stateString, trackData),
 
-            timestamps: (settings.store.enableTimestamps ? {
-                start: Date.now() - (trackData.playerPosition * 1000),
-                end: Date.now() - (trackData.playerPosition * 1000) + (trackData.duration * 1000),
-            } : undefined),
+            timestamps: settings.store.enableTimestamps
+                ? {
+                      start: Date.now() - trackData.playerPosition * 1000,
+                      end:
+                          Date.now() -
+                          trackData.playerPosition * 1000 +
+                          trackData.duration * 1000,
+                  }
+                : undefined,
 
             assets,
 
-            buttons: buttons.length ? buttons.map(v => v.label) : undefined,
-            metadata: { button_urls: buttons.map(v => v.url) || undefined, },
+            buttons: buttons.length ? buttons.map((v) => v.label) : undefined,
+            metadata: { button_urls: buttons.map((v) => v.url) || undefined },
 
             type: settings.store.activityType,
             flags: ActivityFlag.INSTANCE,
         };
-    }
+    },
 });

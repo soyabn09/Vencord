@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Link } from "@components/Link";
 import { Forms, React } from "@webpack/common";
@@ -23,7 +23,8 @@ export default function PronounsAboutComponent() {
     return (
         <React.Fragment>
             <Forms.FormTitle tag="h3">More Information</Forms.FormTitle>
-            <Forms.FormText>To add your own pronouns, visit{" "}
+            <Forms.FormText>
+                To add your own pronouns, visit{" "}
                 <Link href="https://pronoundb.org">pronoundb.org</Link>
             </Forms.FormText>
             <Forms.FormDivider />
@@ -33,8 +34,11 @@ export default function PronounsAboutComponent() {
                     <li>Lowercase: they/them</li>
                     <li>Capitalized: They/Them</li>
                 </ul>
-                Text like "Ask me my pronouns" or "Any pronouns" will always be capitalized. <br /><br />
-                You can also configure whether or not to display pronouns for the current user (since you probably already know them)
+                Text like "Ask me my pronouns" or "Any pronouns" will always be
+                capitalized. <br />
+                <br />
+                You can also configure whether or not to display pronouns for
+                the current user (since you probably already know them)
             </Forms.FormText>
         </React.Fragment>
     );

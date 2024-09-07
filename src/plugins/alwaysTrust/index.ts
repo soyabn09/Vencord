@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
@@ -25,37 +25,39 @@ const settings = definePluginSettings({
         type: OptionType.BOOLEAN,
         default: true,
         description: "Remove the untrusted domain popup when opening links",
-        restartNeeded: true
+        restartNeeded: true,
     },
     file: {
         type: OptionType.BOOLEAN,
         default: true,
-        description: "Remove the 'Potentially Dangerous Download' popup when opening links",
-        restartNeeded: true
-    }
+        description:
+            "Remove the 'Potentially Dangerous Download' popup when opening links",
+        restartNeeded: true,
+    },
 });
 
 export default definePlugin({
     name: "AlwaysTrust",
-    description: "Removes the annoying untrusted domain and suspicious file popup",
+    description:
+        "Removes the annoying untrusted domain and suspicious file popup",
     authors: [Devs.zt, Devs.Trwy],
     patches: [
         {
             find: '="MaskedLinkStore",',
             replacement: {
                 match: /(?<=isTrustedDomain\(\i\){)return \i\(\i\)/,
-                replace: "return true"
+                replace: "return true",
             },
-            predicate: () => settings.store.domain
+            predicate: () => settings.store.domain,
         },
         {
             find: "bitbucket.org",
             replacement: {
                 match: /function \i\(\i\){(?=.{0,60}\.parse\(\i\))/,
-                replace: "$&return null;"
+                replace: "$&return null;",
             },
-            predicate: () => settings.store.file
-        }
+            predicate: () => settings.store.file,
+        },
     ],
-    settings
+    settings,
 });

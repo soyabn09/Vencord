@@ -14,14 +14,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 
 export default definePlugin({
     name: "MemberListDecoratorsAPI",
-    description: "API to add decorators to member list (both in servers and DMs)",
+    description:
+        "API to add decorators to member list (both in servers and DMs)",
     authors: [Devs.TheSun, Devs.Ven],
     patches: [
         {
@@ -29,19 +30,22 @@ export default definePlugin({
             replacement: [
                 {
                     match: /let\{[^}]*lostPermissionTooltipText:\i[^}]*\}=(\i),/,
-                    replace: "$&vencordProps=$1,"
-                }, {
+                    replace: "$&vencordProps=$1,",
+                },
+                {
                     match: /\.Messages\.GUILD_OWNER(?=.+?decorators:(\i)\(\)).+?\1=?\(\)=>.+?children:\[/,
-                    replace: "$&...(typeof vencordProps=='undefined'?[]:Vencord.Api.MemberListDecorators.__getDecorators(vencordProps)),"
-                }
-            ]
+                    replace:
+                        "$&...(typeof vencordProps=='undefined'?[]:Vencord.Api.MemberListDecorators.__getDecorators(vencordProps)),",
+                },
+            ],
         },
         {
             find: "PrivateChannel.renderAvatar",
             replacement: {
                 match: /decorators:(\i\.isSystemDM\(\))\?(.+?):null/,
-                replace: "decorators:[...Vencord.Api.MemberListDecorators.__getDecorators(arguments[0]), $1?$2:null]"
-            }
-        }
+                replace:
+                    "decorators:[...Vencord.Api.MemberListDecorators.__getDecorators(arguments[0]), $1?$2:null]",
+            },
+        },
     ],
 });

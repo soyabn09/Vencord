@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { OptionType, PluginOptionNumber } from "@utils/types";
 import { Forms, React, TextInput } from "@webpack/common";
@@ -23,13 +23,22 @@ import { ISettingElementProps } from ".";
 
 const MAX_SAFE_NUMBER = BigInt(Number.MAX_SAFE_INTEGER);
 
-export function SettingNumericComponent({ option, pluginSettings, definedSettings, id, onChange, onError }: ISettingElementProps<PluginOptionNumber>) {
+export function SettingNumericComponent({
+    option,
+    pluginSettings,
+    definedSettings,
+    id,
+    onChange,
+    onError,
+}: ISettingElementProps<PluginOptionNumber>) {
     function serialize(value: any) {
         if (option.type === OptionType.BIGINT) return BigInt(value);
         return Number(value);
     }
 
-    const [state, setState] = React.useState<any>(`${pluginSettings[id] ?? option.default ?? 0}`);
+    const [state, setState] = React.useState<any>(
+        `${pluginSettings[id] ?? option.default ?? 0}`,
+    );
     const [error, setError] = React.useState<string | null>(null);
 
     React.useEffect(() => {
@@ -43,7 +52,10 @@ export function SettingNumericComponent({ option, pluginSettings, definedSetting
         if (typeof isValid === "string") setError(isValid);
         else if (!isValid) setError("Invalid input provided.");
 
-        if (option.type === OptionType.NUMBER && BigInt(newValue) >= MAX_SAFE_NUMBER) {
+        if (
+            option.type === OptionType.NUMBER &&
+            BigInt(newValue) >= MAX_SAFE_NUMBER
+        ) {
             setState(`${Number.MAX_SAFE_INTEGER}`);
             onChange(serialize(newValue));
         } else {
@@ -64,7 +76,11 @@ export function SettingNumericComponent({ option, pluginSettings, definedSetting
                 disabled={option.disabled?.call(definedSettings) ?? false}
                 {...option.componentProps}
             />
-            {error && <Forms.FormText style={{ color: "var(--text-danger)" }}>{error}</Forms.FormText>}
+            {error && (
+                <Forms.FormText style={{ color: "var(--text-danger)" }}>
+                    {error}
+                </Forms.FormText>
+            )}
         </Forms.FormSection>
     );
 }

@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 if (Number(process.versions.node.split(".")[0]) < 18)
     throw `Your node version (${process.version}) is too old, please update to v18 or higher https://nodejs.org/en/download/`;

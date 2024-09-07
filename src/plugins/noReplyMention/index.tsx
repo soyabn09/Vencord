@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
@@ -44,10 +44,11 @@ const settings = definePluginSettings({
         ],
     },
     inverseShiftReply: {
-        description: "Invert Discord's shift replying behaviour (enable to make shift reply mention user)",
+        description:
+            "Invert Discord's shift replying behaviour (enable to make shift reply mention user)",
         type: OptionType.BOOLEAN,
         default: false,
-    }
+    },
 });
 
 export default definePlugin({
@@ -59,16 +60,19 @@ export default definePlugin({
     shouldMention(message: Message, isHoldingShift: boolean) {
         const isListed = settings.store.userList.includes(message.author.id);
         const isExempt = settings.store.shouldPingListed ? isListed : !isListed;
-        return settings.store.inverseShiftReply ? isHoldingShift !== isExempt : !isHoldingShift && isExempt;
+        return settings.store.inverseShiftReply
+            ? isHoldingShift !== isExempt
+            : !isHoldingShift && isExempt;
     },
 
     patches: [
         {
-            find: ",\"Message\")}function",
+            find: ',"Message")}function',
             replacement: {
                 match: /:(\i),shouldMention:!(\i)\.shiftKey/,
-                replace: ":$1,shouldMention:$self.shouldMention($1,$2.shiftKey)"
-            }
-        }
+                replace:
+                    ":$1,shouldMention:$self.shouldMention($1,$2.shiftKey)",
+            },
+        },
     ],
 });

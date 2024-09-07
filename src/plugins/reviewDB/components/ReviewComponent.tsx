@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { openUserProfile } from "@utils/discord";
 import { classes } from "@utils/misc";
@@ -24,9 +24,20 @@ import { Alerts, Parser, Timestamp, useState } from "@webpack/common";
 
 import { Auth, getToken } from "../auth";
 import { Review, ReviewType } from "../entities";
-import { blockUser, deleteReview, reportReview, unblockUser } from "../reviewDbApi";
+import {
+    blockUser,
+    deleteReview,
+    reportReview,
+    unblockUser,
+} from "../reviewDbApi";
 import { settings } from "../settings";
-import { canBlockReviewAuthor, canDeleteReview, canReportReview, cl, showToast } from "../utils";
+import {
+    canBlockReviewAuthor,
+    canDeleteReview,
+    canReportReview,
+    cl,
+    showToast,
+} from "../utils";
 import { openBlockModal } from "./BlockedUserModal";
 import { BlockButton, DeleteButton, ReportButton } from "./MessageButton";
 import ReviewBadge from "./ReviewBadge";
@@ -39,18 +50,26 @@ export default LazyComponent(() => {
         { container, isHeader },
         { avatar, clickable, username, wrapper, cozy },
         buttonClasses,
-        botTag
+        botTag,
     ] = findBulk(
         p("cozyMessage"),
         p("container", "isHeader"),
         p("avatar", "zalgo"),
         p("button", "wrapper", "selected"),
-        p("botTagRegular")
+        p("botTagRegular"),
     );
 
     const dateFormat = new Intl.DateTimeFormat();
 
-    return function ReviewComponent({ review, refetch, profileId }: { review: Review; refetch(): void; profileId: string; }) {
+    return function ReviewComponent({
+        review,
+        refetch,
+        profileId,
+    }: {
+        review: Review;
+        refetch(): void;
+        profileId: string;
+    }) {
         const [showAll, setShowAll] = useState(false);
 
         function openModal() {
@@ -65,15 +84,17 @@ export default LazyComponent(() => {
                 cancelText: "Nevermind",
                 onConfirm: async () => {
                     if (!(await getToken())) {
-                        return showToast("You must be logged in to delete reviews.");
+                        return showToast(
+                            "You must be logged in to delete reviews.",
+                        );
                     } else {
-                        deleteReview(review.id).then(res => {
+                        deleteReview(review.id).then((res) => {
                             if (res) {
                                 refetch();
                             }
                         });
                     }
-                }
+                },
             });
         }
 
@@ -86,19 +107,22 @@ export default LazyComponent(() => {
                 // confirmColor: "red", this just adds a class name and breaks the submit button guh
                 onConfirm: async () => {
                     if (!(await getToken())) {
-                        return showToast("You must be logged in to report reviews.");
+                        return showToast(
+                            "You must be logged in to report reviews.",
+                        );
                     } else {
                         reportReview(review.id);
                     }
-                }
+                },
             });
         }
 
-        const isAuthorBlocked = Auth?.user?.blockedUsers?.includes(review.sender.discordID) ?? false;
+        const isAuthorBlocked =
+            Auth?.user?.blockedUsers?.includes(review.sender.discordID) ??
+            false;
 
         function blockReviewSender() {
-            if (isAuthorBlocked)
-                return unblockUser(review.sender.discordID);
+            if (isAuthorBlocked) return unblockUser(review.sender.discordID);
 
             Alerts.show({
                 title: "Are you sure?",
@@ -108,33 +132,54 @@ export default LazyComponent(() => {
                 // confirmColor: "red", this just adds a class name and breaks the submit button guh
                 onConfirm: async () => {
                     if (!(await getToken())) {
-                        return showToast("You must be logged in to block users.");
+                        return showToast(
+                            "You must be logged in to block users.",
+                        );
                     } else {
                         blockUser(review.sender.discordID);
                     }
-                }
+                },
             });
         }
 
         return (
-            <div className={classes(cl("review"), cozyMessage, wrapper, message, groupStart, cozy)} style={
-                {
+            <div
+                className={classes(
+                    cl("review"),
+                    cozyMessage,
+                    wrapper,
+                    message,
+                    groupStart,
+                    cozy,
+                )}
+                style={{
                     marginLeft: "0px",
                     paddingLeft: "52px", // wth is this
                     // nobody knows anymore
-                }
-            }>
-
+                }}
+            >
                 <img
                     className={classes(avatar, clickable)}
                     onClick={openModal}
-                    src={review.sender.profilePhoto || "/assets/1f0bfc0865d324c2587920a7d80c609b.png?size=128"}
+                    src={
+                        review.sender.profilePhoto ||
+                        "/assets/1f0bfc0865d324c2587920a7d80c609b.png?size=128"
+                    }
                     style={{ left: "0px", zIndex: 0 }}
                 />
-                <div style={{ display: "inline-flex", justifyContent: "center", alignItems: "center" }}>
+                <div
+                    style={{
+                        display: "inline-flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}
+                >
                     <span
                         className={classes(clickable, username)}
-                        style={{ color: "var(--channels-default)", fontSize: "14px" }}
+                        style={{
+                            color: "var(--channels-default)",
+                            fontSize: "14px",
+                        }}
                         onClick={() => openModal()}
                     >
                         {review.sender.username}
@@ -142,11 +187,15 @@ export default LazyComponent(() => {
 
                     {review.type === ReviewType.System && (
                         <span
-                            className={classes(botTag.botTagVerified, botTag.botTagRegular, botTag.px, botTag.rem)}
-                            style={{ marginLeft: "4px" }}>
-                            <span className={botTag.botText}>
-                                System
-                            </span>
+                            className={classes(
+                                botTag.botTagVerified,
+                                botTag.botTagRegular,
+                                botTag.px,
+                                botTag.rem,
+                            )}
+                            style={{ marginLeft: "4px" }}
+                        >
+                            <span className={botTag.botText}>System</span>
                         </span>
                     )}
                 </div>
@@ -159,29 +208,57 @@ export default LazyComponent(() => {
                         onClick={() => openBlockModal()}
                     />
                 )}
-                {review.sender.badges.map(badge => <ReviewBadge {...badge} />)}
+                {review.sender.badges.map((badge) => (
+                    <ReviewBadge {...badge} />
+                ))}
 
-                {
-                    !settings.store.hideTimestamps && review.type !== ReviewType.System && (
-                        <Timestamp timestamp={new Date(review.timestamp * 1000)} >
+                {!settings.store.hideTimestamps &&
+                    review.type !== ReviewType.System && (
+                        <Timestamp
+                            timestamp={new Date(review.timestamp * 1000)}
+                        >
                             {dateFormat.format(review.timestamp * 1000)}
-                        </Timestamp>)
-                }
+                        </Timestamp>
+                    )}
 
                 <div className={cl("review-comment")}>
-                    {(review.comment.length > 200 && !showAll)
-                        ? [Parser.parseGuildEventDescription(review.comment.substring(0, 200)), "...", <br />, (<a onClick={() => setShowAll(true)}>Read more</a>)]
+                    {review.comment.length > 200 && !showAll
+                        ? [
+                              Parser.parseGuildEventDescription(
+                                  review.comment.substring(0, 200),
+                              ),
+                              "...",
+                              <br />,
+                              <a onClick={() => setShowAll(true)}>Read more</a>,
+                          ]
                         : Parser.parseGuildEventDescription(review.comment)}
                 </div>
 
                 {review.id !== 0 && (
-                    <div className={classes(container, isHeader, buttons)} style={{
-                        padding: "0px",
-                    }}>
-                        <div className={classes(buttonClasses.wrapper, buttonsInner)} >
-                            {canReportReview(review) && <ReportButton onClick={reportRev} />}
-                            {canBlockReviewAuthor(profileId, review) && <BlockButton isBlocked={isAuthorBlocked} onClick={blockReviewSender} />}
-                            {canDeleteReview(profileId, review) && <DeleteButton onClick={delReview} />}
+                    <div
+                        className={classes(container, isHeader, buttons)}
+                        style={{
+                            padding: "0px",
+                        }}
+                    >
+                        <div
+                            className={classes(
+                                buttonClasses.wrapper,
+                                buttonsInner,
+                            )}
+                        >
+                            {canReportReview(review) && (
+                                <ReportButton onClick={reportRev} />
+                            )}
+                            {canBlockReviewAuthor(profileId, review) && (
+                                <BlockButton
+                                    isBlocked={isAuthorBlocked}
+                                    onClick={blockReviewSender}
+                                />
+                            )}
+                            {canDeleteReview(profileId, review) && (
+                                <DeleteButton onClick={delReview} />
+                            )}
                         </div>
                     </div>
                 )}

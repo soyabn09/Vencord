@@ -9,11 +9,11 @@ import { LiteralUnion } from "type-fest";
 // Resolves a possibly nested prop in the form of "some.nested.prop" to type of T.some.nested.prop
 type ResolvePropDeep<T, P> = P extends `${infer Pre}.${infer Suf}`
     ? Pre extends keyof T
-    ? ResolvePropDeep<T[Pre], Suf>
-    : any
+        ? ResolvePropDeep<T[Pre], Suf>
+        : any
     : P extends keyof T
-    ? T[P]
-    : any;
+      ? T[P]
+      : any;
 
 interface SettingsStoreOptions {
     readOnly?: boolean;
@@ -26,7 +26,7 @@ interface SettingsStoreOptions {
 }
 
 // merges the SettingsStoreOptions type into the class
-export interface SettingsStore<T extends object> extends SettingsStoreOptions { }
+export interface SettingsStore<T extends object> extends SettingsStoreOptions {}
 
 /**
  * The SettingsStore allows you to easily create a mutable store that
@@ -63,12 +63,16 @@ export class SettingsStore<T extends object> {
                         target,
                         key,
                         root,
-                        path
+                        path,
                     });
                 }
 
                 if (typeof v === "object" && v !== null && !Array.isArray(v))
-                    return self.makeProxy(v, root, `${path}${path && "."}${key}`);
+                    return self.makeProxy(
+                        v,
+                        root,
+                        `${path}${path && "."}${key}`,
+                    );
 
                 return v;
             },
@@ -78,11 +82,11 @@ export class SettingsStore<T extends object> {
                 Reflect.set(target, key, value);
                 const setPath = `${path}${path && "."}${key}`;
 
-                self.globalListeners.forEach(cb => cb(value, setPath));
-                self.pathListeners.get(setPath)?.forEach(cb => cb(value));
+                self.globalListeners.forEach((cb) => cb(value, setPath));
+                self.pathListeners.get(setPath)?.forEach((cb) => cb(value));
 
                 return true;
-            }
+            },
         });
     }
 
@@ -107,14 +111,14 @@ export class SettingsStore<T extends object> {
             for (const p of path) {
                 if (!v) {
                     console.warn(
-                        `Settings#setData: Path ${pathToNotify} does not exist in new data. Not dispatching update`
+                        `Settings#setData: Path ${pathToNotify} does not exist in new data. Not dispatching update`,
                     );
                     return;
                 }
                 v = v[p];
             }
 
-            this.pathListeners.get(pathToNotify)?.forEach(cb => cb(v));
+            this.pathListeners.get(pathToNotify)?.forEach((cb) => cb(v));
         }
 
         this.markAsChanged();
@@ -146,7 +150,7 @@ export class SettingsStore<T extends object> {
      */
     public addChangeListener<P extends LiteralUnion<keyof T, string>>(
         path: P,
-        cb: (data: ResolvePropDeep<T, P>) => void
+        cb: (data: ResolvePropDeep<T, P>) => void,
     ) {
         const listeners = this.pathListeners.get(path as string) ?? new Set();
         listeners.add(cb);
@@ -165,7 +169,10 @@ export class SettingsStore<T extends object> {
      * Remove a scoped listener
      * @see {@link addChangeListener}
      */
-    public removeChangeListener(path: LiteralUnion<keyof T, string>, cb: (data: any) => void) {
+    public removeChangeListener(
+        path: LiteralUnion<keyof T, string>,
+        cb: (data: any) => void,
+    ) {
         const listeners = this.pathListeners.get(path as string);
         if (!listeners) return;
 
@@ -177,6 +184,6 @@ export class SettingsStore<T extends object> {
      * Call all global change listeners
      */
     public markAsChanged() {
-        this.globalListeners.forEach(cb => cb(this.plain, ""));
+        this.globalListeners.forEach((cb) => cb(this.plain, ""));
     }
 }

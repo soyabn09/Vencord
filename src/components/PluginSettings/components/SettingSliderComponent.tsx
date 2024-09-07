@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { PluginOptionSlider } from "@utils/types";
 import { Forms, React, Slider } from "@webpack/common";
@@ -29,7 +29,14 @@ export function makeRange(start: number, end: number, step = 1) {
     return ranges;
 }
 
-export function SettingSliderComponent({ option, pluginSettings, definedSettings, id, onChange, onError }: ISettingElementProps<PluginOptionSlider>) {
+export function SettingSliderComponent({
+    option,
+    pluginSettings,
+    definedSettings,
+    id,
+    onChange,
+    onError,
+}: ISettingElementProps<PluginOptionSlider>) {
     const def = pluginSettings[id] ?? option.default;
 
     const [error, setError] = React.useState<string | null>(null);
@@ -65,4 +72,3 @@ export function SettingSliderComponent({ option, pluginSettings, definedSettings
         </Forms.FormSection>
     );
 }
-

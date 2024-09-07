@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="utf-8" />
@@ -50,10 +50,10 @@
                             value: css,
                             language: "css",
                             theme: getTheme(),
-                        }
+                        },
                     );
                     editor.onDidChangeModelContent(() =>
-                        setCss(editor.getValue())
+                        setCss(editor.getValue()),
                     );
                     window.addEventListener("resize", () => {
                         // make monaco re-layout

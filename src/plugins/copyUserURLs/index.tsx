@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { NavContextMenuPatchCallback } from "@api/ContextMenu";
 import { LinkIcon } from "@components/Icons";
@@ -29,16 +29,21 @@ interface UserContextProps {
     user: User;
 }
 
-const UserContextMenuPatch: NavContextMenuPatchCallback = (children, { user }: UserContextProps) => {
+const UserContextMenuPatch: NavContextMenuPatchCallback = (
+    children,
+    { user }: UserContextProps,
+) => {
     if (!user) return;
 
     children.push(
         <Menu.MenuItem
             id="vc-copy-user-url"
             label="Copy User URL"
-            action={() => Clipboard.copy(`<https://discord.com/users/${user.id}>`)}
+            action={() =>
+                Clipboard.copy(`<https://discord.com/users/${user.id}>`)
+            }
             icon={LinkIcon}
-        />
+        />,
     );
 };
 
@@ -47,6 +52,6 @@ export default definePlugin({
     authors: [Devs.castdrian],
     description: "Adds a 'Copy User URL' option to the user context menu.",
     contextMenus: {
-        "user-context": UserContextMenuPatch
-    }
+        "user-context": UserContextMenuPatch,
+    },
 });

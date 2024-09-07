@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 export interface UserProfileProps {
     userId: string;
@@ -29,14 +29,14 @@ export interface PronounsResponse {
     [id: string]: {
         sets?: {
             [locale: string]: PronounCode[];
-        }
-    }
+        };
+    };
 }
 
 export interface CachePronouns {
     sets?: {
         [locale: string]: PronounCode[];
-    }
+    };
 }
 
 export type PronounCode = keyof typeof PronounMapping;

@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { onceDefined } from "@shared/onceDefined";
 import electron, { app, BrowserWindowConstructorOptions, Menu } from "electron";
@@ -30,7 +30,9 @@ console.log("[Vencord] Starting up...");
 const injectorPath = require.main!.filename;
 
 // special discord_arch_electron injection method
-const asarName = require.main!.path.endsWith("app.asar") ? "_app.asar" : "app.asar";
+const asarName = require.main!.path.endsWith("app.asar")
+    ? "_app.asar"
+    : "app.asar";
 
 // The original app.asar
 const asarPath = join(dirname(injectorPath), "..", asarName);
@@ -58,7 +60,7 @@ if (!IS_VANILLA) {
                             visible: false,
                             acceleratorWorksWhenHidden: true,
                             accelerator: "Control+Q",
-                            click: () => app.quit()
+                            click: () => app.quit(),
                         });
                     }
                 }
@@ -71,14 +73,22 @@ if (!IS_VANILLA) {
         constructor(options: BrowserWindowConstructorOptions) {
             if (options?.webPreferences?.preload && options.title) {
                 const original = options.webPreferences.preload;
-                options.webPreferences.preload = join(__dirname, IS_DISCORD_DESKTOP ? "preload.js" : "vencordDesktopPreload.js");
+                options.webPreferences.preload = join(
+                    __dirname,
+                    IS_DISCORD_DESKTOP
+                        ? "preload.js"
+                        : "vencordDesktopPreload.js",
+                );
                 options.webPreferences.sandbox = false;
                 // work around discord unloading when in background
                 options.webPreferences.backgroundThrottling = false;
 
                 if (settings.frameless) {
                     options.frame = false;
-                } else if (process.platform === "win32" && settings.winNativeTitleBar) {
+                } else if (
+                    process.platform === "win32" &&
+                    settings.winNativeTitleBar
+                ) {
                     delete options.frame;
                 }
 
@@ -87,7 +97,9 @@ if (!IS_VANILLA) {
                     options.backgroundColor = "#00000000";
                 }
 
-                const needsVibrancy = process.platform === "darwin" && settings.macosVibrancyStyle;
+                const needsVibrancy =
+                    process.platform === "darwin" &&
+                    settings.macosVibrancyStyle;
 
                 if (needsVibrancy) {
                     options.backgroundColor = "#00000000";
@@ -107,19 +119,25 @@ if (!IS_VANILLA) {
     // esbuild may rename our BrowserWindow, which leads to it being excluded
     // from getFocusedWindow(), so this is necessary
     // https://github.com/discord/electron/blob/13-x-y/lib/browser/api/browser-window.ts#L60-L62
-    Object.defineProperty(BrowserWindow, "name", { value: "BrowserWindow", configurable: true });
+    Object.defineProperty(BrowserWindow, "name", {
+        value: "BrowserWindow",
+        configurable: true,
+    });
 
     // Replace electrons exports with our custom BrowserWindow
     const electronPath = require.resolve("electron");
     delete require.cache[electronPath]!.exports;
     require.cache[electronPath]!.exports = {
         ...electron,
-        BrowserWindow
+        BrowserWindow,
     };
 
     // Patch appSettings to force enable devtools and optionally disable min size
-    onceDefined(global, "appSettings", s => {
-        s.set("DANGEROUS_ENABLE_DEVTOOLS_ONLY_ENABLE_IF_YOU_KNOW_WHAT_YOURE_DOING", true);
+    onceDefined(global, "appSettings", (s) => {
+        s.set(
+            "DANGEROUS_ENABLE_DEVTOOLS_ONLY_ENABLE_IF_YOU_KNOW_WHAT_YOURE_DOING",
+            true,
+        );
         if (settings.disableMinSize) {
             s.set("MIN_WIDTH", 0);
             s.set("MIN_HEIGHT", 0);
