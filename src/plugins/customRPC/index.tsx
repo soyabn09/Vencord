@@ -41,13 +41,13 @@ import {
 
 const useProfileThemeStyle = findByCodeLazy(
     "profileThemeStyle:",
-    "--profile-gradient-primary-color"
+    "--profile-gradient-primary-color",
 );
 const ActivityComponent = findComponentByCodeLazy("onOpenGameProfile");
 
 const ShowCurrentGame = getUserSettingLazy<boolean>(
     "status",
-    "showCurrentGame"
+    "showCurrentGame",
 )!;
 
 async function getApplicationAsset(key: string): Promise<string> {
@@ -501,7 +501,7 @@ export default definePlugin({
                             activity={activity[0]}
                             channelId={SelectedChannelStore.getChannelId()}
                             guild={GuildStore.getGuild(
-                                SelectedGuildStore.getLastSelectedGuildId()
+                                SelectedGuildStore.getLastSelectedGuildId(),
                             )}
                             application={{ id: settings.store.appID }}
                             user={UserStore.getCurrentUser()}

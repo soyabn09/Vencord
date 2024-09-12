@@ -19,51 +19,69 @@ interface UserProfileProps {
     originalPopout: () => React.ReactNode;
 }
 
-const UserProfile = findComponentByCodeLazy("UserProfilePopoutWrapper: user cannot be undefined");
+const UserProfile = findComponentByCodeLazy(
+    "UserProfilePopoutWrapper: user cannot be undefined",
+);
 const styles = findByPropsLazy("accountProfilePopoutWrapper");
 
 let openAlternatePopout = false;
-let accountPanelRef: React.MutableRefObject<Record<PropertyKey, any> | null> = { current: null };
+let accountPanelRef: React.MutableRefObject<Record<PropertyKey, any> | null> = {
+    current: null,
+};
 
-const AccountPanelContextMenu = ErrorBoundary.wrap(() => {
-    const { prioritizeServerProfile } = settings.use(["prioritizeServerProfile"]);
+const AccountPanelContextMenu = ErrorBoundary.wrap(
+    () => {
+        const { prioritizeServerProfile } = settings.use([
+            "prioritizeServerProfile",
+        ]);
 
-    return (
-        <Menu.Menu
-            navId="vc-ap-server-profile"
-            onClose={ContextMenuApi.closeContextMenu}
-        >
-            <Menu.MenuItem
-                id="vc-ap-view-alternate-popout"
-                label={prioritizeServerProfile ? "View Account Profile" : "View Server Profile"}
-                disabled={getCurrentChannel()?.getGuildId() == null}
-                action={e => {
-                    openAlternatePopout = true;
-                    accountPanelRef.current?.props.onMouseDown();
-                    accountPanelRef.current?.props.onClick(e);
-                }}
-            />
-            <Menu.MenuCheckboxItem
-                id="vc-ap-prioritize-server-profile"
-                label="Prioritize Server Profile"
-                checked={prioritizeServerProfile}
-                action={() => settings.store.prioritizeServerProfile = !prioritizeServerProfile}
-            />
-        </Menu.Menu>
-    );
-}, { noop: true });
+        return (
+            <Menu.Menu
+                navId="vc-ap-server-profile"
+                onClose={ContextMenuApi.closeContextMenu}
+            >
+                <Menu.MenuItem
+                    id="vc-ap-view-alternate-popout"
+                    label={
+                        prioritizeServerProfile
+                            ? "View Account Profile"
+                            : "View Server Profile"
+                    }
+                    disabled={getCurrentChannel()?.getGuildId() == null}
+                    action={(e) => {
+                        openAlternatePopout = true;
+                        accountPanelRef.current?.props.onMouseDown();
+                        accountPanelRef.current?.props.onClick(e);
+                    }}
+                />
+                <Menu.MenuCheckboxItem
+                    id="vc-ap-prioritize-server-profile"
+                    label="Prioritize Server Profile"
+                    checked={prioritizeServerProfile}
+                    action={() =>
+                        (settings.store.prioritizeServerProfile =
+                            !prioritizeServerProfile)
+                    }
+                />
+            </Menu.Menu>
+        );
+    },
+    { noop: true },
+);
 
 const settings = definePluginSettings({
     prioritizeServerProfile: {
         type: OptionType.BOOLEAN,
-        description: "Prioritize Server Profile when left clicking your account panel",
-        default: false
-    }
+        description:
+            "Prioritize Server Profile when left clicking your account panel",
+        default: false,
+    },
 });
 
 export default definePlugin({
     name: "AccountPanelServerProfile",
-    description: "Right click your account panel in the bottom left to view your profile in the current server",
+    description:
+        "Right click your account panel in the bottom left to view your profile in the current server",
     authors: [Devs.Nuckyz, Devs.relitrix],
     settings,
 
@@ -74,22 +92,30 @@ export default definePlugin({
             replacement: [
                 {
                     match: /(?<=\.SIZE_32\)}\);)/,
-                    replace: "$self.useAccountPanelRef();"
+                    replace: "$self.useAccountPanelRef();",
                 },
                 {
                     match: /(\.AVATAR,children:.+?renderPopout:(\i)=>){(.+?)}(?=,position)(?<=currentUser:(\i).+?)/,
-                    replace: (_, rest, popoutProps, originalPopout, currentUser) => `${rest}$self.UserProfile({popoutProps:${popoutProps},currentUser:${currentUser},originalPopout:()=>{${originalPopout}}})`
+                    replace: (
+                        _,
+                        rest,
+                        popoutProps,
+                        originalPopout,
+                        currentUser,
+                    ) =>
+                        `${rest}$self.UserProfile({popoutProps:${popoutProps},currentUser:${currentUser},originalPopout:()=>{${originalPopout}}})`,
                 },
                 {
                     match: /\.AVATAR,children:.+?(?=renderPopout:)/,
-                    replace: "$&onRequestClose:$self.onPopoutClose,"
+                    replace: "$&onRequestClose:$self.onPopoutClose,",
                 },
                 {
                     match: /(?<=.avatarWrapper,)/,
-                    replace: "ref:$self.accountPanelRef,onContextMenu:$self.openAccountPanelContextMenu,"
-                }
-            ]
-        }
+                    replace:
+                        "ref:$self.accountPanelRef,onContextMenu:$self.openAccountPanelContextMenu,",
+                },
+            ],
+        },
     ],
 
     get accountPanelRef() {
@@ -97,9 +123,12 @@ export default definePlugin({
     },
 
     useAccountPanelRef() {
-        useEffect(() => () => {
-            accountPanelRef.current = null;
-        }, []);
+        useEffect(
+            () => () => {
+                accountPanelRef.current = null;
+            },
+            [],
+        );
 
         return (accountPanelRef = useRef(null));
     },
@@ -112,23 +141,33 @@ export default definePlugin({
         openAlternatePopout = false;
     },
 
-    UserProfile: ErrorBoundary.wrap(({ popoutProps, currentUser, originalPopout }: UserProfileProps) => {
-        if (
-            (settings.store.prioritizeServerProfile && openAlternatePopout) ||
-            (!settings.store.prioritizeServerProfile && !openAlternatePopout)
-        ) {
-            return originalPopout();
-        }
+    UserProfile: ErrorBoundary.wrap(
+        ({ popoutProps, currentUser, originalPopout }: UserProfileProps) => {
+            if (
+                (settings.store.prioritizeServerProfile &&
+                    openAlternatePopout) ||
+                (!settings.store.prioritizeServerProfile &&
+                    !openAlternatePopout)
+            ) {
+                return originalPopout();
+            }
 
-        const currentChannel = getCurrentChannel();
-        if (currentChannel?.getGuildId() == null) {
-            return originalPopout();
-        }
+            const currentChannel = getCurrentChannel();
+            if (currentChannel?.getGuildId() == null) {
+                return originalPopout();
+            }
 
-        return (
-            <div className={styles.accountProfilePopoutWrapper}>
-                <UserProfile {...popoutProps} userId={currentUser.id} guildId={currentChannel.getGuildId()} channelId={currentChannel.id} />
-            </div>
-        );
-    }, { noop: true })
+            return (
+                <div className={styles.accountProfilePopoutWrapper}>
+                    <UserProfile
+                        {...popoutProps}
+                        userId={currentUser.id}
+                        guildId={currentChannel.getGuildId()}
+                        channelId={currentChannel.id}
+                    />
+                </div>
+            );
+        },
+        { noop: true },
+    ),
 });

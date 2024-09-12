@@ -27,11 +27,11 @@ interface TimebarComponentProps {
 const ActivityTimeBar = findComponentByCodeLazy<ActivityTimestamps>(
     ".bar",
     ".progress",
-    "(100*"
+    "(100*",
 );
 
 function isActivityTimestamped(
-    activity: Activity
+    activity: Activity,
 ): activity is RequiredDeep<Activity> {
     return (
         activity.timestamps != null &&
@@ -100,6 +100,6 @@ export default definePlugin({
                 />
             );
         },
-        { noop: true }
+        { noop: true },
     ),
 });

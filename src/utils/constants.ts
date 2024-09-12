@@ -599,6 +599,6 @@ export const DevsById = /* #__PURE__*/ (() =>
         Object.fromEntries(
             Object.entries(Devs)
                 .filter((d) => d[1].id !== 0n)
-                .map(([_, v]) => [v.id, v] as const)
-        )
+                .map(([_, v]) => [v.id, v] as const),
+        ),
     ))() as Record<string, Dev>;

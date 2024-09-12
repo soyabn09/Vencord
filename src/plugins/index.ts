@@ -74,7 +74,7 @@ export function addPatch(newPatch: Omit<Patch, "plugin">, pluginName: string) {
     }
 
     patch.replacement = patch.replacement.filter(
-        ({ predicate }) => !predicate || predicate()
+        ({ predicate }) => !predicate || predicate(),
     );
 
     patches.push(patch);
@@ -97,7 +97,7 @@ for (const p of pluginsValues)
 
             if (!dep) {
                 const error = new Error(
-                    `Plugin ${p.name} has unresolved dependency ${d}`
+                    `Plugin ${p.name} has unresolved dependency ${d}`,
                 );
 
                 if (IS_DEV) {
@@ -150,7 +150,7 @@ export const startAllPlugins = traceFunction(
                 startPlugin(Plugins[name]);
             }
         }
-    }
+    },
 );
 
 export function startDependenciesRecursive(p: Plugin) {
@@ -182,7 +182,7 @@ export function startDependenciesRecursive(p: Plugin) {
 
 export function subscribePluginFluxEvents(
     p: Plugin,
-    fluxDispatcher: typeof FluxDispatcher
+    fluxDispatcher: typeof FluxDispatcher,
 ) {
     if (
         p.flux &&
@@ -200,14 +200,14 @@ export function subscribePluginFluxEvents(
                         ? res.catch((e) =>
                               logger.error(
                                   `${p.name}: Error while handling ${event}\n`,
-                                  e
-                              )
+                                  e,
+                              ),
                           )
                         : res;
                 } catch (e) {
                     logger.error(
                         `${p.name}: Error while handling ${event}\n`,
-                        e
+                        e,
                     );
                 }
             });
@@ -219,7 +219,7 @@ export function subscribePluginFluxEvents(
 
 export function unsubscribePluginFluxEvents(
     p: Plugin,
-    fluxDispatcher: typeof FluxDispatcher
+    fluxDispatcher: typeof FluxDispatcher,
 ) {
     if (p.flux) {
         subscribedFluxEventsPlugins.delete(p.name);
@@ -232,7 +232,7 @@ export function unsubscribePluginFluxEvents(
 }
 
 export function subscribeAllPluginsFluxEvents(
-    fluxDispatcher: typeof FluxDispatcher
+    fluxDispatcher: typeof FluxDispatcher,
 ) {
     enabledPluginsSubscribedFlux = true;
 
@@ -288,7 +288,7 @@ export const startPlugin = traceFunction(
 
         return true;
     },
-    (p) => `startPlugin ${p.name}`
+    (p) => `startPlugin ${p.name}`,
 );
 
 export const stopPlugin = traceFunction(
@@ -320,7 +320,7 @@ export const stopPlugin = traceFunction(
                 } catch (e) {
                     logger.error(
                         `Failed to unregister command ${cmd.name}\n`,
-                        e
+                        e,
                     );
                     return false;
                 }
@@ -338,5 +338,5 @@ export const stopPlugin = traceFunction(
 
         return true;
     },
-    (p) => `stopPlugin ${p.name}`
+    (p) => `stopPlugin ${p.name}`,
 );
