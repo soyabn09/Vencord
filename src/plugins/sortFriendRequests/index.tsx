@@ -50,7 +50,7 @@ export default definePlugin({
             find: ".Messages.FRIEND_REQUEST_CANCEL",
             replacement: {
                 predicate: () => settings.store.showDates,
-                match: /subText:(\i)(?=,className:\i\.userInfo}\))(?<=user:(\i).+?)/,
+                match: /subText:(\i)(?<=user:(\i).+?)/,
                 replace: (_, subtext, user) =>
                     `subText:$self.makeSubtext(${subtext},${user})`,
             },
@@ -71,7 +71,7 @@ export default definePlugin({
         const since = this.getSince(user);
         return (
             <Flex
-                flexDirection="row"
+                flexDirection="column"
                 style={{ gap: 0, flexWrap: "wrap", lineHeight: "0.9rem" }}
             >
                 <span>{text}</span>

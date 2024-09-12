@@ -26,11 +26,7 @@ import { Margins } from "@utils/margins";
 import { classes } from "@utils/misc";
 import { useAwaiter } from "@utils/react";
 import definePlugin, { OptionType } from "@utils/types";
-import {
-    findByCodeLazy,
-    findByPropsLazy,
-    findComponentByCodeLazy,
-} from "@webpack";
+import { findByCodeLazy, findComponentByCodeLazy } from "@webpack";
 import {
     ApplicationAssetUtils,
     Button,
@@ -45,14 +41,13 @@ import {
 
 const useProfileThemeStyle = findByCodeLazy(
     "profileThemeStyle:",
-    "--profile-gradient-primary-color",
+    "--profile-gradient-primary-color"
 );
 const ActivityComponent = findComponentByCodeLazy("onOpenGameProfile");
-const ActivityClassName = findByPropsLazy("activity", "buttonColor");
 
 const ShowCurrentGame = getUserSettingLazy<boolean>(
     "status",
-    "showCurrentGame",
+    "showCurrentGame"
 )!;
 
 async function getApplicationAsset(key: string): Promise<string> {
@@ -491,14 +486,22 @@ export default definePlugin({
 
                 <Forms.FormDivider className={Margins.top8} />
 
-                <div style={{ width: "284px", ...profileThemeStyle }}>
+                <div
+                    style={{
+                        width: "284px",
+                        ...profileThemeStyle,
+                        padding: 8,
+                        marginTop: 8,
+                        borderRadius: 8,
+                        background: "var(--bg-mod-faint)",
+                    }}
+                >
                     {activity[0] && (
                         <ActivityComponent
                             activity={activity[0]}
-                            className={ActivityClassName.activity}
                             channelId={SelectedChannelStore.getChannelId()}
                             guild={GuildStore.getGuild(
-                                SelectedGuildStore.getLastSelectedGuildId(),
+                                SelectedGuildStore.getLastSelectedGuildId()
                             )}
                             application={{ id: settings.store.appID }}
                             user={UserStore.getCurrentUser()}

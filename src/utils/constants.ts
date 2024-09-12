@@ -40,6 +40,7 @@ export const Devs = /* #__PURE__*/ Object.freeze({
     Arjix: {
         name: "ArjixWasTaken",
         id: 674710789138939916n,
+        badge: false,
     },
     Cyn: {
         name: "Cynosphere",
@@ -582,6 +583,10 @@ export const Devs = /* #__PURE__*/ Object.freeze({
         name: "niko",
         id: 341377368075796483n,
     },
+    relitrix: {
+        name: "Relitrix",
+        id: 423165393901715456n,
+    },
     RamziAH: {
         name: "RamziAH",
         id: 1279957227612147747n,
@@ -594,6 +599,6 @@ export const DevsById = /* #__PURE__*/ (() =>
         Object.fromEntries(
             Object.entries(Devs)
                 .filter((d) => d[1].id !== 0n)
-                .map(([_, v]) => [v.id, v] as const),
-        ),
+                .map(([_, v]) => [v.id, v] as const)
+        )
     ))() as Record<string, Dev>;

@@ -5,9 +5,11 @@
  */
 
 import { definePluginSettings } from "@api/Settings";
+import ErrorBoundary from "@components/ErrorBoundary";
 import { Devs } from "@utils/constants";
 import definePlugin, { OptionType } from "@utils/types";
 import { findComponentByCodeLazy } from "@webpack";
+import { RequiredDeep } from "type-fest";
 
 interface Activity {
     timestamps?: ActivityTimestamps;
@@ -18,11 +20,25 @@ interface ActivityTimestamps {
     end?: string;
 }
 
+interface TimebarComponentProps {
+    activity: Activity;
+}
+
 const ActivityTimeBar = findComponentByCodeLazy<ActivityTimestamps>(
-    ".Millis.HALF_SECOND",
     ".bar",
     ".progress",
+    "(100*"
 );
+
+function isActivityTimestamped(
+    activity: Activity
+): activity is RequiredDeep<Activity> {
+    return (
+        activity.timestamps != null &&
+        activity.timestamps.start != null &&
+        activity.timestamps.end != null
+    );
+}
 
 export const settings = definePluginSettings({
     hideActivityDetailText: {
@@ -45,12 +61,12 @@ export default definePlugin({
     settings,
     patches: [
         {
-            find: ".Messages.USER_ACTIVITY_PLAYING",
+            find: ".gameState,children:",
             replacement: [
                 // Insert Spotify time bar component
                 {
                     match: /\(0,.{0,30}activity:(\i),className:\i\.badges\}\)/g,
-                    replace: "$&,$self.getTimeBar($1)",
+                    replace: "$&,$self.TimebarComponent({activity:$1})",
                 },
                 // Hide the large title on listening activities, to make them look more like Spotify (also visible from hovering over the large icon)
                 {
@@ -71,22 +87,19 @@ export default definePlugin({
         },
     ],
 
-    isActivityTimestamped(activity: Activity) {
-        return (
-            activity.timestamps != null &&
-            activity.timestamps.start != null &&
-            activity.timestamps.end != null
-        );
-    },
+    isActivityTimestamped,
 
-    getTimeBar(activity: Activity) {
-        if (this.isActivityTimestamped(activity)) {
+    TimebarComponent: ErrorBoundary.wrap(
+        ({ activity }: TimebarComponentProps) => {
+            if (!isActivityTimestamped(activity)) return null;
+
             return (
                 <ActivityTimeBar
-                    start={activity.timestamps!.start}
-                    end={activity.timestamps!.end}
+                    start={activity.timestamps.start}
+                    end={activity.timestamps.end}
                 />
             );
-        }
-    },
+        },
+        { noop: true }
+    ),
 });
