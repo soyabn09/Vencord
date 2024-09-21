@@ -29,7 +29,9 @@ import { Forms, React } from "@webpack/common";
 import hideBugReport from "./hideBugReport.css?managed";
 
 const KbdStyles = findByPropsLazy("key", "combo");
-const BugReporterExperiment = findLazy(m => m?.definition?.id === "2024-09_bug_reporter");
+const BugReporterExperiment = findLazy(
+    (m) => m?.definition?.id === "2024-09_bug_reporter",
+);
 
 const settings = definePluginSettings({
     toolbarDevMenu: {
@@ -76,7 +78,7 @@ export default definePlugin({
             find: "toolbar:function",
             replacement: {
                 match: /hasBugReporterAccess:(\i)/,
-                replace: "_hasBugReporterAccess:$1=true"
+                replace: "_hasBugReporterAccess:$1=true",
             },
             predicate: () => settings.store.toolbarDevMenu,
         },
@@ -87,19 +89,21 @@ export default definePlugin({
             replacement: {
                 match: /\i\.isDM\(\)\|\|\i\.isThread\(\)/,
                 replace: "false",
-            }
+            },
         },
         // enable option to always record clips even if you are not streaming
         {
             find: "isDecoupledGameClippingEnabled(){",
             replacement: {
                 match: /\i\.isStaff\(\)/,
-                replace: "true"
-            }
-        }
+                replace: "true",
+            },
+        },
     ],
 
-    start: () => !BugReporterExperiment.getCurrentConfig().hasBugReporterAccess && enableStyle(hideBugReport),
+    start: () =>
+        !BugReporterExperiment.getCurrentConfig().hasBugReporterAccess &&
+        enableStyle(hideBugReport),
     stop: () => disableStyle(hideBugReport),
 
     settingsAboutComponent: () => {

@@ -132,9 +132,9 @@ export default definePlugin({
             all: true,
             replacement: {
                 match: /\i\.\i\.get\(\{url:\i\.\i\.GUILD_DISCOVERY_VALID_TERM,query:\{term:\i\},oldFormErrors:!0\}\)/g,
-                replace: "Promise.resolve({ body: { valid: true } })"
-            }
-        }
+                replace: "Promise.resolve({ body: { valid: true } })",
+            },
+        },
     ],
     settings,
 });

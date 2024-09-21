@@ -74,7 +74,7 @@ function showErrorToast(message: string) {
     });
 }
 
-function ReloadRequiredCard({ required }: { required: boolean; }) {
+function ReloadRequiredCard({ required }: { required: boolean }) {
     return (
         <Card className={cl("info-card", { "restart-card": required })}>
             {required ? (
@@ -210,7 +210,7 @@ const enum SearchStatus {
     NEW,
 }
 
-function ExcludedPluginsList({ search }: { search: string; }) {
+function ExcludedPluginsList({ search }: { search: string }) {
     const matchingExcludedPlugins = Object.entries(ExcludedPlugins).filter(
         ([name]) => name.toLowerCase().includes(search),
     );
@@ -360,16 +360,20 @@ export default function PluginSettings() {
 
         if (!pluginFilter(p)) continue;
 
-        const isRequired = p.required || p.isDependency || depMap[p.name]?.some(d => settings.plugins[d].enabled);
+        const isRequired =
+            p.required ||
+            p.isDependency ||
+            depMap[p.name]?.some((d) => settings.plugins[d].enabled);
 
         if (isRequired) {
-            const tooltipText = p.required || !depMap[p.name]
-                ? "This plugin is required for Vencord to function."
-                : makeDependencyList(
-                    depMap[p.name]?.filter(
-                        (d) => settings.plugins[d].enabled,
-                    ),
-                );
+            const tooltipText =
+                p.required || !depMap[p.name]
+                    ? "This plugin is required for Vencord to function."
+                    : makeDependencyList(
+                          depMap[p.name]?.filter(
+                              (d) => settings.plugins[d].enabled,
+                          ),
+                      );
 
             requiredPlugins.push(
                 <Tooltip text={tooltipText} key={p.name}>

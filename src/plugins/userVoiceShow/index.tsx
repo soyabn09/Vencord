@@ -28,16 +28,18 @@ import { VoiceChannelIndicator } from "./components";
 const settings = definePluginSettings({
     showInUserProfileModal: {
         type: OptionType.BOOLEAN,
-        description: "Show a user's Voice Channel indicator in their profile next to the name",
+        description:
+            "Show a user's Voice Channel indicator in their profile next to the name",
         default: true,
-        restartNeeded: true
+        restartNeeded: true,
     },
     showInMemberList: {
         type: OptionType.BOOLEAN,
-        description: "Show a user's Voice Channel indicator in the member and DMs list",
+        description:
+            "Show a user's Voice Channel indicator in the member and DMs list",
         default: true,
-        restartNeeded: true
-    }
+        restartNeeded: true,
+    },
 });
 
 export default definePlugin({
@@ -52,9 +54,10 @@ export default definePlugin({
             find: ".Messages.USER_PROFILE_LOAD_ERROR",
             replacement: {
                 match: /(\.fetchError.+?\?)null/,
-                replace: (_, rest) => `${rest}$self.VoiceChannelIndicator({userId:arguments[0]?.userId})`
+                replace: (_, rest) =>
+                    `${rest}$self.VoiceChannelIndicator({userId:arguments[0]?.userId})`,
             },
-            predicate: () => settings.store.showInUserProfileModal
+            predicate: () => settings.store.showInUserProfileModal,
         },
         // To use without the MemberList decorator API
         /* // Guild Members List
@@ -80,15 +83,20 @@ export default definePlugin({
             find: "null!=this.peopleListItemRef.current",
             replacement: {
                 match: /\.actions,children:\[/,
-                replace: "$&$self.VoiceChannelIndicator({userId:this?.props?.user?.id,size:20,isActionButton:true}),"
+                replace:
+                    "$&$self.VoiceChannelIndicator({userId:this?.props?.user?.id,size:20,isActionButton:true}),",
             },
-            predicate: () => settings.store.showInMemberList
-        }
+            predicate: () => settings.store.showInMemberList,
+        },
     ],
 
     start() {
         if (settings.store.showInMemberList) {
-            addDecorator("UserVoiceShow", ({ user }) => user == null ? null : <VoiceChannelIndicator userId={user.id} />);
+            addDecorator("UserVoiceShow", ({ user }) =>
+                user == null ? null : (
+                    <VoiceChannelIndicator userId={user.id} />
+                ),
+            );
         }
     },
 
@@ -96,5 +104,5 @@ export default definePlugin({
         removeDecorator("UserVoiceShow");
     },
 
-    VoiceChannelIndicator
+    VoiceChannelIndicator,
 });

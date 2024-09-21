@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { migratePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
@@ -27,8 +27,12 @@ import type { MouseEvent } from "react";
 const { useMessageMenu } = findByPropsLazy("useMessageMenu");
 
 function MessageMenu({ message, channel, onHeightUpdate }) {
-    const canReport = message.author &&
-        !(message.author.id === UserStore.getCurrentUser().id || message.author.system);
+    const canReport =
+        message.author &&
+        !(
+            message.author.id === UserStore.getCurrentUser().id ||
+            message.author.system
+        );
 
     return useMessageMenu({
         navId: "message-actions",
@@ -54,16 +58,19 @@ function MessageMenu({ message, channel, onHeightUpdate }) {
 migratePluginSettings("FullSearchContext", "SearchReply");
 export default definePlugin({
     name: "FullSearchContext",
-    description: "Makes the message context menu in message search results have all options you'd expect",
+    description:
+        "Makes the message context menu in message search results have all options you'd expect",
     authors: [Devs.Ven, Devs.Aria],
 
-    patches: [{
-        find: "onClick:this.handleMessageClick,",
-        replacement: {
-            match: /this(?=\.handleContextMenu\(\i,\i\))/,
-            replace: "$self"
-        }
-    }],
+    patches: [
+        {
+            find: "onClick:this.handleMessageClick,",
+            replacement: {
+                match: /this(?=\.handleContextMenu\(\i,\i\))/,
+                replace: "$self",
+            },
+        },
+    ],
 
     handleContextMenu(event: MouseEvent, message: Message) {
         const channel = ChannelStore.getChannel(message.channel_id);
@@ -71,12 +78,12 @@ export default definePlugin({
 
         event.stopPropagation();
 
-        ContextMenuApi.openContextMenu(event, contextMenuProps =>
+        ContextMenuApi.openContextMenu(event, (contextMenuProps) => (
             <MessageMenu
                 message={message}
                 channel={channel}
                 onHeightUpdate={contextMenuProps.onHeightUpdate}
             />
-        );
-    }
+        ));
+    },
 });

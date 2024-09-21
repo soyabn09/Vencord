@@ -16,7 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { ComponentType, CSSProperties, FunctionComponent, HtmlHTMLAttributes, HTMLProps, KeyboardEvent, MouseEvent, PropsWithChildren, PropsWithRef, ReactNode, Ref } from "react";
+import type {
+    ComponentType,
+    CSSProperties,
+    FunctionComponent,
+    HtmlHTMLAttributes,
+    HTMLProps,
+    KeyboardEvent,
+    MouseEvent,
+    PropsWithChildren,
+    PropsWithRef,
+    ReactNode,
+    Ref,
+} from "react";
 
 import { IconNames } from "./iconNames";
 
@@ -107,14 +119,14 @@ export type Heading = ComponentType<TextProps>;
 
 export type FormTitle = ComponentType<
     HTMLProps<HTMLTitleElement> &
-    PropsWithChildren<{
-        /** default is h5 */
-        tag?: HeadingTag;
-        faded?: boolean;
-        disabled?: boolean;
-        required?: boolean;
-        error?: ReactNode;
-    }>
+        PropsWithChildren<{
+            /** default is h5 */
+            tag?: HeadingTag;
+            faded?: boolean;
+            disabled?: boolean;
+            required?: boolean;
+            error?: ReactNode;
+        }>
 >;
 
 export type FormSection = ComponentType<
@@ -142,8 +154,8 @@ export type FormText = ComponentType<
         /** defaults to FormText.Types.DEFAULT */
         type?: string;
     }> &
-    TextProps
-> & { Types: FormTextTypes; };
+        TextProps
+> & { Types: FormTextTypes };
 
 export type Tooltip = ComponentType<{
     text: ReactNode | ComponentType;
@@ -599,7 +611,7 @@ export type Popout = ComponentType<{
 
 export type Dialog = ComponentType<JSX.IntrinsicElements["div"]>;
 
-type Resolve = (data: { theme: "light" | "dark"; saturation: number; }) => {
+type Resolve = (data: { theme: "light" | "dark"; saturation: number }) => {
     hex(): string;
     hsl(): string;
     int(): number;
@@ -669,15 +681,15 @@ export type Avatar = ComponentType<
 
         src?: string;
         size?:
-        | "SIZE_16"
-        | "SIZE_20"
-        | "SIZE_24"
-        | "SIZE_32"
-        | "SIZE_40"
-        | "SIZE_48"
-        | "SIZE_56"
-        | "SIZE_80"
-        | "SIZE_120";
+            | "SIZE_16"
+            | "SIZE_20"
+            | "SIZE_24"
+            | "SIZE_32"
+            | "SIZE_40"
+            | "SIZE_48"
+            | "SIZE_56"
+            | "SIZE_80"
+            | "SIZE_120";
 
         statusColor?: string;
         statusTooltip?: string;
@@ -694,13 +706,17 @@ export type Avatar = ComponentType<
     }>
 >;
 
-type FocusLock = ComponentType<PropsWithChildren<{
-    containerRef: RefObject<HTMLElement>;
-}>>;
+type FocusLock = ComponentType<
+    PropsWithChildren<{
+        containerRef: RefObject<HTMLElement>;
+    }>
+>;
 
-export type Icon = ComponentType<JSX.IntrinsicElements["svg"] & {
-    size?: string;
-    colorClass?: string;
-} & Record<string, any>>;
+export type Icon = ComponentType<
+    JSX.IntrinsicElements["svg"] & {
+        size?: string;
+        colorClass?: string;
+    } & Record<string, any>
+>;
 
 export type Icons = Record<IconNames, Icon>;

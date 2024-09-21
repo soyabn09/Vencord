@@ -22,7 +22,7 @@ import type { HTMLAttributes, ReactElement } from "react";
 
 import PluginsSubmenu from "./PluginsSubmenu";
 
-type SettingsEntry = { section: string, label: string; };
+type SettingsEntry = { section: string; label: string };
 
 const cl = classNameFactory("");
 let Classes: Record<string, string>;
@@ -144,13 +144,14 @@ export default definePlugin({
             replacement: [
                 {
                     match: /(EXPERIMENTS:.+?)(\(0,\i.\i\)\(\))(?=\.filter\(\i=>\{let\{section:\i\}=)/,
-                    replace: "$1$self.wrapMenu($2)"
+                    replace: "$1$self.wrapMenu($2)",
                 },
                 {
                     match: /case \i\.\i\.DEVELOPER_OPTIONS:return \i;/,
-                    replace: "$&case 'VencordPlugins':return $self.PluginsSubmenu();"
-                }
-            ]
+                    replace:
+                        "$&case 'VencordPlugins':return $self.PluginsSubmenu();",
+                },
+            ],
         },
     ],
 

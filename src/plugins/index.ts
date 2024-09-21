@@ -203,11 +203,11 @@ export function subscribePluginFluxEvents(
                     const res = handler.apply(p, arguments as any);
                     return res instanceof Promise
                         ? res.catch((e) =>
-                            logger.error(
-                                `${p.name}: Error while handling ${event}\n`,
-                                e,
-                            ),
-                        )
+                              logger.error(
+                                  `${p.name}: Error while handling ${event}\n`,
+                                  e,
+                              ),
+                          )
                         : res;
                 } catch (e) {
                     logger.error(
