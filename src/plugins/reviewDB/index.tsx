@@ -114,7 +114,7 @@ export default definePlugin({
             },
         },
         {
-            find: ".PANEL,isInteractionSource:",
+            find: ".PANEL,interactionType:",
             replacement: {
                 match: /{profileType:\i\.\i\.PANEL,children:\[/,
                 replace:

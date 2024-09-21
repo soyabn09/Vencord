@@ -123,7 +123,6 @@ export default definePlugin({
     description:
         "Adds a /petpet slash command to create headpet gifs from any image",
     authors: [Devs.Ven],
-    dependencies: ["CommandsAPI"],
     commands: [
         {
             inputType: ApplicationCommandInputType.BUILT_IN,

@@ -111,6 +111,11 @@ for (const p of pluginsValues)
             settings[d].enabled = true;
             dep.isDependency = true;
         });
+
+        if (p.commands?.length) {
+            Plugins.CommandsAPI.isDependency = true;
+            settings.CommandsAPI.enabled = true;
+        }
     }
 
 for (const p of pluginsValues) {
@@ -198,11 +203,11 @@ export function subscribePluginFluxEvents(
                     const res = handler.apply(p, arguments as any);
                     return res instanceof Promise
                         ? res.catch((e) =>
-                              logger.error(
-                                  `${p.name}: Error while handling ${event}\n`,
-                                  e,
-                              ),
-                          )
+                            logger.error(
+                                `${p.name}: Error while handling ${event}\n`,
+                                e,
+                            ),
+                        )
                         : res;
                 } catch (e) {
                     logger.error(

@@ -84,7 +84,6 @@ export default definePlugin({
     description:
         "Share your current Spotify track, album or artist via slash command (/track, /album, /artist)",
     authors: [Devs.katlyn],
-    dependencies: ["CommandsAPI"],
     commands: [
         {
             name: "track",

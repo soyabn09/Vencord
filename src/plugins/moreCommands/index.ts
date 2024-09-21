@@ -38,7 +38,6 @@ export default definePlugin({
     name: "MoreCommands",
     description: "echo, lenny, mock",
     authors: [Devs.Arjix, Devs.echo, Devs.Samu],
-    dependencies: ["CommandsAPI"],
     commands: [
         {
             name: "echo",
