@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { getCurrentChannel } from "@utils/discord";
 import { useAwaiter } from "@utils/react";
@@ -22,11 +22,23 @@ import { findStoreLazy } from "@webpack";
 import { UserProfileStore, UserStore } from "@webpack/common";
 
 import { settings } from "./settings";
-import { PronounMapping, Pronouns, PronounsCache, PronounSets, PronounsFormat, PronounSource, PronounsResponse } from "./types";
+import {
+    PronounMapping,
+    Pronouns,
+    PronounsCache,
+    PronounSets,
+    PronounsFormat,
+    PronounSource,
+    PronounsResponse,
+} from "./types";
 
 const UserSettingsAccountStore = findStoreLazy("UserSettingsAccountStore");
 
-const EmptyPronouns = { pronouns: undefined, source: "", hasPendingPronouns: false } as const satisfies Pronouns;
+const EmptyPronouns = {
+    pronouns: undefined,
+    source: "",
+    hasPendingPronouns: false,
+} as const satisfies Pronouns;
 
 type RequestCallback = (pronounSets?: PronounSets) => void;
 
@@ -53,14 +65,14 @@ async function processQueue() {
         }
 
         ids = Object.keys(requestQueue);
-        await new Promise(r => setTimeout(r, 2000));
+        await new Promise((r) => setTimeout(r, 2000));
     }
 
     isProcessing = false;
 }
 
 function fetchPronouns(id: string): Promise<string | undefined> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         if (pronounCache[id] != null) {
             resolve(extractPronouns(pronounCache[id].sets));
             return;
@@ -87,23 +99,27 @@ async function bulkFetchPronouns(ids: string[]): Promise<PronounsResponse> {
     params.append("ids", ids.join(","));
 
     try {
-        const req = await fetch("https://pronoundb.org/api/v2/lookup?" + String(params), {
-            method: "GET",
-            headers: {
-                "Accept": "application/json",
-                "X-PronounDB-Source": "WebExtension/0.14.5"
-            }
-        });
+        const req = await fetch(
+            "https://pronoundb.org/api/v2/lookup?" + String(params),
+            {
+                method: "GET",
+                headers: {
+                    Accept: "application/json",
+                    "X-PronounDB-Source": "WebExtension/0.14.5",
+                },
+            },
+        );
 
         if (!req.ok) throw new Error(`Status ${req.status}`);
         const res: PronounsResponse = await req.json();
 
         Object.assign(pronounCache, res);
         return res;
-
     } catch (e) {
         console.error("PronounDB request failed:", e);
-        const dummyPronouns: PronounsResponse = Object.fromEntries(ids.map(id => [id, { sets: {} }]));
+        const dummyPronouns: PronounsResponse = Object.fromEntries(
+            ids.map((id) => [id, { sets: {} }]),
+        );
 
         Object.assign(pronounCache, dummyPronouns);
         return dummyPronouns;
@@ -120,34 +136,62 @@ function extractPronouns(pronounSets?: PronounSets): string | undefined {
     const { pronounsFormat } = settings.store;
 
     if (pronouns.length > 1) {
-        const pronounString = pronouns.map(p => p[0].toUpperCase() + p.slice(1)).join("/");
-        return pronounsFormat === PronounsFormat.Capitalized ? pronounString : pronounString.toLowerCase();
+        const pronounString = pronouns
+            .map((p) => p[0].toUpperCase() + p.slice(1))
+            .join("/");
+        return pronounsFormat === PronounsFormat.Capitalized
+            ? pronounString
+            : pronounString.toLowerCase();
     }
 
     const pronoun = pronouns[0];
     // For capitalized pronouns or special codes (any, ask, avoid), we always return the normal (capitalized) string
-    if (pronounsFormat === PronounsFormat.Capitalized || ["any", "ask", "avoid", "other", "unspecified"].includes(pronoun)) {
+    if (
+        pronounsFormat === PronounsFormat.Capitalized ||
+        ["any", "ask", "avoid", "other", "unspecified"].includes(pronoun)
+    ) {
         return PronounMapping[pronoun];
     } else {
         return PronounMapping[pronoun].toLowerCase();
     }
 }
 
-function getDiscordPronouns(id: string, useGlobalProfile: boolean = false): string | undefined {
+function getDiscordPronouns(
+    id: string,
+    useGlobalProfile: boolean = false,
+): string | undefined {
     const globalPronouns = UserProfileStore.getUserProfile(id)?.pronouns;
     if (useGlobalProfile) return globalPronouns;
 
-    return UserProfileStore.getGuildMemberProfile(id, getCurrentChannel()?.guild_id)?.pronouns || globalPronouns;
+    return (
+        UserProfileStore.getGuildMemberProfile(
+            id,
+            getCurrentChannel()?.guild_id,
+        )?.pronouns || globalPronouns
+    );
 }
 
-export function useFormattedPronouns(id: string, useGlobalProfile: boolean = false): Pronouns {
-    const discordPronouns = getDiscordPronouns(id, useGlobalProfile)?.trim().replace(/\n+/g, "");
-    const hasPendingPronouns = UserSettingsAccountStore.getPendingPronouns() != null;
+export function useFormattedPronouns(
+    id: string,
+    useGlobalProfile: boolean = false,
+): Pronouns {
+    const discordPronouns = getDiscordPronouns(id, useGlobalProfile)
+        ?.trim()
+        .replace(/\n+/g, "");
+    const hasPendingPronouns =
+        UserSettingsAccountStore.getPendingPronouns() != null;
 
     const [pronouns] = useAwaiter(() => fetchPronouns(id));
 
-    if (settings.store.pronounSource === PronounSource.PreferDiscord && discordPronouns) {
-        return { pronouns: discordPronouns, source: "Discord", hasPendingPronouns };
+    if (
+        settings.store.pronounSource === PronounSource.PreferDiscord &&
+        discordPronouns
+    ) {
+        return {
+            pronouns: discordPronouns,
+            source: "Discord",
+            hasPendingPronouns,
+        };
     }
 
     if (pronouns != null && pronouns !== PronounMapping.unspecified) {
@@ -157,12 +201,16 @@ export function useFormattedPronouns(id: string, useGlobalProfile: boolean = fal
     return { pronouns: discordPronouns, source: "Discord", hasPendingPronouns };
 }
 
-export function useProfilePronouns(id: string, useGlobalProfile: boolean = false): Pronouns {
+export function useProfilePronouns(
+    id: string,
+    useGlobalProfile: boolean = false,
+): Pronouns {
     try {
         const pronouns = useFormattedPronouns(id, useGlobalProfile);
 
         if (!settings.store.showInProfile) return EmptyPronouns;
-        if (!settings.store.showSelf && id === UserStore.getCurrentUser()?.id) return EmptyPronouns;
+        if (!settings.store.showSelf && id === UserStore.getCurrentUser()?.id)
+            return EmptyPronouns;
 
         return pronouns;
     } catch (e) {

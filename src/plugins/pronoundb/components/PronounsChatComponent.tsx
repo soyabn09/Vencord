@@ -47,7 +47,7 @@ function shouldShow(message: Message): boolean {
 }
 
 export const PronounsChatComponentWrapper = ErrorBoundary.wrap(
-    ({ message }: { message: Message; }) => {
+    ({ message }: { message: Message }) => {
         return shouldShow(message) ? (
             <PronounsChatComponent message={message} />
         ) : null;
@@ -56,7 +56,7 @@ export const PronounsChatComponentWrapper = ErrorBoundary.wrap(
 );
 
 export const CompactPronounsChatComponentWrapper = ErrorBoundary.wrap(
-    ({ message }: { message: Message; }) => {
+    ({ message }: { message: Message }) => {
         return shouldShow(message) ? (
             <CompactPronounsChatComponent message={message} />
         ) : null;
@@ -64,22 +64,35 @@ export const CompactPronounsChatComponentWrapper = ErrorBoundary.wrap(
     { noop: true },
 );
 
-function PronounsChatComponent({ message }: { message: Message; }) {
+function PronounsChatComponent({ message }: { message: Message }) {
     const { pronouns } = useFormattedPronouns(message.author.id);
 
-    return pronouns && (
-        <span
-            className={classes(styles.timestampInline, styles.timestamp)}
-        >• {pronouns}</span>
+    return (
+        pronouns && (
+            <span className={classes(styles.timestampInline, styles.timestamp)}>
+                • {pronouns}
+            </span>
+        )
     );
 }
 
-export const CompactPronounsChatComponent = ErrorBoundary.wrap(({ message }: { message: Message; }) => {
-    const { pronouns } = useFormattedPronouns(message.author.id);
+export const CompactPronounsChatComponent = ErrorBoundary.wrap(
+    ({ message }: { message: Message }) => {
+        const { pronouns } = useFormattedPronouns(message.author.id);
 
-    return pronouns && (
-        <span
-            className={classes(styles.timestampInline, styles.timestamp, "vc-pronoundb-compact")}
-        >• {pronouns}</span>
-    );
-}, { noop: true });
+        return (
+            pronouns && (
+                <span
+                    className={classes(
+                        styles.timestampInline,
+                        styles.timestamp,
+                        "vc-pronoundb-compact",
+                    )}
+                >
+                    • {pronouns}
+                </span>
+            )
+        );
+    },
+    { noop: true },
+);

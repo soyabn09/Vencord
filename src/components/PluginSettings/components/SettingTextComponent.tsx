@@ -52,8 +52,12 @@ export function SettingTextComponent({
 
     return (
         <Forms.FormSection>
-            <Forms.FormTitle>{wordsToTitle(wordsFromCamel(id))}</Forms.FormTitle>
-            <Forms.FormText className={Margins.bottom20} type="description">{option.description}</Forms.FormText>
+            <Forms.FormTitle>
+                {wordsToTitle(wordsFromCamel(id))}
+            </Forms.FormTitle>
+            <Forms.FormText className={Margins.bottom20} type="description">
+                {option.description}
+            </Forms.FormText>
             <TextInput
                 type="text"
                 value={state}

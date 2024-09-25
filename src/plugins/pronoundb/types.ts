@@ -26,7 +26,7 @@ export interface UserProfilePronounsProps {
 }
 
 export type PronounSets = Record<string, PronounCode[]>;
-export type PronounsResponse = Record<string, { sets?: PronounSets; }>;
+export type PronounsResponse = Record<string, { sets?: PronounSets }>;
 
 export interface PronounsCache {
     sets?: PronounSets;
@@ -54,10 +54,10 @@ export interface Pronouns {
 
 export const enum PronounsFormat {
     Lowercase = "LOWERCASE",
-    Capitalized = "CAPITALIZED"
+    Capitalized = "CAPITALIZED",
 }
 
 export const enum PronounSource {
     PreferPDB,
-    PreferDiscord
+    PreferDiscord,
 }

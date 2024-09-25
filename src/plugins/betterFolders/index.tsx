@@ -229,8 +229,8 @@ export default definePlugin({
             replacement: {
                 // Render the Better Folders sidebar
                 match: /(container.{0,50}({className:\i\.guilds,themeOverride:\i})\))/,
-                replace: "$1,$self.FolderSideBar({...$2})"
-            }
+                replace: "$1,$self.FolderSideBar({...$2})",
+            },
         },
         {
             find: ".Messages.DISCODO_DISABLED",

@@ -24,7 +24,9 @@ import definePlugin, { OptionType } from "@utils/types";
 import { findByCodeLazy } from "@webpack";
 import { ChannelStore, GuildMemberStore, GuildStore } from "@webpack/common";
 
-const useMessageAuthor = findByCodeLazy('"Result cannot be null because the message is not null"');
+const useMessageAuthor = findByCodeLazy(
+    '"Result cannot be null because the message is not null"',
+);
 
 const settings = definePluginSettings({
     chatMentions: {
@@ -50,7 +52,7 @@ const settings = definePluginSettings({
         type: OptionType.BOOLEAN,
         default: true,
         description: "Show role colors in the reactors list",
-        restartNeeded: true
+        restartNeeded: true,
     },
     colorChatMessages: {
         type: OptionType.BOOLEAN,
@@ -62,7 +64,7 @@ const settings = definePluginSettings({
         type: OptionType.SLIDER,
         description: "Intensity of message coloring.",
         markers: makeRange(0, 100, 10),
-        default: 30
+        default: 30,
     },
 });
 
@@ -136,7 +138,7 @@ export default definePlugin({
             find: '.Messages.MESSAGE_EDITED,")"',
             replacement: {
                 match: /(?<=isUnsupported\]:(\i)\.isUnsupported\}\),)(?=children:\[)/,
-                replace: "style:{color:$self.useMessageColor($1)},"
+                replace: "style:{color:$self.useMessageColor($1)},",
             },
             predicate: () => settings.store.colorChatMessages,
         },
@@ -145,7 +147,7 @@ export default definePlugin({
 
     getColor(
         userId: string,
-        { channelId, guildId }: { channelId?: string; guildId?: string; },
+        { channelId, guildId }: { channelId?: string; guildId?: string },
     ) {
         if (!(guildId ??= ChannelStore.getChannel(channelId!)?.guild_id))
             return null;
@@ -154,7 +156,7 @@ export default definePlugin({
 
     getUserColor(
         userId: string,
-        ids: { channelId?: string; guildId?: string; },
+        ids: { channelId?: string; guildId?: string },
     ) {
         const colorString = this.getColor(userId, ids);
         return colorString && parseInt(colorString.slice(1), 16);
@@ -195,7 +197,7 @@ export default definePlugin({
         user: { id: userId },
         guildId,
     }: {
-        user: { id: string; };
+        user: { id: string };
         guildId: string;
     }) {
         return {

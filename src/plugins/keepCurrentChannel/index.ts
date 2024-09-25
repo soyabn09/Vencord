@@ -19,7 +19,11 @@
 import * as DataStore from "@api/DataStore";
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
-import { ChannelRouter, SelectedChannelStore, SelectedGuildStore } from "@webpack/common";
+import {
+    ChannelRouter,
+    SelectedChannelStore,
+    SelectedGuildStore,
+} from "@webpack/common";
 
 export interface LogoutEvent {
     type: "LOGOUT";

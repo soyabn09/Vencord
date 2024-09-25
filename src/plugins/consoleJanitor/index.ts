@@ -8,7 +8,7 @@ import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
 import definePlugin, { OptionType, StartAt } from "@utils/types";
 
-const Noop = () => { };
+const Noop = () => {};
 const NoopLogger = {
     logDangerously: Noop,
     log: Noop,
@@ -36,17 +36,21 @@ const settings = definePluginSettings({
         description:
             "Disable the Spotify logger, which leaks account information and access token",
         default: true,
-        restartNeeded: true
+        restartNeeded: true,
     },
     whitelistedLoggers: {
         type: OptionType.STRING,
-        description: "Semi colon separated list of loggers to allow even if others are hidden",
+        description:
+            "Semi colon separated list of loggers to allow even if others are hidden",
         default: "GatewaySocket; Routing/Utils",
         onChange(newVal: string) {
             logAllow.clear();
-            newVal.split(";").map(x => x.trim()).forEach(logAllow.add.bind(logAllow));
-        }
-    }
+            newVal
+                .split(";")
+                .map((x) => x.trim())
+                .forEach(logAllow.add.bind(logAllow));
+        },
+    },
 });
 
 export default definePlugin({
@@ -58,7 +62,10 @@ export default definePlugin({
     startAt: StartAt.Init,
     start() {
         logAllow.clear();
-        this.settings.store.whitelistedLoggers?.split(";").map(x => x.trim()).forEach(logAllow.add.bind(logAllow));
+        this.settings.store.whitelistedLoggers
+            ?.split(";")
+            .map((x) => x.trim())
+            .forEach(logAllow.add.bind(logAllow));
     },
 
     NoopLogger: () => NoopLogger,
@@ -130,16 +137,16 @@ export default definePlugin({
             predicate: () => settings.store.disableLoggers,
             replacement: {
                 match: /(?<=&&)(?=console)/,
-                replace: "$self.shouldLog(arguments[0])&&"
-            }
+                replace: "$self.shouldLog(arguments[0])&&",
+            },
         },
         {
             find: '("Spotify")',
             predicate: () => settings.store.disableSpotifyLogger,
             replacement: {
                 match: /new \i\.\i\("Spotify"\)/,
-                replace: "$self.NoopLogger()"
-            }
-        }
+                replace: "$self.NoopLogger()",
+            },
+        },
     ],
 });

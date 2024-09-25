@@ -270,8 +270,8 @@ export default definePlugin({
             predicate: () => settings.store.enableEmojiBypass,
             replacement: {
                 match: /CHAT/,
-                replace: "STATUS"
-            }
+                replace: "STATUS",
+            },
         },
         {
             find: ".PREMIUM_LOCKED;",

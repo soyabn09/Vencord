@@ -16,7 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { findGroupChildrenByChildId, NavContextMenuPatchCallback } from "@api/ContextMenu";
+import {
+    findGroupChildrenByChildId,
+    NavContextMenuPatchCallback,
+} from "@api/ContextMenu";
 import { migratePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
 import { NoopComponent } from "@utils/react";
@@ -32,8 +35,12 @@ interface CopyIdMenuItemProps {
     label: string;
 }
 
-let CopyIdMenuItem: (props: CopyIdMenuItemProps) => React.ReactElement | null = NoopComponent;
-waitFor(filters.componentByCode('"devmode-copy-id-".concat'), m => CopyIdMenuItem = m);
+let CopyIdMenuItem: (props: CopyIdMenuItemProps) => React.ReactElement | null =
+    NoopComponent;
+waitFor(
+    filters.componentByCode('"devmode-copy-id-".concat'),
+    (m) => (CopyIdMenuItem = m),
+);
 
 function MessageMenu({ message, channel, onHeightUpdate }) {
     const canReport =
@@ -62,7 +69,7 @@ function MessageMenu({ message, channel, onHeightUpdate }) {
         itemSafeSrc: void 0,
         itemTextContent: void 0,
 
-        isFullSearchContextMenu: true
+        isFullSearchContextMenu: true,
     });
 }
 
@@ -71,12 +78,18 @@ interface MessageActionsProps {
     isFullSearchContextMenu?: boolean;
 }
 
-const contextMenuPatch: NavContextMenuPatchCallback = (children, props: MessageActionsProps) => {
+const contextMenuPatch: NavContextMenuPatchCallback = (
+    children,
+    props: MessageActionsProps,
+) => {
     if (props?.isFullSearchContextMenu == null) return;
 
-    const group = findGroupChildrenByChildId("devmode-copy-id", children);
+    const group = findGroupChildrenByChildId("devmode-copy-id", children, true);
     group?.push(
-        CopyIdMenuItem({ id: props.message.author.id, label: i18n.Messages.COPY_ID_AUTHOR })
+        CopyIdMenuItem({
+            id: props.message.author.id,
+            label: i18n.Messages.COPY_ID_AUTHOR,
+        }),
     );
 };
 
@@ -113,6 +126,6 @@ export default definePlugin({
     },
 
     contextMenus: {
-        "message-actions": contextMenuPatch
-    }
+        "message-actions": contextMenuPatch,
+    },
 });

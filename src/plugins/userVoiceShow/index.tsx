@@ -39,14 +39,14 @@ const settings = definePluginSettings({
         description:
             "Show a user's Voice Channel indicator in the member and DMs list",
         default: true,
-        restartNeeded: true
+        restartNeeded: true,
     },
     showInMessages: {
         type: OptionType.BOOLEAN,
         description: "Show a user's Voice Channel indicator in messages",
         default: true,
-        restartNeeded: true
-    }
+        restartNeeded: true,
+    },
 });
 
 export default definePlugin({
@@ -62,7 +62,8 @@ export default definePlugin({
             find: ".Messages.USER_PROFILE_LOAD_ERROR",
             replacement: {
                 match: /(\.fetchError.+?\?)null/,
-                replace: (_, rest) => `${rest}$self.VoiceChannelIndicator({userId:arguments[0]?.userId,isProfile:true})`
+                replace: (_, rest) =>
+                    `${rest}$self.VoiceChannelIndicator({userId:arguments[0]?.userId,isProfile:true})`,
             },
             predicate: () => settings.store.showInUserProfileModal,
         },
@@ -90,7 +91,8 @@ export default definePlugin({
             find: "null!=this.peopleListItemRef.current",
             replacement: {
                 match: /\.actions,children:\[(?<=isFocused:(\i).+?)/,
-                replace: "$&$self.VoiceChannelIndicator({userId:this?.props?.user?.id,isActionButton:true,shouldHighlight:$1}),"
+                replace:
+                    "$&$self.VoiceChannelIndicator({userId:this?.props?.user?.id,isActionButton:true,shouldHighlight:$1}),",
             },
             predicate: () => settings.store.showInMemberList,
         },
@@ -98,10 +100,21 @@ export default definePlugin({
 
     start() {
         if (settings.store.showInMemberList) {
-            addDecorator("UserVoiceShow", ({ user }) => user == null ? null : <VoiceChannelIndicator userId={user.id} />);
+            addDecorator("UserVoiceShow", ({ user }) =>
+                user == null ? null : (
+                    <VoiceChannelIndicator userId={user.id} />
+                ),
+            );
         }
         if (settings.store.showInMessages) {
-            addDecoration("UserVoiceShow", ({ message }) => message?.author == null ? null : <VoiceChannelIndicator userId={message.author.id} isMessageIndicator />);
+            addDecoration("UserVoiceShow", ({ message }) =>
+                message?.author == null ? null : (
+                    <VoiceChannelIndicator
+                        userId={message.author.id}
+                        isMessageIndicator
+                    />
+                ),
+            );
         }
     },
 

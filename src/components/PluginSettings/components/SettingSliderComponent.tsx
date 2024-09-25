@@ -59,8 +59,12 @@ export function SettingSliderComponent({
 
     return (
         <Forms.FormSection>
-            <Forms.FormTitle>{wordsToTitle(wordsFromCamel(id))}</Forms.FormTitle>
-            <Forms.FormText className={Margins.bottom20} type="description">{option.description}</Forms.FormText>
+            <Forms.FormTitle>
+                {wordsToTitle(wordsFromCamel(id))}
+            </Forms.FormTitle>
+            <Forms.FormText className={Margins.bottom20} type="description">
+                {option.description}
+            </Forms.FormText>
             <Slider
                 disabled={option.disabled?.call(definedSettings) ?? false}
                 markers={option.markers}
