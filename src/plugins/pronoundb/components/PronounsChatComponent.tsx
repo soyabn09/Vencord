@@ -22,7 +22,7 @@ import { findByPropsLazy } from "@webpack";
 import { UserStore } from "@webpack/common";
 import { Message } from "discord-types/general";
 
-import { useFormattedPronouns } from "../pronoundbUtils";
+import { useFormattedPronouns } from "../api";
 import { settings } from "../settings";
 
 const styles: Record<string, string> = findByPropsLazy("timestampInline");
@@ -47,7 +47,7 @@ function shouldShow(message: Message): boolean {
 }
 
 export const PronounsChatComponentWrapper = ErrorBoundary.wrap(
-    ({ message }: { message: Message }) => {
+    ({ message }: { message: Message; }) => {
         return shouldShow(message) ? (
             <PronounsChatComponent message={message} />
         ) : null;
@@ -56,7 +56,7 @@ export const PronounsChatComponentWrapper = ErrorBoundary.wrap(
 );
 
 export const CompactPronounsChatComponentWrapper = ErrorBoundary.wrap(
-    ({ message }: { message: Message }) => {
+    ({ message }: { message: Message; }) => {
         return shouldShow(message) ? (
             <CompactPronounsChatComponent message={message} />
         ) : null;
@@ -64,31 +64,22 @@ export const CompactPronounsChatComponentWrapper = ErrorBoundary.wrap(
     { noop: true },
 );
 
-function PronounsChatComponent({ message }: { message: Message }) {
-    const [result] = useFormattedPronouns(message.author.id);
+function PronounsChatComponent({ message }: { message: Message; }) {
+    const { pronouns } = useFormattedPronouns(message.author.id);
 
-    return result ? (
-        <span className={classes(styles.timestampInline, styles.timestamp)}>
-            • {result}
-        </span>
-    ) : null;
+    return pronouns && (
+        <span
+            className={classes(styles.timestampInline, styles.timestamp)}
+        >• {pronouns}</span>
+    );
 }
 
-export const CompactPronounsChatComponent = ErrorBoundary.wrap(
-    ({ message }: { message: Message }) => {
-        const [result] = useFormattedPronouns(message.author.id);
+export const CompactPronounsChatComponent = ErrorBoundary.wrap(({ message }: { message: Message; }) => {
+    const { pronouns } = useFormattedPronouns(message.author.id);
 
-        return result ? (
-            <span
-                className={classes(
-                    styles.timestampInline,
-                    styles.timestamp,
-                    "vc-pronoundb-compact",
-                )}
-            >
-                • {result}
-            </span>
-        ) : null;
-    },
-    { noop: true },
-);
+    return pronouns && (
+        <span
+            className={classes(styles.timestampInline, styles.timestamp, "vc-pronoundb-compact")}
+        >• {pronouns}</span>
+    );
+}, { noop: true });

@@ -114,7 +114,7 @@ export default definePlugin({
             },
         },
         {
-            find: ".PANEL,interactionType:",
+            find: 'location:"UserProfilePanel"',
             replacement: {
                 match: /{profileType:\i\.\i\.PANEL,children:\[/,
                 replace:

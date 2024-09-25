@@ -6,9 +6,9 @@
 
 import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
-import definePlugin, { OptionType } from "@utils/types";
+import definePlugin, { OptionType, StartAt } from "@utils/types";
 
-const Noop = () => {};
+const Noop = () => { };
 const NoopLogger = {
     logDangerously: Noop,
     log: Noop,
@@ -22,10 +22,12 @@ const NoopLogger = {
     fileOnly: Noop,
 };
 
+const logAllow = new Set();
+
 const settings = definePluginSettings({
-    disableNoisyLoggers: {
+    disableLoggers: {
         type: OptionType.BOOLEAN,
-        description: "Disable noisy loggers like the MessageActionCreators",
+        description: "Disables Discords loggers",
         default: false,
         restartNeeded: true,
     },
@@ -34,17 +36,35 @@ const settings = definePluginSettings({
         description:
             "Disable the Spotify logger, which leaks account information and access token",
         default: true,
-        restartNeeded: true,
+        restartNeeded: true
     },
+    whitelistedLoggers: {
+        type: OptionType.STRING,
+        description: "Semi colon separated list of loggers to allow even if others are hidden",
+        default: "GatewaySocket; Routing/Utils",
+        onChange(newVal: string) {
+            logAllow.clear();
+            newVal.split(";").map(x => x.trim()).forEach(logAllow.add.bind(logAllow));
+        }
+    }
 });
 
 export default definePlugin({
     name: "ConsoleJanitor",
     description: "Disables annoying console messages/errors",
-    authors: [Devs.Nuckyz],
+    authors: [Devs.Nuckyz, Devs.sadan],
     settings,
 
+    startAt: StartAt.Init,
+    start() {
+        logAllow.clear();
+        this.settings.store.whitelistedLoggers?.split(";").map(x => x.trim()).forEach(logAllow.add.bind(logAllow));
+    },
+
     NoopLogger: () => NoopLogger,
+    shouldLog(logger: string) {
+        return logAllow.has(logger);
+    },
 
     patches: [
         {
@@ -104,50 +124,22 @@ export default definePlugin({
                 replace: "",
             },
         },
-        ...[
-            '("MessageActionCreators")',
-            '("ChannelMessages")',
-            '("Routing/Utils")',
-            '("RTCControlSocket")',
-            '("ConnectionEventFramerateReducer")',
-            '("RTCLatencyTestManager")',
-            '("OverlayBridgeStore")',
-            '("RPCServer:WSS")',
-            '("RPCServer:IPC")',
-        ].map((logger) => ({
-            find: logger,
-            predicate: () => settings.store.disableNoisyLoggers,
-            all: true,
-            replacement: {
-                match: new RegExp(
-                    String.raw`new \i\.\i${logger.replace(/([()])/g, "\\$1")}`,
-                ),
-                replace: `$self.NoopLogger${logger}`,
-            },
-        })),
+        // Patches discords generic logger function
         {
-            find: '"Experimental codecs: "',
-            predicate: () => settings.store.disableNoisyLoggers,
+            find: "Σ:",
+            predicate: () => settings.store.disableLoggers,
             replacement: {
-                match: /new \i\.\i\("Connection\("\.concat\(\i,"\)"\)\)/,
-                replace: "$self.NoopLogger()",
-            },
-        },
-        {
-            find: '"_handleLocalVideoDisabled: ',
-            predicate: () => settings.store.disableNoisyLoggers,
-            replacement: {
-                match: /new \i\.\i\("RTCConnection\("\.concat.+?\)\)(?=,)/,
-                replace: "$self.NoopLogger()",
-            },
+                match: /(?<=&&)(?=console)/,
+                replace: "$self.shouldLog(arguments[0])&&"
+            }
         },
         {
             find: '("Spotify")',
             predicate: () => settings.store.disableSpotifyLogger,
             replacement: {
                 match: /new \i\.\i\("Spotify"\)/,
-                replace: "$self.NoopLogger()",
-            },
-        },
+                replace: "$self.NoopLogger()"
+            }
+        }
     ],
 });

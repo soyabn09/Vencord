@@ -178,15 +178,16 @@ export const Clipboard: t.Clipboard = mapMangledModuleLazy(
     },
 );
 
-export const NavigationRouter: t.NavigationRouter = mapMangledModuleLazy(
-    "Transitioning to ",
-    {
-        transitionTo: filters.byCode("transitionTo -"),
-        transitionToGuild: filters.byCode("transitionToGuild -"),
-        back: filters.byCode("goBack()"),
-        forward: filters.byCode("goForward()"),
-    },
-);
+export const NavigationRouter: t.NavigationRouter = mapMangledModuleLazy("Transitioning to ", {
+    transitionTo: filters.byCode("transitionTo -"),
+    transitionToGuild: filters.byCode("transitionToGuild -"),
+    back: filters.byCode("goBack()"),
+    forward: filters.byCode("goForward()"),
+});
+export const ChannelRouter: t.ChannelRouter = mapMangledModuleLazy('"Thread must have a parent ID."', {
+    transitionToChannel: filters.byCode(".preload"),
+    transitionToThread: filters.byCode('"Thread must have a parent ID."')
+});
 
 export let SettingsRouter: any;
 waitFor(["open", "saveAccountChanges"], (m) => (SettingsRouter = m));

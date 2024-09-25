@@ -18,9 +18,13 @@
 
 import { definePluginSettings } from "@api/Settings";
 import ErrorBoundary from "@components/ErrorBoundary";
+import { makeRange } from "@components/PluginSettings/components";
 import { Devs } from "@utils/constants";
 import definePlugin, { OptionType } from "@utils/types";
+import { findByCodeLazy } from "@webpack";
 import { ChannelStore, GuildMemberStore, GuildStore } from "@webpack/common";
+
+const useMessageAuthor = findByCodeLazy('"Result cannot be null because the message is not null"');
 
 const settings = definePluginSettings({
     chatMentions: {
@@ -46,13 +50,25 @@ const settings = definePluginSettings({
         type: OptionType.BOOLEAN,
         default: true,
         description: "Show role colors in the reactors list",
+        restartNeeded: true
+    },
+    colorChatMessages: {
+        type: OptionType.BOOLEAN,
+        default: false,
+        description: "Color chat messages based on the author's role color",
         restartNeeded: true,
+    },
+    messageSaturation: {
+        type: OptionType.SLIDER,
+        description: "Intensity of message coloring.",
+        markers: makeRange(0, 100, 10),
+        default: 30
     },
 });
 
 export default definePlugin({
     name: "RoleColorEverywhere",
-    authors: [Devs.KingFish, Devs.lewisakura, Devs.AutumnVN],
+    authors: [Devs.KingFish, Devs.lewisakura, Devs.AutumnVN, Devs.Kyuuhachi],
     description: "Adds the top role color anywhere possible",
     patches: [
         // Chat Mentions
@@ -116,12 +132,20 @@ export default definePlugin({
             },
             predicate: () => settings.store.reactorsList,
         },
+        {
+            find: '.Messages.MESSAGE_EDITED,")"',
+            replacement: {
+                match: /(?<=isUnsupported\]:(\i)\.isUnsupported\}\),)(?=children:\[)/,
+                replace: "style:{color:$self.useMessageColor($1)},"
+            },
+            predicate: () => settings.store.colorChatMessages,
+        },
     ],
     settings,
 
     getColor(
         userId: string,
-        { channelId, guildId }: { channelId?: string; guildId?: string },
+        { channelId, guildId }: { channelId?: string; guildId?: string; },
     ) {
         if (!(guildId ??= ChannelStore.getChannel(channelId!)?.guild_id))
             return null;
@@ -130,7 +154,7 @@ export default definePlugin({
 
     getUserColor(
         userId: string,
-        ids: { channelId?: string; guildId?: string },
+        ids: { channelId?: string; guildId?: string; },
     ) {
         const colorString = this.getColor(userId, ids);
         return colorString && parseInt(colorString.slice(1), 16);
@@ -171,7 +195,7 @@ export default definePlugin({
         user: { id: userId },
         guildId,
     }: {
-        user: { id: string };
+        user: { id: string; };
         guildId: string;
     }) {
         return {
@@ -179,5 +203,17 @@ export default definePlugin({
                 color: this.getColor(userId, { guildId }),
             },
         };
+    },
+
+    useMessageColor(message: any) {
+        try {
+            const { messageSaturation } = settings.use(["messageSaturation"]);
+            const author = useMessageAuthor(message);
+            if (author.colorString !== undefined && messageSaturation !== 0)
+                return `color-mix(in oklab, ${author.colorString} ${messageSaturation}%, var(--text-normal))`;
+        } catch (e) {
+            console.error("[RCE] failed to get message color", e);
+        }
+        return undefined;
     },
 });
