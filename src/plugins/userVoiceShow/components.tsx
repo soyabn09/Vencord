@@ -47,9 +47,15 @@ const { useChannelName } = mapMangledModuleLazy(".Messages.GROUP_DM_ALONE", {
 const getDMChannelIcon = findByCodeLazy(".getChannelIconURL({");
 const VoiceStateStore = findStoreLazy("VoiceStateStore");
 
-const UserSummaryItem = findComponentByCodeLazy("defaultRenderUser", "showDefaultAvatarsForNullUsers");
+const UserSummaryItem = findComponentByCodeLazy(
+    "defaultRenderUser",
+    "showDefaultAvatarsForNullUsers",
+);
 const Avatar = findComponentByCodeLazy(".status)/2):0");
-const GroupDMAvatars = findComponentByCodeLazy(".AvatarSizeSpecs[", "getAvatarURL");
+const GroupDMAvatars = findComponentByCodeLazy(
+    ".AvatarSizeSpecs[",
+    "getAvatarURL",
+);
 
 const ActionButtonClasses = findByPropsLazy("actionButton", "highlight");
 
@@ -139,10 +145,10 @@ function VoiceChannelTooltip({ channel, isLocked }: VoiceChannelTooltipProps) {
         guild?.icon == null
             ? undefined
             : IconUtils.getGuildIconURL({
-                id: guild.id,
-                icon: guild.icon,
-                size: 30,
-            });
+                  id: guild.id,
+                  icon: guild.icon,
+                  size: 30,
+              });
 
     const channelIcon = match(channel.type)
         .with(P.union(1, 3), () => {
@@ -215,8 +221,8 @@ export const VoiceChannelIndicator = ErrorBoundary.wrap(
             [VoiceStateStore],
             () =>
                 VoiceStateStore.getVoiceStateForUser(userId)?.channelId as
-                | string
-                | undefined,
+                    | string
+                    | undefined,
         );
 
         const channel =
@@ -283,8 +289,8 @@ export const VoiceChannelIndicator = ErrorBoundary.wrap(
                         className: classes(
                             isMessageIndicator && cl("message-indicator"),
                             !isProfile &&
-                            !isActionButton &&
-                            cl("speaker-margin"),
+                                !isActionButton &&
+                                cl("speaker-margin"),
                             isActionButton && ActionButtonClasses.actionButton,
                             shouldHighlight && ActionButtonClasses.highlight,
                         ),

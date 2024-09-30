@@ -35,9 +35,10 @@ export default definePlugin({
                 },
                 {
                     match: /(?<=function (\i)\(\i\){)return null!=(\i)(?=.*NOTICE_DISMISS:\1)/,
-                    replace: "if($2.id==\"VencordNotice\")return($2=null,Vencord.Api.Notices.nextNotice(),true);$&"
-                }
-            ]
-        }
+                    replace:
+                        'if($2.id=="VencordNotice")return($2=null,Vencord.Api.Notices.nextNotice(),true);$&',
+                },
+            ],
+        },
     ],
 });

@@ -321,7 +321,7 @@ export default definePlugin({
             predicate: () => settings.store.enableStickerBypass,
             replacement: {
                 match: /(?<=canUseCustomStickersEverywhere:)\i/,
-                replace: "()=>true"
+                replace: "()=>true",
             },
         },
         // Make stickers always available
@@ -343,7 +343,7 @@ export default definePlugin({
             ].map((func) => {
                 return {
                     match: new RegExp(`(?<=${func}:)\\i`, "g"),
-                    replace: "()=>true"
+                    replace: "()=>true",
                 };
             }),
         },
@@ -361,8 +361,8 @@ export default definePlugin({
             find: "canUseClientThemes:",
             replacement: {
                 match: /(?<=canUseClientThemes:)\i/,
-                replace: "()=>true"
-            }
+                replace: "()=>true",
+            },
         },
         {
             find: '"UserSettingsProtoStore"',
@@ -370,7 +370,8 @@ export default definePlugin({
                 {
                     // Overwrite incoming connection settings proto with our local settings
                     match: /function (\i)\((\i)\){(?=.*CONNECTION_OPEN:\1)/,
-                    replace: (m, funcName, props) => `${m}$self.handleProtoChange(${props}.userSettingsProto,${props}.user);`
+                    replace: (m, funcName, props) =>
+                        `${m}$self.handleProtoChange(${props}.userSettingsProto,${props}.user);`,
                 },
                 {
                     // Overwrite non local proto changes with our local settings
@@ -486,8 +487,8 @@ export default definePlugin({
             find: "canUsePremiumAppIcons:",
             replacement: {
                 match: /(?<=canUsePremiumAppIcons:)\i/,
-                replace: "()=>true"
-            }
+                replace: "()=>true",
+            },
         },
         // Separate patch for allowing using custom app icons
         {
@@ -510,9 +511,9 @@ export default definePlugin({
             find: "canUseCustomNotificationSounds:",
             replacement: {
                 match: /(?<=canUseCustomNotificationSounds:)\i/,
-                replace: "()=>true"
-            }
-        }
+                replace: "()=>true",
+            },
+        },
     ],
 
     get guildId() {
@@ -597,11 +598,11 @@ export default definePlugin({
         const newAppearanceProto =
             currentAppearanceSettings != null
                 ? AppearanceSettingsActionCreators.fromBinary(
-                    AppearanceSettingsActionCreators.toBinary(
-                        currentAppearanceSettings,
-                    ),
-                    BINARY_READ_OPTIONS,
-                )
+                      AppearanceSettingsActionCreators.toBinary(
+                          currentAppearanceSettings,
+                      ),
+                      BINARY_READ_OPTIONS,
+                  )
                 : AppearanceSettingsActionCreators.create();
 
         newAppearanceProto.theme = theme;
@@ -683,7 +684,7 @@ export default definePlugin({
                     let url: URL | null = null;
                     try {
                         url = new URL(child.props.href);
-                    } catch { }
+                    } catch {}
 
                     const emojiName =
                         EmojiStore.getCustomEmojiById(fakeNitroMatch[1])
@@ -819,7 +820,7 @@ export default definePlugin({
                 let url: URL | null = null;
                 try {
                     url = new URL(item);
-                } catch { }
+                } catch {}
 
                 const stickerName =
                     StickerStore.getStickerById(imgMatch[1])?.name ??

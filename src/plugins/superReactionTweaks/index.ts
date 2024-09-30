@@ -50,8 +50,8 @@ export default definePlugin({
             find: ",BURST_REACTION_EFFECT_PLAY",
             replacement: {
                 match: /((\i)=\i=>{.{50,100})(\i\(\i,\i\))>=\i(?=.*BURST_REACTION_EFFECT_PLAY:\2)/,
-                replace: "$1!$self.shouldPlayBurstReaction($3)"
-            }
+                replace: "$1!$self.shouldPlayBurstReaction($3)",
+            },
         },
         {
             find: ".EMOJI_PICKER_CONSTANTS_EMOJI_CONTAINER_PADDING_HORIZONTAL)",

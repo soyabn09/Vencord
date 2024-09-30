@@ -52,7 +52,7 @@ import { openHistoryModal } from "./HistoryModal";
 
 interface MLMessage extends Message {
     deleted?: boolean;
-    editHistory?: { timestamp: Date; content: string; }[];
+    editHistory?: { timestamp: Date; content: string }[];
     firstEditTimestamp?: Date;
 }
 
@@ -304,7 +304,7 @@ export default definePlugin({
 
     handleDelete(
         cache: any,
-        data: { ids: string[]; id: string; mlDeleted?: boolean; },
+        data: { ids: string[]; id: string; mlDeleted?: boolean },
         isBulk: boolean,
     ) {
         try {
@@ -405,7 +405,7 @@ export default definePlugin({
                         "   var cache = $3getOrCreate($2.channelId);" +
                         "   cache = $self.handleDelete(cache, $2, false);" +
                         "   $3commit(cache);" +
-                        "}"
+                        "}",
                 },
                 {
                     // Add deleted=true to all target messages in the MESSAGE_DELETE_BULK event
@@ -415,19 +415,20 @@ export default definePlugin({
                         "   var cache = $3getOrCreate($2.channelId);" +
                         "   cache = $self.handleDelete(cache, $2, true);" +
                         "   $3commit(cache);" +
-                        "}"
+                        "}",
                 },
                 {
                     // Add current cached content + new edit time to cached message's editHistory
                     match: /(function (\i)\((\i)\).+?)\.update\((\i)(?=.*MESSAGE_UPDATE:\2)/,
-                    replace: "$1" +
+                    replace:
+                        "$1" +
                         ".update($4,m =>" +
                         "   (($3.message.flags & 64) === 64 || $self.shouldIgnore($3.message, true)) ? m :" +
                         "   $3.message.edited_timestamp && $3.message.content !== m.content ?" +
                         "       m.set('editHistory',[...(m.editHistory || []), $self.makeEdit($3.message, m)]) :" +
                         "       m" +
                         ")" +
-                        ".update($4"
+                        ".update($4",
                 },
                 {
                     // fix up key (edit last message) attempting to edit a deleted message
@@ -543,13 +544,13 @@ export default definePlugin({
             replacement: [
                 {
                     match: /MESSAGE_DELETE:\i,/,
-                    replace: "MESSAGE_DELETE:()=>{},"
+                    replace: "MESSAGE_DELETE:()=>{},",
                 },
                 {
                     match: /MESSAGE_DELETE_BULK:\i,/,
-                    replace: "MESSAGE_DELETE_BULK:()=>{},"
-                }
-            ]
+                    replace: "MESSAGE_DELETE_BULK:()=>{},",
+                },
+            ],
         },
 
         {

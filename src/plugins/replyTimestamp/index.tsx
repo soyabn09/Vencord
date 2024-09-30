@@ -37,12 +37,12 @@ const enum ReferencedMessageState {
 }
 
 type ReferencedMessage =
-    | { state: ReferencedMessageState.LOADED; message: Message; }
+    | { state: ReferencedMessageState.LOADED; message: Message }
     | {
-        state:
-        | ReferencedMessageState.NOT_LOADED
-        | ReferencedMessageState.DELETED;
-    };
+          state:
+              | ReferencedMessageState.NOT_LOADED
+              | ReferencedMessageState.DELETED;
+      };
 
 function ReplyTimestamp({
     referencedMessage,
@@ -80,9 +80,9 @@ export default definePlugin({
             find: ".REPLY_QUOTE_MESSAGE_BLOCKED",
             replacement: {
                 match: /\.onClickReply,.+?}\),(?=\i,\i,\i\])/,
-                replace: "$&$self.ReplyTimestamp(arguments[0]),"
-            }
-        }
+                replace: "$&$self.ReplyTimestamp(arguments[0]),",
+            },
+        },
     ],
 
     ReplyTimestamp: ErrorBoundary.wrap(ReplyTimestamp, { noop: true }),

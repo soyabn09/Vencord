@@ -41,7 +41,7 @@ export default definePlugin({
             replacement: [
                 {
                     match: /(?<=Date\.now\(\)-\i>)\i\.\i\|\|/,
-                    replace: "$self.getIdleTimeout()||"
+                    replace: "$self.getIdleTimeout()||",
                 },
                 {
                     match: /Math\.min\((\i\.\i\.getSetting\(\)\*\i\.\i\.\i\.SECOND),\i\.\i\)/,

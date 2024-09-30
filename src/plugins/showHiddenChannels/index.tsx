@@ -217,7 +217,7 @@ export default definePlugin({
                     predicate: () =>
                         settings.store.hideUnreads === false &&
                         settings.store.showMode ===
-                        ShowMode.HiddenIconWithMutedStyle,
+                            ShowMode.HiddenIconWithMutedStyle,
                     match: /\.LOCKED;if\((?<={channel:(\i).+?)/,
                     replace: (m, channel) =>
                         `${m}!$self.isHiddenChannel(${channel})&&`,
@@ -536,9 +536,10 @@ export default definePlugin({
                 {
                     // Filter hidden channels from GuildChannelStore.getChannels unless told otherwise
                     match: /(?<=getChannels\(\i)(\){.*?)return (.+?)}/,
-                    replace: (_, rest, channels) => `,shouldIncludeHidden${rest}return $self.resolveGuildChannels(${channels},shouldIncludeHidden??arguments[0]==="@favorites");}`
-                }
-            ]
+                    replace: (_, rest, channels) =>
+                        `,shouldIncludeHidden${rest}return $self.resolveGuildChannels(${channels},shouldIncludeHidden??arguments[0]==="@favorites");}`,
+                },
+            ],
         },
         {
             find: ".Messages.FORM_LABEL_MUTED",
@@ -559,7 +560,7 @@ export default definePlugin({
     ],
 
     isHiddenChannel(
-        channel: Channel & { channelId?: string; },
+        channel: Channel & { channelId?: string },
         checkConnect = false,
     ) {
         try {
@@ -589,7 +590,7 @@ export default definePlugin({
     resolveGuildChannels(
         channels: Record<
             string | number,
-            Array<{ channel: Channel; comparator: number; }> | string | number
+            Array<{ channel: Channel; comparator: number }> | string | number
         >,
         shouldIncludeHidden: boolean,
     ) {

@@ -79,8 +79,8 @@ export default definePlugin({
             predicate: () => settings.store.hideMessageRequestsCount,
             replacement: {
                 match: /(?<=getSpamChannelsCount\(\);return )\i\.getMessageRequestsCount\(\)/,
-                replace: "$self.getRealMessageRequestCount()"
-            }
+                replace: "$self.getRealMessageRequestCount()",
+            },
         },
         {
             find: "showProgressBadge:",

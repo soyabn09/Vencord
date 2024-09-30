@@ -63,7 +63,7 @@ interface TagSettings {
 
 // PermissionStore.computePermissions will not work here since it only gets permissions for the current user
 const computePermissions: (options: {
-    user?: { id: string; } | string | null;
+    user?: { id: string } | string | null;
     context?: Guild | Channel | null;
     overwrites?: Channel["permissionOverwrites"] | null;
     checkElevated?: boolean /* = true */;
@@ -77,7 +77,7 @@ const Tag = findLazy((m) => m.Types?.[0] === "BOT") as RC<{
     type?: number;
     className?: string;
     useRemSizes?: boolean;
-}> & { Types: Record<string, number>; };
+}> & { Types: Record<string, number> };
 
 const isWebhook = (message: Message, user: User) =>
     !!message?.webhookId && user.isNonUserBot();
@@ -220,8 +220,8 @@ export default definePlugin({
             find: ".ORIGINAL_POSTER=",
             replacement: {
                 match: /(\i)=\{\}\)\);(?=let \i=100)/,
-                replace: "$1=$self.getTagTypes()));"
-            }
+                replace: "$1=$self.getTagTypes()));",
+            },
         },
         {
             find: ".DISCORD_SYSTEM_MESSAGE_BOT_TAG_TOOLTIP_OFFICIAL,",
@@ -293,12 +293,14 @@ export default definePlugin({
                     // prevent channel id from getting ghosted
                     // it's either this or extremely long lookbehind
                     match: /user:\i,nick:\i,/,
-                    replace: "$&moreTags_channelId,"
-                }, {
+                    replace: "$&moreTags_channelId,",
+                },
+                {
                     match: /,botType:(\i),botVerified:(\i),(?!discriminatorClass:)(?<=user:(\i).+?)/g,
-                    replace: ",botType:$self.getTag({user:$3,channelId:moreTags_channelId,origType:$1,location:'not-chat'}),botVerified:$2,"
-                }
-            ]
+                    replace:
+                        ",botType:$self.getTag({user:$3,channelId:moreTags_channelId,origType:$1,location:'not-chat'}),botVerified:$2,",
+                },
+            ],
         },
     ],
 
@@ -378,8 +380,8 @@ export default definePlugin({
         channel,
     }: {
         message?: Message;
-        user: User & { isClyde(): boolean; };
-        channel?: Channel & { isForumPost(): boolean; isMediaPost(): boolean; };
+        user: User & { isClyde(): boolean };
+        channel?: Channel & { isForumPost(): boolean; isMediaPost(): boolean };
         channelId?: string;
         origType?: number;
         location: "chat" | "not-chat";
@@ -413,7 +415,7 @@ export default definePlugin({
             if (
                 (tag.name !== "OWNER" &&
                     GuildStore.getGuild(channel?.guild_id)?.ownerId ===
-                    user.id &&
+                        user.id &&
                     location === "chat" &&
                     !settings.tagSettings.OWNER.showInChat) ||
                 (location === "not-chat" &&

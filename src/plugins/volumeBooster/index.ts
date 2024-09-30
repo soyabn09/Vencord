@@ -89,7 +89,7 @@ export default definePlugin({
             replacement: [
                 {
                     match: /(?<=isLocalMute\(\i,\i\),volume:(\i).+?\i\(\i,\i,)\1(?=\))/,
-                    replace: "$&>200?200:$&"
+                    replace: "$&>200?200:$&",
                 },
                 {
                     match: /(?<=Object\.entries\(\i\.localMutes\).+?volume:).+?(?=,)/,
