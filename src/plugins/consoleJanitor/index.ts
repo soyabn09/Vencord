@@ -8,7 +8,7 @@ import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
 import definePlugin, { OptionType, StartAt } from "@utils/types";
 
-const Noop = () => {};
+const Noop = () => { };
 const NoopLogger = {
     logDangerously: Noop,
     log: Noop,
@@ -127,9 +127,9 @@ export default definePlugin({
         {
             find: "Slow dispatch on",
             replacement: {
-                match: /\i\.totalTime>100&&\i\.verbose\("Slow dispatch on ".+?\)\);/,
-                replace: "",
-            },
+                match: /\i\.totalTime>\i&&\i\.verbose\("Slow dispatch on ".+?\)\);/,
+                replace: ""
+            }
         },
         // Patches discords generic logger function
         {

@@ -317,11 +317,11 @@ export default definePlugin({
         },
         // Allow stickers to be sent everywhere
         {
-            find: "canUseCustomStickersEverywhere:function",
+            find: "canUseCustomStickersEverywhere:",
             predicate: () => settings.store.enableStickerBypass,
             replacement: {
-                match: /canUseCustomStickersEverywhere:function\(\i\){/,
-                replace: "$&return true;",
+                match: /(?<=canUseCustomStickersEverywhere:)\i/,
+                replace: "()=>true"
             },
         },
         // Make stickers always available
@@ -335,18 +335,15 @@ export default definePlugin({
         },
         // Allow streaming with high quality
         {
-            find: "canUseHighVideoUploadQuality:function",
+            find: "canUseHighVideoUploadQuality:",
             predicate: () => settings.store.enableStreamQualityBypass,
             replacement: [
                 "canUseHighVideoUploadQuality",
                 "canStreamQuality",
             ].map((func) => {
                 return {
-                    match: new RegExp(
-                        `${func}:function\\(\\i(?:,\\i)?\\){`,
-                        "g",
-                    ),
-                    replace: "$&return true;",
+                    match: new RegExp(`(?<=${func}:)\\i`, "g"),
+                    replace: "()=>true"
                 };
             }),
         },
@@ -361,20 +358,19 @@ export default definePlugin({
         },
         // Allow client themes to be changeable
         {
-            find: "canUseClientThemes:function",
+            find: "canUseClientThemes:",
             replacement: {
-                match: /canUseClientThemes:function\(\i\){/,
-                replace: "$&return true;",
-            },
+                match: /(?<=canUseClientThemes:)\i/,
+                replace: "()=>true"
+            }
         },
         {
             find: '"UserSettingsProtoStore"',
             replacement: [
                 {
                     // Overwrite incoming connection settings proto with our local settings
-                    match: /CONNECTION_OPEN:function\((\i)\){/,
-                    replace: (m, props) =>
-                        `${m}$self.handleProtoChange(${props}.userSettingsProto,${props}.user);`,
+                    match: /function (\i)\((\i)\){(?=.*CONNECTION_OPEN:\1)/,
+                    replace: (m, funcName, props) => `${m}$self.handleProtoChange(${props}.userSettingsProto,${props}.user);`
                 },
                 {
                     // Overwrite non local proto changes with our local settings
@@ -487,11 +483,11 @@ export default definePlugin({
         },
         // Allow using custom app icons
         {
-            find: "canUsePremiumAppIcons:function",
+            find: "canUsePremiumAppIcons:",
             replacement: {
-                match: /canUsePremiumAppIcons:function\(\i\){/,
-                replace: "$&return true;",
-            },
+                match: /(?<=canUsePremiumAppIcons:)\i/,
+                replace: "()=>true"
+            }
         },
         // Separate patch for allowing using custom app icons
         {
@@ -511,12 +507,12 @@ export default definePlugin({
         },
         // Allow using custom notification sounds
         {
-            find: "canUseCustomNotificationSounds:function",
+            find: "canUseCustomNotificationSounds:",
             replacement: {
-                match: /canUseCustomNotificationSounds:function\(\i\){/,
-                replace: "$&return true;",
-            },
-        },
+                match: /(?<=canUseCustomNotificationSounds:)\i/,
+                replace: "()=>true"
+            }
+        }
     ],
 
     get guildId() {
@@ -601,11 +597,11 @@ export default definePlugin({
         const newAppearanceProto =
             currentAppearanceSettings != null
                 ? AppearanceSettingsActionCreators.fromBinary(
-                      AppearanceSettingsActionCreators.toBinary(
-                          currentAppearanceSettings,
-                      ),
-                      BINARY_READ_OPTIONS,
-                  )
+                    AppearanceSettingsActionCreators.toBinary(
+                        currentAppearanceSettings,
+                    ),
+                    BINARY_READ_OPTIONS,
+                )
                 : AppearanceSettingsActionCreators.create();
 
         newAppearanceProto.theme = theme;
@@ -687,7 +683,7 @@ export default definePlugin({
                     let url: URL | null = null;
                     try {
                         url = new URL(child.props.href);
-                    } catch {}
+                    } catch { }
 
                     const emojiName =
                         EmojiStore.getCustomEmojiById(fakeNitroMatch[1])
@@ -823,7 +819,7 @@ export default definePlugin({
                 let url: URL | null = null;
                 try {
                     url = new URL(item);
-                } catch {}
+                } catch { }
 
                 const stickerName =
                     StickerStore.getStickerById(imgMatch[1])?.name ??

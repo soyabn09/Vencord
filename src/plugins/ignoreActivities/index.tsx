@@ -328,7 +328,7 @@ export default definePlugin({
 
     patches: [
         {
-            find: '="LocalActivityStore",',
+            find: '"LocalActivityStore"',
             replacement: [
                 {
                     match: /HANG_STATUS.+?(?=!\i\(\)\(\i,\i\)&&)(?<=(\i)\.push.+?)/,
@@ -338,7 +338,7 @@ export default definePlugin({
             ],
         },
         {
-            find: '="ActivityTrackingStore",',
+            find: '"ActivityTrackingStore"',
             replacement: {
                 match: /getVisibleRunningGames\(\).+?;(?=for)(?<=(\i)=\i\.\i\.getVisibleRunningGames.+?)/,
                 replace: (m, runningGames) =>
