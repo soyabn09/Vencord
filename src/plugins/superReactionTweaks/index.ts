@@ -37,7 +37,7 @@ export const settings = definePluginSettings(
                 return this.store.unlimitedSuperReactionPlaying;
             },
         },
-    }
+    },
 );
 
 export default definePlugin({
@@ -61,7 +61,7 @@ export default definePlugin({
                     _,
                     rest,
                     isBurstReactionVariable,
-                    isReactionIntention
+                    isReactionIntention,
                 ) =>
                     `${rest}$self.shouldSuperReactByDefault&&${isReactionIntention})`,
             },

@@ -75,7 +75,7 @@ export default definePlugin({
         } catch (e) {
             new Logger("NoBlockedMessages").error(
                 "Failed to check if user is blocked:",
-                e
+                e,
             );
         }
     },

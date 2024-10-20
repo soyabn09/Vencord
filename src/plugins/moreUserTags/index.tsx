@@ -70,7 +70,7 @@ const computePermissions: (options: {
     excludeGuildPermissions?: boolean /* = false */;
 }) => bigint = findByCodeLazy(
     ".getCurrentUser()",
-    ".computeLurkerPermissionsAllowList()"
+    ".computeLurkerPermissionsAllowList()",
 );
 
 const Tag = findLazy((m) => m.Types?.[0] === "BOT") as RC<{
@@ -131,7 +131,7 @@ const defaultSettings = Object.fromEntries(
     tags.map(({ name, displayName }) => [
         name,
         { text: displayName, showInChat: true, showInNotChat: true },
-    ])
+    ]),
 ) as TagSettings;
 
 function SettingsComponent() {
@@ -235,7 +235,7 @@ export default definePlugin({
                         variant,
                         tags,
                         displayedText,
-                        strings
+                        strings,
                     ) =>
                         `${origSwitch}default:{${displayedText} = $self.getTagText(${tags}[${variant}], ${strings})}`,
                 },

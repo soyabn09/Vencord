@@ -36,13 +36,13 @@ import { Message, ReactionEmoji, User } from "discord-types/general";
 
 const UserSummaryItem = findComponentByCodeLazy(
     "defaultRenderUser",
-    "showDefaultAvatarsForNullUsers"
+    "showDefaultAvatarsForNullUsers",
 );
 const AvatarStyles = findByPropsLazy(
     "moreUsers",
     "emptyUser",
     "avatarContainer",
-    "clickableAvatar"
+    "clickableAvatar",
 );
 let Scroll: any = null;
 const queue = new Queue();

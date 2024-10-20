@@ -76,6 +76,11 @@ export default definePlugin({
                     match: /Math\.max.{0,30}\)\)/,
                     replace: "arguments[0]",
                 },
+                // Fix streams not playing audio until you update them
+                {
+                    match: /\}return"video"/,
+                    replace: "this.updateAudioElement();$&",
+                },
                 // Patch the volume
                 {
                     match: /\.volume=this\._volume\/100;/,
@@ -88,7 +93,7 @@ export default definePlugin({
             find: "AudioContextSettingsMigrated",
             replacement: [
                 {
-                    match: /(?<=isLocalMute\(\i,\i\),volume:(\i).+?\i\(\i,\i,)\1(?=\))/,
+                    match: /(?<=isLocalMute\(\i,\i\),volume:.+?volume:)\i(?=})/,
                     replace: "$&>200?200:$&",
                 },
                 {
@@ -103,7 +108,7 @@ export default definePlugin({
         },
         // Prevent the MediaEngineStore from overwriting our LocalVolumes above 200 with the ones the Discord Audio Context Settings sync sends
         {
-            find: '="MediaEngineStore",',
+            find: '"MediaEngineStore"',
             replacement: [
                 {
                     match: /(\.settings\.audioContextSettings.+?)(\i\[\i\])=(\i\.volume)(.+?setLocalVolume\(\i,).+?\)/,
@@ -130,14 +135,8 @@ export default definePlugin({
             gain.connect(data.audioContext.destination);
         }
 
-        // @ts-expect-error
-        if (
-            data.sinkId != null &&
-            data.sinkId !== data.audioContext.sinkId &&
-            "setSinkId" in AudioContext.prototype
-        ) {
-            // @ts-expect-error https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/setSinkId
-            data.audioContext.setSinkId(data.sinkId);
+        if (data.sinkId != null && "setSinkId" in data.audioContext) {
+            (data.audioContext as any).setSinkId(data.sinkId);
         }
 
         data.gainNode.gain.value = data._mute ? 0 : data._volume / 100;
