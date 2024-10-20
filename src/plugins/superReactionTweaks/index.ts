@@ -37,7 +37,7 @@ export const settings = definePluginSettings(
                 return this.store.unlimitedSuperReactionPlaying;
             },
         },
-    },
+    }
 );
 
 export default definePlugin({
@@ -49,8 +49,8 @@ export default definePlugin({
         {
             find: ",BURST_REACTION_EFFECT_PLAY",
             replacement: {
-                match: /((\i)=\i=>{.{50,100})(\i\(\i,\i\))>=\i(?=.*BURST_REACTION_EFFECT_PLAY:\2)/,
-                replace: "$1!$self.shouldPlayBurstReaction($3)",
+                match: /(BURST_REACTION_EFFECT_PLAY:\i=>{.{50,100})(\i\(\i,\i\))>=\d+/,
+                replace: "$1!$self.shouldPlayBurstReaction($2)",
             },
         },
         {
@@ -61,7 +61,7 @@ export default definePlugin({
                     _,
                     rest,
                     isBurstReactionVariable,
-                    isReactionIntention,
+                    isReactionIntention
                 ) =>
                     `${rest}$self.shouldSuperReactByDefault&&${isReactionIntention})`,
             },

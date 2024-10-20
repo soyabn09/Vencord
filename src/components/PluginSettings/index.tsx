@@ -122,7 +122,7 @@ export function PluginCard({
 }: PluginCardProps) {
     const settings = Settings.plugins[plugin.name];
 
-    const isEnabled = () => settings.enabled ?? false;
+    const isEnabled = () => Vencord.Plugins.isPluginEnabled(plugin.name);
 
     function toggleEnabled() {
         const wasEnabled = isEnabled();

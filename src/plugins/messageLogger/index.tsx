@@ -59,7 +59,7 @@ interface MLMessage extends Message {
 const styles = findByPropsLazy(
     "edited",
     "communicationDisabled",
-    "isSystemMessage",
+    "isSystemMessage"
 );
 const getMessage = findByCodeLazy('replace(/^\\n+|\\n+$/g,"")');
 
@@ -77,7 +77,7 @@ const REMOVE_HISTORY_ID = "ml-remove-history";
 const TOGGLE_DELETE_STYLE_ID = "ml-toggle-style";
 const patchMessageContextMenu: NavContextMenuPatchCallback = (
     children,
-    props,
+    props
 ) => {
     const { message } = props;
     const { deleted, editHistory, id, channel_id } = message;
@@ -88,7 +88,7 @@ const patchMessageContextMenu: NavContextMenuPatchCallback = (
         if (!deleted) break toggle;
 
         const domElement = document.getElementById(
-            `chat-messages-${channel_id}-${id}`,
+            `chat-messages-${channel_id}-${id}`
         );
         if (!domElement) break toggle;
 
@@ -100,7 +100,7 @@ const patchMessageContextMenu: NavContextMenuPatchCallback = (
                 action={() =>
                     domElement.classList.toggle("messagelogger-deleted")
                 }
-            />,
+            />
         );
     }
 
@@ -122,13 +122,13 @@ const patchMessageContextMenu: NavContextMenuPatchCallback = (
                     message.editHistory = [];
                 }
             }}
-        />,
+        />
     );
 };
 
 const patchChannelContextMenu: NavContextMenuPatchCallback = (
     children,
-    { channel },
+    { channel }
 ) => {
     const messages = MessageStore.getMessages(channel?.id) as MLMessage[];
     if (!messages?.some((msg) => msg.deleted || msg.editHistory?.length))
@@ -156,7 +156,7 @@ const patchChannelContextMenu: NavContextMenuPatchCallback = (
                         });
                 });
             }}
-        />,
+        />
     );
 };
 
@@ -207,7 +207,7 @@ export default definePlugin({
                 () =>
                     MessageStore.getMessage(channelId, messageId) as MLMessage,
                 null,
-                (oldMsg, newMsg) => oldMsg?.editHistory === newMsg?.editHistory,
+                (oldMsg, newMsg) => oldMsg?.editHistory === newMsg?.editHistory
             );
 
             return (
@@ -232,7 +232,7 @@ export default definePlugin({
                 )
             );
         },
-        { noop: true },
+        { noop: true }
     ),
 
     makeEdit(newMessage: any, oldMessage: any): any {
@@ -305,7 +305,7 @@ export default definePlugin({
     handleDelete(
         cache: any,
         data: { ids: string[]; id: string; mlDeleted?: boolean },
-        isBulk: boolean,
+        isBulk: boolean
     ) {
         try {
             if (cache == null || (!isBulk && !cache.has(data.id))) return cache;
@@ -326,8 +326,8 @@ export default definePlugin({
                     cache = cache.update(id, (m) =>
                         m.set("deleted", true).set(
                             "attachments",
-                            m.attachments.map((a) => ((a.deleted = true), a)),
-                        ),
+                            m.attachments.map((a) => ((a.deleted = true), a))
+                        )
                     );
                 }
             };
@@ -361,11 +361,11 @@ export default definePlugin({
             ignoreUsers.includes(message.author?.id) ||
             ignoreChannels.includes(message.channel_id) ||
             ignoreChannels.includes(
-                ChannelStore.getChannel(message.channel_id)?.parent_id,
+                ChannelStore.getChannel(message.channel_id)?.parent_id
             ) ||
             (isEdit ? !logEdits : !logDeletes) ||
             ignoreGuilds.includes(
-                ChannelStore.getChannel(message.channel_id)?.guild_id,
+                ChannelStore.getChannel(message.channel_id)?.guild_id
             ) ||
             // Ignore Venbot in the support channel
             (message.channel_id === "1026515880080842772" &&
@@ -388,7 +388,7 @@ export default definePlugin({
 
     Messages: proxyLazy(() => ({
         DELETED_MESSAGE_COUNT: getMessage(
-            "{count, plural, =0 {No deleted messages} one {{count} deleted message} other {{count} deleted messages}}",
+            "{count, plural, =0 {No deleted messages} one {{count} deleted message} other {{count} deleted messages}}"
         ),
     })),
 
@@ -399,36 +399,36 @@ export default definePlugin({
             replacement: [
                 {
                     // Add deleted=true to all target messages in the MESSAGE_DELETE event
-                    match: /function (\i)\((\i)\){let.+?((?:\i\.){2})getOrCreate.+?}(?=function.*MESSAGE_DELETE:\1)/,
+                    match: /MESSAGE_DELETE:function\((\i)\){let.+?((?:\i\.){2})getOrCreate.+?},/,
                     replace:
-                        "function $1($2){" +
-                        "   var cache = $3getOrCreate($2.channelId);" +
-                        "   cache = $self.handleDelete(cache, $2, false);" +
-                        "   $3commit(cache);" +
-                        "}",
+                        "MESSAGE_DELETE:function($1){" +
+                        "   var cache = $2getOrCreate($1.channelId);" +
+                        "   cache = $self.handleDelete(cache, $1, false);" +
+                        "   $2commit(cache);" +
+                        "},",
                 },
                 {
                     // Add deleted=true to all target messages in the MESSAGE_DELETE_BULK event
-                    match: /function (\i)\((\i)\){let.+?((?:\i\.){2})getOrCreate.+?}(?=function.*MESSAGE_DELETE_BULK:\1)/,
+                    match: /MESSAGE_DELETE_BULK:function\((\i)\){let.+?((?:\i\.){2})getOrCreate.+?},/,
                     replace:
-                        "function $1($2){" +
-                        "   var cache = $3getOrCreate($2.channelId);" +
-                        "   cache = $self.handleDelete(cache, $2, true);" +
-                        "   $3commit(cache);" +
-                        "}",
+                        "MESSAGE_DELETE_BULK:function($1){" +
+                        "   var cache = $2getOrCreate($1.channelId);" +
+                        "   cache = $self.handleDelete(cache, $1, true);" +
+                        "   $2commit(cache);" +
+                        "},",
                 },
                 {
                     // Add current cached content + new edit time to cached message's editHistory
-                    match: /(function (\i)\((\i)\).+?)\.update\((\i)(?=.*MESSAGE_UPDATE:\2)/,
+                    match: /(MESSAGE_UPDATE:function\((\i)\).+?)\.update\((\i)/,
                     replace:
                         "$1" +
-                        ".update($4,m =>" +
-                        "   (($3.message.flags & 64) === 64 || $self.shouldIgnore($3.message, true)) ? m :" +
-                        "   $3.message.edited_timestamp && $3.message.content !== m.content ?" +
-                        "       m.set('editHistory',[...(m.editHistory || []), $self.makeEdit($3.message, m)]) :" +
+                        ".update($3,m =>" +
+                        "   (($2.message.flags & 64) === 64 || $self.shouldIgnore($2.message, true)) ? m :" +
+                        "   $2.message.edited_timestamp && $2.message.content !== m.content ?" +
+                        "       m.set('editHistory',[...(m.editHistory || []), $self.makeEdit($2.message, m)]) :" +
                         "       m" +
                         ")" +
-                        ".update($4",
+                        ".update($3",
                 },
                 {
                     // fix up key (edit last message) attempting to edit a deleted message
@@ -543,12 +543,12 @@ export default definePlugin({
             find: '"ReferencedMessageStore"',
             replacement: [
                 {
-                    match: /MESSAGE_DELETE:\i,/,
-                    replace: "MESSAGE_DELETE:()=>{},",
+                    match: /MESSAGE_DELETE:function\((\i)\).+?},/,
+                    replace: "MESSAGE_DELETE:function($1){},",
                 },
                 {
-                    match: /MESSAGE_DELETE_BULK:\i,/,
-                    replace: "MESSAGE_DELETE_BULK:()=>{},",
+                    match: /MESSAGE_DELETE_BULK:function\((\i)\).+?},/,
+                    replace: "MESSAGE_DELETE_BULK:function($1){},",
                 },
             ],
         },

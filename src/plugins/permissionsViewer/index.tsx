@@ -44,7 +44,7 @@ const RoleButtonClasses = findByPropsLazy(
     "button",
     "buttonInner",
     "icon",
-    "banner",
+    "banner"
 );
 
 export const enum PermissionsSortOrder {
@@ -112,7 +112,7 @@ function MenuItem(guildId: string, id?: string, type?: MenuItemParentType) {
                             permissions.push({
                                 type: PermissionType.Owner,
                                 permissions: Object.values(
-                                    PermissionsBits,
+                                    PermissionsBits
                                 ).reduce((prev, curr) => prev | curr, 0n),
                             });
                         }
@@ -134,9 +134,9 @@ function MenuItem(guildId: string, id?: string, type?: MenuItemParentType) {
                                     id,
                                     overwriteAllow: allow,
                                     overwriteDeny: deny,
-                                }),
+                                })
                             ),
-                            guildId,
+                            guildId
                         );
 
                         return {
@@ -146,7 +146,7 @@ function MenuItem(guildId: string, id?: string, type?: MenuItemParentType) {
                     })
                     .otherwise(() => {
                         const permissions = Object.values(
-                            GuildStore.getRoles(guild.id),
+                            GuildStore.getRoles(guild.id)
                         ).map((role) => ({
                             type: PermissionType.Role,
                             ...role,
@@ -166,7 +166,7 @@ function MenuItem(guildId: string, id?: string, type?: MenuItemParentType) {
 
 function makeContextMenuPatch(
     childId: string | string[],
-    type?: MenuItemParentType,
+    type?: MenuItemParentType
 ): NavContextMenuPatchCallback {
     return (children, props) => {
         if (
@@ -183,10 +183,10 @@ function makeContextMenuPatch(
 
         const item = match(type)
             .with(MenuItemParentType.User, () =>
-                MenuItem(props.guildId, props.user.id, type),
+                MenuItem(props.guildId, props.user.id, type)
             )
             .with(MenuItemParentType.Channel, () =>
-                MenuItem(props.guild.id, props.channel.id, type),
+                MenuItem(props.guild.id, props.channel.id, type)
             )
             .with(MenuItemParentType.Guild, () => MenuItem(props.guild.id))
             .otherwise(() => null);
@@ -215,7 +215,7 @@ export default definePlugin({
         {
             find: ".VIEW_ALL_ROLES,",
             replacement: {
-                match: /\.collapseButton,.+?}\)}\),/,
+                match: /\.expandButton,.+?null,/,
                 replace: "$&$self.ViewPermissionsButton(arguments[0]),",
             },
         },
@@ -254,12 +254,12 @@ export default definePlugin({
                             size={Button.Sizes.NONE}
                             innerClassName={classes(
                                 RoleButtonClasses.buttonInner,
-                                RoleButtonClasses.icon,
+                                RoleButtonClasses.icon
                             )}
                             className={classes(
                                 RoleButtonClasses.button,
                                 RoleButtonClasses.icon,
-                                "vc-permviewer-role-button",
+                                "vc-permviewer-role-button"
                             )}
                         >
                             <SafetyIcon height="16" width="16" />
@@ -268,22 +268,22 @@ export default definePlugin({
                 )}
             </Popout>
         ),
-        { noop: true },
+        { noop: true }
     ),
 
     contextMenus: {
         "user-context": makeContextMenuPatch("roles", MenuItemParentType.User),
         "channel-context": makeContextMenuPatch(
             ["mute-channel", "unmute-channel"],
-            MenuItemParentType.Channel,
+            MenuItemParentType.Channel
         ),
         "guild-context": makeContextMenuPatch(
             "privacy",
-            MenuItemParentType.Guild,
+            MenuItemParentType.Guild
         ),
         "guild-header-popout": makeContextMenuPatch(
             "privacy",
-            MenuItemParentType.Guild,
+            MenuItemParentType.Guild
         ),
     },
 });
