@@ -25,12 +25,12 @@ export default definePlugin({
     authors: [Devs.KingFish, Devs.Ven, Devs.Nuckyz],
     patches: [
         {
-            find: "Messages.MESSAGE_UTILITIES_A11Y_LABEL",
+            find: "#{intl::MESSAGE_UTILITIES_A11Y_LABEL}",
             replacement: {
-                match: /\.jsx\)\((\i\.\i),\{label:\i\.\i\.Messages\.MESSAGE_ACTION_REPLY.{0,200}?"reply-self".{0,50}?\}\):null(?=,.+?message:(\i))/,
-                replace:
-                    "$&,Vencord.Api.MessagePopover._buildPopoverElements($1,$2)",
-            },
-        },
-    ],
+                match: /(?<=:null),(.{0,40}togglePopout:.+?}\))\]}\):null,(?<=\((\i\.\i),{label:.+?:null,(\i&&!\i)\?\(0,\i\.jsxs?\)\(\i\.Fragment.+?message:(\i).+?)/,
+                replace: (_, ReactButton, ButtonComponent, showReactButton, message) => "" +
+                    `]}):null,Vencord.Api.MessagePopover._buildPopoverElements(${ButtonComponent},${message}),${showReactButton}?${ReactButton}:null,`
+            }
+        }
+    ]
 });

@@ -22,10 +22,11 @@ import {
 } from "@api/ContextMenu";
 import { migratePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
+import { getIntlMessage } from "@utils/discord";
 import { NoopComponent } from "@utils/react";
 import definePlugin from "@utils/types";
 import { filters, findByPropsLazy, waitFor } from "@webpack";
-import { ChannelStore, ContextMenuApi, i18n, UserStore } from "@webpack/common";
+import { ChannelStore, ContextMenuApi, UserStore } from "@webpack/common";
 import { Message } from "discord-types/general";
 
 const { useMessageMenu } = findByPropsLazy("useMessageMenu");
@@ -52,7 +53,7 @@ function MessageMenu({ message, channel, onHeightUpdate }) {
 
     return useMessageMenu({
         navId: "message-actions",
-        ariaLabel: i18n.Messages.MESSAGE_UTILITIES_A11Y_LABEL,
+        ariaLabel: getIntlMessage("MESSAGE_UTILITIES_A11Y_LABEL"),
 
         message,
         channel,
@@ -86,10 +87,7 @@ const contextMenuPatch: NavContextMenuPatchCallback = (
 
     const group = findGroupChildrenByChildId("devmode-copy-id", children, true);
     group?.push(
-        CopyIdMenuItem({
-            id: props.message.author.id,
-            label: i18n.Messages.COPY_ID_AUTHOR,
-        }),
+        CopyIdMenuItem({ id: props.message.author.id, label: getIntlMessage("COPY_ID_AUTHOR") })
     );
 };
 

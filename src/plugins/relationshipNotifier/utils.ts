@@ -71,14 +71,16 @@ async function runMigrations() {
 
 export async function syncAndRunChecks() {
     await runMigrations();
-    const [oldGuilds, oldGroups, oldFriends] = (await DataStore.getMany([
+    if (UserStore.getCurrentUser() == null) return;
+
+    const [oldGuilds, oldGroups, oldFriends] = await DataStore.getMany([
         guildsKey(),
         groupsKey(),
         friendsKey(),
     ])) as [
-        Map<string, SimpleGuild> | undefined,
-        Map<string, SimpleGroupChannel> | undefined,
-        Record<"friends" | "requests", string[]> | undefined,
+        Map<string, SimpleGuild > | undefined,
+            Map<string, SimpleGroupChannel> | undefined,
+            Record<"friends" | "requests", string[]> | undefined,
     ];
 
     await Promise.all([syncGuilds(), syncGroups(), syncFriends()]);

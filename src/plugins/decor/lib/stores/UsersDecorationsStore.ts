@@ -69,7 +69,7 @@ export const useUsersDecorationsStore = proxyLazy(() =>
                         if (
                             !force &&
                             Date.now() - fetchedAt.getTime() <
-                                DECORATION_FETCH_COOLDOWN
+                            DECORATION_FETCH_COOLDOWN
                         )
                             return;
                     }
@@ -123,35 +123,40 @@ export const useUsersDecorationsStore = proxyLazy(() =>
     ),
 );
 
-export function useUserDecorAvatarDecoration(
-    user?: User,
-): AvatarDecoration | null | undefined {
-    const [decorAvatarDecoration, setDecorAvatarDecoration] = useState<
-        string | null
-    >(
-        user
-            ? (useUsersDecorationsStore.getState().getAsset(user.id) ?? null)
-            : null,
-    );
+export function useUserDecorAvatarDecoration(user?: User): AvatarDecoration | null | undefined {
+    try {
+        const [decorAvatarDecoration, setDecorAvatarDecoration] = useState<string | null>(user ? useUsersDecorationsStore.getState().getAsset(user.id) ?? null : null);
 
-    useEffect(() => {
-        const destructor = useUsersDecorationsStore.subscribe((state) => {
-            if (!user) return;
-            const newDecorAvatarDecoration = state.getAsset(user.id);
-            if (!newDecorAvatarDecoration) return;
-            if (decorAvatarDecoration !== newDecorAvatarDecoration)
-                setDecorAvatarDecoration(newDecorAvatarDecoration);
-        });
+        useEffect(() => {
+            const destructor = (() => {
+                try {
+                    return useUsersDecorationsStore.subscribe(
+                        state => {
+                            if (!user) return;
+                            const newDecorAvatarDecoration = state.getAsset(user.id);
+                            if (!newDecorAvatarDecoration) return;
+                            if (decorAvatarDecoration !== newDecorAvatarDecoration) setDecorAvatarDecoration(newDecorAvatarDecoration);
+                        }
+                    );
+                } catch {
+                    return () => { };
+                }
+            })();
 
-        if (user) {
-            const { fetch: fetchUserDecorAvatarDecoration } =
-                useUsersDecorationsStore.getState();
-            fetchUserDecorAvatarDecoration(user.id);
-        }
-        return destructor;
-    }, []);
+            try {
+                if (user) {
+                    const { fetch: fetchUserDecorAvatarDecoration } = useUsersDecorationsStore.getState();
+                    fetchUserDecorAvatarDecoration(user.id);
+                }
+            } catch { }
 
-    return decorAvatarDecoration
-        ? { asset: decorAvatarDecoration, skuId: SKU_ID }
-        : null;
+            return destructor;
+        }, []);
+
+        return decorAvatarDecoration ? { asset: decorAvatarDecoration, skuId: SKU_ID } : null;
+    } catch (e) {
+        console.error(e);
+    }
+
+    return null;
 }

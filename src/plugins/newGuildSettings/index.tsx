@@ -20,7 +20,7 @@ import {
     findGroupChildrenByChildId,
     NavContextMenuPatchCallback,
 } from "@api/ContextMenu";
-import { definePluginSettings, migratePluginSettings } from "@api/Settings";
+import { definePluginSettings } from "@api/Settings";
 import { CogWheel } from "@components/Icons";
 import { Devs } from "@utils/constants";
 import definePlugin, { OptionType } from "@utils/types";
@@ -100,19 +100,19 @@ const makeContextMenuPatch: (
     shouldAddIcon: boolean,
 ) => NavContextMenuPatchCallback =
     (shouldAddIcon: boolean) =>
-    (children, { guild }: { guild: Guild; onClose(): void }) => {
-        if (!guild) return;
+        (children, { guild }: { guild: Guild; onClose(): void; }) => {
+            if (!guild) return;
 
-        const group = findGroupChildrenByChildId("privacy", children);
-        group?.push(
-            <Menu.MenuItem
-                label="Apply NewGuildSettings"
-                id="vc-newguildsettings-apply"
-                icon={shouldAddIcon ? CogWheel : void 0}
-                action={() => applyDefaultSettings(guild.id)}
-            />,
-        );
-    };
+            const group = findGroupChildrenByChildId("privacy", children);
+            group?.push(
+                <Menu.MenuItem
+                    label="Apply NewGuildSettings"
+                    id="vc-newguildsettings-apply"
+                    icon={shouldAddIcon ? CogWheel : void 0}
+                    action={() => applyDefaultSettings(guild.id)}
+                />,
+            );
+        };
 
 function applyDefaultSettings(guildId: string | null) {
     if (guildId === "@me" || guildId === "null" || guildId == null) return;
@@ -133,7 +133,6 @@ function applyDefaultSettings(guildId: string | null) {
     }
 }
 
-migratePluginSettings("NewGuildSettings", "MuteNewGuild");
 export default definePlugin({
     name: "NewGuildSettings",
     description:

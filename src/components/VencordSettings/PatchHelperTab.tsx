@@ -315,7 +315,7 @@ function FullPatchInput({
         }
 
         try {
-            const parsed = (0, eval)(`(${fullPatch})`) as Patch;
+            const parsed = (0, eval)(`([${fullPatch}][0])`) as Patch;
 
             if (!parsed.find) throw new Error("No 'find' field");
             if (!parsed.replacement) throw new Error("No 'replacement' field");

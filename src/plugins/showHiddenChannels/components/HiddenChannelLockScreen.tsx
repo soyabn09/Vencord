@@ -19,26 +19,8 @@
 import { Settings } from "@api/Settings";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { formatDuration } from "@utils/text";
-import {
-    findByPropsLazy,
-    findComponentByCodeLazy,
-    findComponentLazy,
-} from "@webpack";
-import {
-    EmojiStore,
-    FluxDispatcher,
-    GuildMemberStore,
-    GuildStore,
-    Parser,
-    PermissionsBits,
-    PermissionStore,
-    SnowflakeUtils,
-    Text,
-    Timestamp,
-    Tooltip,
-    useEffect,
-    useState,
-} from "@webpack/common";
+import { findByPropsLazy, findComponentByCodeLazy } from "@webpack";
+import { EmojiStore, FluxDispatcher, GuildMemberStore, GuildStore, Parser, PermissionsBits, PermissionStore, SnowflakeUtils, Text, Timestamp, Tooltip, useEffect, useState } from "@webpack/common";
 import type { Channel } from "discord-types/general";
 
 import openRolesAndUsersPermissionsModal, {
@@ -100,19 +82,8 @@ const enum ChannelFlags {
 
 const ChatScrollClasses = findByPropsLazy("auto", "managedReactiveScroller");
 const ChatClasses = findByPropsLazy("chat", "content", "noChat", "chatContent");
-const ChannelBeginHeader = findComponentByCodeLazy(
-    ".Messages.ROLE_REQUIRED_SINGLE_USER_MESSAGE",
-);
-const TagComponent = findComponentLazy((m) => {
-    if (typeof m !== "function") return false;
-
-    const code = Function.prototype.toString.call(m);
-    // Get the component which doesn't include increasedActivity
-    return (
-        code.includes(".Messages.FORUM_TAG_A11Y_FILTER_BY_TAG") &&
-        !code.includes("increasedActivityPill")
-    );
-});
+const ChannelBeginHeader = findComponentByCodeLazy("#{intl::ROLE_REQUIRED_SINGLE_USER_MESSAGE}");
+const TagComponent = findComponentByCodeLazy("#{intl::FORUM_TAG_A11Y_FILTER_BY_TAG}");
 
 const EmojiParser = findByPropsLazy("convertSurrogateToName");
 const EmojiUtils = findByPropsLazy("getURL", "getEmojiColors");
@@ -144,7 +115,7 @@ const VideoQualityModesToNames = {
 // Icon from the modal when clicking a message link you don't have access to view
 const HiddenChannelLogo = "/assets/433e3ec4319a9d11b0cbe39342614982.svg";
 
-function HiddenChannelLockScreen({ channel }: { channel: ExtendedChannel }) {
+function HiddenChannelLockScreen({ channel }: { channel: ExtendedChannel; }) {
     const { defaultAllowedUsersAndRolesDropdownState } = settings.use([
         "defaultAllowedUsersAndRolesDropdownState",
     ]);
@@ -325,7 +296,7 @@ function HiddenChannelLockScreen({ channel }: { channel: ExtendedChannel }) {
                         Video quality mode:{" "}
                         {
                             VideoQualityModesToNames[
-                                videoQualityMode ?? VideoQualityModes.AUTO
+                            videoQualityMode ?? VideoQualityModes.AUTO
                             ]
                         }
                     </Text>
@@ -366,18 +337,18 @@ function HiddenChannelLockScreen({ channel }: { channel: ExtendedChannel }) {
                             {
                                 name: defaultReactionEmoji.emojiName
                                     ? EmojiParser.convertSurrogateToName(
-                                          defaultReactionEmoji.emojiName,
-                                      )
+                                        defaultReactionEmoji.emojiName,
+                                    )
                                     : (EmojiStore.getCustomEmojiById(
-                                          defaultReactionEmoji.emojiId,
-                                      )?.name ?? ""),
+                                        defaultReactionEmoji.emojiId,
+                                    )?.name ?? ""),
                                 emojiId: defaultReactionEmoji.emojiId ?? void 0,
                                 surrogate:
                                     defaultReactionEmoji.emojiName ?? void 0,
                                 src: defaultReactionEmoji.emojiName
                                     ? EmojiUtils.getURL(
-                                          defaultReactionEmoji.emojiName,
-                                      )
+                                        defaultReactionEmoji.emojiName,
+                                    )
                                     : void 0,
                             },
                             void 0,
@@ -449,8 +420,8 @@ function HiddenChannelLockScreen({ channel }: { channel: ExtendedChannel }) {
                                     onMouseEnter={onMouseEnter}
                                     className="shc-lock-screen-allowed-users-and-roles-container-toggle-btn"
                                     onClick={() =>
-                                        (settings.store.defaultAllowedUsersAndRolesDropdownState =
-                                            !defaultAllowedUsersAndRolesDropdownState)
+                                    (settings.store.defaultAllowedUsersAndRolesDropdownState =
+                                        !defaultAllowedUsersAndRolesDropdownState)
                                     }
                                 >
                                     <svg

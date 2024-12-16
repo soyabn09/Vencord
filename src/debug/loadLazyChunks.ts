@@ -31,25 +31,26 @@ export async function loadLazyChunks() {
             /(?:(?:Promise\.all\(\[)?(\i\.e\("?[^)]+?"?\)[^\]]*?)(?:\]\))?)\.then\(\i\.bind\(\i,"?([^)]+?)"?\)\)/g,
         );
 
+        let foundCssDebuggingLoad = false;
+
         async function searchAndLoadLazyChunks(factoryCode: string) {
+            // Workaround to avoid loading the CSS debugging chunk which turns the app pink
+            const hasCssDebuggingLoad = foundCssDebuggingLoad ? false : (foundCssDebuggingLoad = factoryCode.includes(".cssDebuggingEnabled&&"));
+
             const lazyChunks = factoryCode.matchAll(LazyChunkRegex);
             const validChunkGroups = new Set<
                 [chunkIds: number[], entryPoint: number]
             >();
 
-            // Workaround for a chunk that depends on the ChannelMessage component but may be be force loaded before
-            // the chunk containing the component
-            const shouldForceDefer = factoryCode.includes(
-                ".Messages.GUILD_FEED_UNFEATURE_BUTTON_TEXT",
-            );
+            const shouldForceDefer = false;
 
             await Promise.all(
                 Array.from(lazyChunks).map(
                     async ([, rawChunkIds, entryPoint]) => {
                         const chunkIds = rawChunkIds
                             ? Array.from(
-                                  rawChunkIds.matchAll(Webpack.ChunkIdsRegex),
-                              ).map((m) => Number(m[1]))
+                                rawChunkIds.matchAll(Webpack.ChunkIdsRegex),
+                            ).map((m) => Number(m[1]))
                             : [];
 
                         if (chunkIds.length === 0) {
@@ -59,11 +60,17 @@ export async function loadLazyChunks() {
                         let invalidChunkGroup = false;
 
                         for (const id of chunkIds) {
-                            if (
-                                wreq.u(id) == null ||
-                                wreq.u(id) === "undefined.js"
-                            )
-                                continue;
+                            if (hasCssDebuggingLoad) {
+                                if (chunkIds.length > 1) {
+                                    throw new Error("Found multiple chunks in factory that loads the CSS debugging chunk");
+                                }
+
+                                invalidChunks.add(id);
+                                invalidChunkGroup = true;
+                                break;
+                            }
+
+                            if (wreq.u(id) == null || wreq.u(id) === "undefined.js") continue;
 
                             const isWorkerAsset = await fetch(
                                 wreq.p + wreq.u(id),
@@ -94,7 +101,7 @@ export async function loadLazyChunks() {
             await Promise.all(
                 Array.from(validChunkGroups).map(([chunkIds]) =>
                     Promise.all(
-                        chunkIds.map((id) => wreq.e(id as any).catch(() => {})),
+                        chunkIds.map((id) => wreq.e(id as any).catch(() => { })),
                     ),
                 ),
             );

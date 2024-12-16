@@ -104,7 +104,10 @@ function GuildInfoModal({ guild }: GuildProps) {
                     className={cl("banner")}
                     src={bannerUrl}
                     alt=""
-                    onClick={() => openImageModal(bannerUrl)}
+                    onClick={() => openImageModal({
+                        url: bannerUrl,
+                        width: 1024
+                    })}
                 />
             )}
 
@@ -113,7 +116,11 @@ function GuildInfoModal({ guild }: GuildProps) {
                     <img
                         src={iconUrl}
                         alt=""
-                        onClick={() => openImageModal(iconUrl)}
+                        onClick={() => openImageModal({
+                            url: iconUrl,
+                            height: 512,
+                            width: 512,
+                        })}
                     />
                 ) : (
                     <div
@@ -191,11 +198,11 @@ function Owner(guildId: string, owner: User) {
     const guildAvatar = GuildMemberStore.getMember(guildId, owner.id)?.avatar;
     const ownerAvatarUrl = guildAvatar
         ? IconUtils.getGuildMemberAvatarURLSimple({
-              userId: owner!.id,
-              avatar: guildAvatar,
-              guildId,
-              canAnimate: true,
-          })
+            userId: owner!.id,
+            avatar: guildAvatar,
+            guildId,
+            canAnimate: true,
+        })
         : IconUtils.getUserAvatarURL(owner, true);
 
     return (
@@ -203,7 +210,11 @@ function Owner(guildId: string, owner: User) {
             <img
                 src={ownerAvatarUrl}
                 alt=""
-                onClick={() => openImageModal(ownerAvatarUrl)}
+                onClick={() => openImageModal({
+                    url: ownerAvatarUrl,
+                    height: 512,
+                    width: 512
+                })}
             />
             {Parser.parse(`<@${owner.id}>`)}
         </div>
@@ -232,7 +243,7 @@ function ServerInfoTab({ guild }: GuildProps) {
         "Preferred Locale": guild.preferredLocale || "-",
         "Verification Level":
             ["None", "Low", "Medium", "High", "Highest"][
-                guild.verificationLevel
+            guild.verificationLevel
             ] || "?",
         "Nitro Boosts": `${guild.premiumSubscriberCount ?? 0} (Level ${guild.premiumTier ?? 0})`,
         Channels: GuildChannelStore.getChannels(guild.id)?.count - 1 || "?", // - null category
@@ -309,7 +320,7 @@ function UserList(
                     user={UserStore.getUser(id)}
                     status={PresenceStore.getStatus(id) || "offline"}
                     onSelect={() => openUserProfile(id)}
-                    onContextMenu={() => {}}
+                    onContextMenu={() => { }}
                 />
             ))}
         </ScrollerThin>

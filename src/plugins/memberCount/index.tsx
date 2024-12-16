@@ -30,20 +30,20 @@ import { MemberCount } from "./MemberCount";
 
 export const GuildMemberCountStore = findStoreLazy(
     "GuildMemberCountStore",
-) as FluxStore & { getMemberCount(guildId?: string): number | null };
+) as FluxStore & { getMemberCount(guildId?: string): number | null; };
 export const ChannelMemberStore = findStoreLazy(
     "ChannelMemberStore",
 ) as FluxStore & {
     getProps(
         guildId?: string,
         channelId?: string,
-    ): { groups: { count: number; id: string }[] };
+    ): { groups: { count: number; id: string; }[]; };
 };
 export const ThreadMemberListStore = findStoreLazy(
     "ThreadMemberListStore",
 ) as FluxStore & {
     getMemberListSections(channelId?: string): {
-        [sectionId: string]: { sectionId: string; userIds: string[] };
+        [sectionId: string]: { sectionId: string; userIds: string[]; };
     };
 };
 
@@ -88,8 +88,8 @@ export default definePlugin({
         {
             find: ".invitesDisabledTooltip",
             replacement: {
-                match: /\.VIEW_AS_ROLES_MENTIONS_WARNING.{0,100}(?=])/,
-                replace: "$&,$self.renderTooltip(arguments[0].guild)",
+                match: /#{intl::VIEW_AS_ROLES_MENTIONS_WARNING}.{0,100}(?=])/,
+                replace: "$&,$self.renderTooltip(arguments[0].guild)"
             },
             predicate: () => settings.store.toolTip,
         },

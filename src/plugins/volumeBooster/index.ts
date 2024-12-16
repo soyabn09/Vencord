@@ -57,7 +57,10 @@ export default definePlugin({
 
     patches: [
         // Change the max volume for sliders to allow for values above 200
-        ...[".Messages.USER_VOLUME", "currentVolume:"].map((find) => ({
+        ...[
+            "#{intl::USER_VOLUME}",
+            "currentVolume:"
+        ].map(find => ({
             find,
             replacement: {
                 match: /(?<=maxValue:)\i\.\i\?(\d+?):(\d+?)(?=,)/,
@@ -93,8 +96,8 @@ export default definePlugin({
             find: "AudioContextSettingsMigrated",
             replacement: [
                 {
-                    match: /(?<=isLocalMute\(\i,\i\),volume:.+?volume:)\i(?=})/,
-                    replace: "$&>200?200:$&",
+                    match: /(?<=isLocalMute\(\i,\i\),volume:(\i).+?\i\(\i,\i,)\1(?=\))/,
+                    replace: "$&>200?200:$&"
                 },
                 {
                     match: /(?<=Object\.entries\(\i\.localMutes\).+?volume:).+?(?=,)/,
@@ -108,7 +111,7 @@ export default definePlugin({
         },
         // Prevent the MediaEngineStore from overwriting our LocalVolumes above 200 with the ones the Discord Audio Context Settings sync sends
         {
-            find: '"MediaEngineStore"',
+            find: '="MediaEngineStore",',
             replacement: [
                 {
                     match: /(\.settings\.audioContextSettings.+?)(\i\[\i\])=(\i\.volume)(.+?setLocalVolume\(\i,).+?\)/,

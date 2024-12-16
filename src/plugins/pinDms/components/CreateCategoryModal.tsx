@@ -55,15 +55,8 @@ interface ColorPickerWithSwatchesProps {
     renderCustomButton?: () => React.ReactNode;
 }
 
-const ColorPicker = findComponentByCodeLazy<ColorPickerProps>(
-    ".Messages.USER_SETTINGS_PROFILE_COLOR_SELECT_COLOR",
-    ".BACKGROUND_PRIMARY)",
-);
-const ColorPickerWithSwatches =
-    findExportedComponentLazy<ColorPickerWithSwatchesProps>(
-        "ColorPicker",
-        "CustomColorPicker",
-    );
+const ColorPicker = findComponentByCodeLazy<ColorPickerProps>("#{intl::USER_SETTINGS_PROFILE_COLOR_SELECT_COLOR}", ".BACKGROUND_PRIMARY)");
+const ColorPickerWithSwatches = findExportedComponentLazy<ColorPickerWithSwatchesProps>("ColorPicker", "CustomColorPicker");
 
 export const requireSettingsMenu = extractAndLoadChunksLazy(
     ['name:"UserSettings"'],

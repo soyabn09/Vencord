@@ -91,11 +91,7 @@ export default definePlugin({
                 if (msg.deleted === true) return;
 
                 if (isMe) {
-                    if (
-                        !settings.store.enableDoubleClickToEdit ||
-                        EditStore.isEditing(channel.id, msg.id)
-                    )
-                        return;
+                    if (!settings.store.enableDoubleClickToEdit || EditStore.isEditing(channel.id, msg.id) || msg.state !== "SENT") return;
 
                     MessageActions.startEditMessage(
                         channel.id,

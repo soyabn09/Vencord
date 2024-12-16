@@ -27,7 +27,7 @@ export default definePlugin({
 
     patches: [
         {
-            find: ".Messages.MESSAGE_UTILITIES_A11Y_LABEL",
+            find: "#{intl::MESSAGE_UTILITIES_A11Y_LABEL}",
             replacement: {
                 match: /isExpanded:\i&&(.+?),/,
                 replace: "isExpanded:$1,",

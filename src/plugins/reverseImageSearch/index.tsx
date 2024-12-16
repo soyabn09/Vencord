@@ -128,7 +128,7 @@ export default definePlugin({
 
     patches: [
         {
-            find: ".Messages.MESSAGE_ACTIONS_MENU_LABEL,shouldHideMediaOptions",
+            find: "#{intl::MESSAGE_ACTIONS_MENU_LABEL}",
             replacement: {
                 match: /favoriteableType:\i,(?<=(\i)\.getAttribute\("data-type"\).+?)/,
                 replace: (m, target) =>

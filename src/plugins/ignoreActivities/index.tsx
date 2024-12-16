@@ -162,7 +162,7 @@ function ImportCustomRPCComponent() {
 
 let idsListPushID: ((id: string) => boolean) | null = null;
 
-function IdsListComponent(props: { setValue: (value: string) => void }) {
+function IdsListComponent(props: { setValue: (value: string) => void; }) {
     const [idsList, setIdsList] = useState<string>(
         settings.store.idsList ?? "",
     );
@@ -346,12 +346,11 @@ export default definePlugin({
             },
         },
         {
-            find: ".Messages.SETTINGS_GAMES_TOGGLE_OVERLAY",
+            find: "#{intl::SETTINGS_GAMES_TOGGLE_OVERLAY}",
             replacement: {
-                match: /\.Messages\.SETTINGS_GAMES_TOGGLE_OVERLAY.+?}\(\),(?<={overlay:\i,.+?=(\i),.+?)(?=!(\i))/,
-                replace: (m, props, nowPlaying) =>
-                    `${m}$self.renderToggleGameActivityButton(${props},${nowPlaying}),`,
-            },
+                match: /#{intl::SETTINGS_GAMES_TOGGLE_OVERLAY}.+?}\(\),(?<={overlay:\i,.+?=(\i),.+?)(?=!(\i))/,
+                replace: (m, props, nowPlaying) => `${m}$self.renderToggleGameActivityButton(${props},${nowPlaying}),`
+            }
         },
         // Discord has 2 different components for activities. Currently, the last is the one being used
         {
@@ -448,7 +447,7 @@ export default definePlugin({
     },
 
     renderToggleGameActivityButton(
-        props: { id?: string; name: string; exePath: string },
+        props: { id?: string; name: string; exePath: string; },
         nowPlaying: boolean,
     ) {
         return (
@@ -467,7 +466,7 @@ export default definePlugin({
         );
     },
 
-    renderToggleActivityButton(props: { id: string; name: string }) {
+    renderToggleActivityButton(props: { id: string; name: string; }) {
         return (
             <ErrorBoundary noop>
                 {ToggleActivityComponent({

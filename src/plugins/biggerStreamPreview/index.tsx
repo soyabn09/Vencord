@@ -68,7 +68,11 @@ export const handleViewPreview = async ({
     );
     if (!previewUrl) return;
 
-    openImageModal(previewUrl);
+    openImageModal({
+        url: previewUrl,
+        height: 720,
+        width: 1280
+    });
 };
 
 export const addViewStreamContext: NavContextMenuPatchCallback = (

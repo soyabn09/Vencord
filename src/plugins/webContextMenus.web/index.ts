@@ -140,14 +140,12 @@ export default definePlugin({
                     replace: "return [true",
                 },
                 {
-                    match: /(?<=COPY_IMAGE_MENU_ITEM,)action:/,
-                    replace:
-                        "action:()=>$self.copyImage(arguments[0]),oldAction:",
+                    match: /(?<=#{intl::COPY_IMAGE_MENU_ITEM}\),)action:/,
+                    replace: "action:()=>$self.copyImage(arguments[0]),oldAction:"
                 },
                 {
-                    match: /(?<=SAVE_IMAGE_MENU_ITEM,)action:/,
-                    replace:
-                        "action:()=>$self.saveImage(arguments[0]),oldAction:",
+                    match: /(?<=#{intl::SAVE_IMAGE_MENU_ITEM}\),)action:/,
+                    replace: "action:()=>$self.saveImage(arguments[0]),oldAction:"
                 },
             ],
         },
@@ -179,9 +177,9 @@ export default definePlugin({
             find: 'getElementById("slate-toolbar"',
             predicate: () => settings.store.addBack,
             replacement: {
-                match: /(?<=handleContextMenu\(\i\)\{.{0,200}isPlatformEmbedded)\?/,
-                replace: "||true?",
-            },
+                match: /(?<=handleContextMenu\(\i\)\{.{0,200}isPlatformEmbedded)\)/,
+                replace: "||true)"
+            }
         },
         {
             find: ".SLASH_COMMAND_SUGGESTIONS_TOGGLED,{",
@@ -217,33 +215,36 @@ export default definePlugin({
             },
         },
         {
-            find: ".Messages.SEARCH_WITH_GOOGLE",
+            find: "#{intl::SEARCH_WITH_GOOGLE}",
             replacement: {
                 match: /\i\.isPlatformEmbedded/,
                 replace: "true",
             },
         },
         {
-            find: ".Messages.COPY,hint:",
+            find: "#{intl::COPY}),hint:",
             replacement: [
                 {
                     match: /\i\.isPlatformEmbedded/,
                     replace: "true",
                 },
                 {
-                    match: /\i\.\i\.copy/,
-                    replace: "Vencord.Webpack.Common.Clipboard.copy",
-                },
+                    match: /\i\.\i\.copy(?=\(\i)/,
+                    replace: "Vencord.Webpack.Common.Clipboard.copy"
+                }
             ],
+            all: true,
+            noWarn: true
         },
         // Automod add filter words
         {
             find: '("interactionUsernameProfile',
-            replacement: {
+            replacement:
+            {
                 match: /\i\.isPlatformEmbedded(?=.{0,50}\.tagName)/,
-                replace: "true",
+                replace: "true"
             },
-        },
+        }
     ],
 
     async copyImage(url: string) {

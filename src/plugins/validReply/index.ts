@@ -21,7 +21,7 @@ interface Reply {
     baseAuthor: User;
     baseMessage: Message;
     channel: Channel;
-    referencedMessage: { state: ReferencedMessageState };
+    referencedMessage: { state: ReferencedMessageState; };
     compact: boolean;
     isReplyAuthorBlocked: boolean;
 }
@@ -42,11 +42,11 @@ export default definePlugin({
     authors: [Devs.newwares],
     patches: [
         {
-            find: "Messages.REPLY_QUOTE_MESSAGE_NOT_LOADED",
+            find: "#{intl::REPLY_QUOTE_MESSAGE_NOT_LOADED}",
             replacement: {
-                match: /Messages\.REPLY_QUOTE_MESSAGE_NOT_LOADED/,
-                replace: "$&,onMouseEnter:()=>$self.fetchReply(arguments[0])",
-            },
+                match: /#{intl::REPLY_QUOTE_MESSAGE_NOT_LOADED}\)/,
+                replace: "$&,onMouseEnter:()=>$self.fetchReply(arguments[0])"
+            }
         },
         {
             find: "ReferencedMessageStore",
@@ -104,7 +104,7 @@ export default definePlugin({
                     });
                 }
             })
-            .catch(() => {})
+            .catch(() => { })
             .finally(() => {
                 fetching.delete(messageId);
             });

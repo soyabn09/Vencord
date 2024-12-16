@@ -83,7 +83,7 @@ export interface ChatBarProps {
 }
 
 export type ChatBarButton = (
-    props: ChatBarProps & { isMainChat: boolean },
+    props: ChatBarProps & { isMainChat: boolean; },
 ) => JSX.Element | null;
 
 const buttonFactories = new Map<string, ChatBarButton>();
@@ -119,18 +119,25 @@ export interface ChatBarButtonProps {
     tooltip: string;
     onClick: MouseEventHandler<HTMLButtonElement>;
     onContextMenu?: MouseEventHandler<HTMLButtonElement>;
-    buttonProps?: Omit<
-        HTMLProps<HTMLButtonElement>,
-        "size" | "onClick" | "onContextMenu"
-    >;
+    onAuxClick?: MouseEventHandler<HTMLButtonElement>;
+    buttonProps?: Omit<HTMLProps<HTMLButtonElement>, "size" | "onClick" | "onContextMenu" | "onAuxClick">;
 }
-export const ChatBarButton = ErrorBoundary.wrap(
-    (props: ChatBarButtonProps) => {
-        return (
-            <Tooltip text={props.tooltip}>
-                {({ onMouseEnter, onMouseLeave }) => (
-                    <div
-                        className={`expression-picker-chat-input-button ${ChannelTextAreaClasses?.buttonContainer ?? ""} vc-chatbar-button`}
+export const ChatBarButton = ErrorBoundary.wrap((props: ChatBarButtonProps) => {
+    return (
+        <Tooltip text={props.tooltip}>
+            {({ onMouseEnter, onMouseLeave }) => (
+                <div className={`expression-picker-chat-input-button ${ChannelTextAreaClasses?.buttonContainer ?? ""} vc-chatbar-button`}>
+                    <Button
+                        aria-label={props.tooltip}
+                        size=""
+                        look={ButtonLooks.BLANK}
+                        onMouseEnter={onMouseEnter}
+                        onMouseLeave={onMouseLeave}
+                        innerClassName={`${ButtonWrapperClasses.button} ${ChannelTextAreaClasses?.button}`}
+                        onClick={props.onClick}
+                        onContextMenu={props.onContextMenu}
+                        onAuxClick={props.onAuxClick}
+                        {...props.buttonProps}
                     >
                         <Button
                             aria-label={props.tooltip}
@@ -147,10 +154,10 @@ export const ChatBarButton = ErrorBoundary.wrap(
                                 {props.children}
                             </div>
                         </Button>
-                    </div>
-                )}
-            </Tooltip>
-        );
-    },
+                </div>
+            )}
+        </Tooltip>
+    );
+},
     { noop: true },
 );

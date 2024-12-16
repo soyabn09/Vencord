@@ -16,12 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {
-    _getBadges,
-    BadgePosition,
-    BadgeUserArgs,
-    ProfileBadge,
-} from "@api/Badges";
+import "./fixDiscordBadgePadding.css";
+
+import { _getBadges, BadgePosition, BadgeUserArgs, ProfileBadge } from "@api/Badges";
 import DonateButton from "@components/DonateButton";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Flex } from "@components/Flex";
@@ -117,7 +114,7 @@ export default definePlugin({
         await loadBadges();
     },
 
-    getBadges(props: { userId: string; user?: User; guildId: string }) {
+    getBadges(props: { userId: string; user?: User; guildId: string; }) {
         if (!props) return [];
 
         try {

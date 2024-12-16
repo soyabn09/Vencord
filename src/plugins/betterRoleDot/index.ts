@@ -48,7 +48,7 @@ export default definePlugin({
         },
 
         {
-            find: ".ADD_ROLE_A11Y_LABEL",
+            find: "#{intl::ADD_ROLE_A11Y_LABEL}",
             all: true,
             predicate: () =>
                 Settings.plugins.BetterRoleDot.copyRoleColorInProfilePopout &&

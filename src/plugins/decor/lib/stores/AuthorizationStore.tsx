@@ -142,6 +142,13 @@ export const useAuthorizationStore = proxyLazy(() =>
                 partialize: (state) => ({ tokens: state.tokens }),
                 onRehydrateStorage: () => (state) => state?.init(),
             },
-        ),
-    ),
-);
+            isAuthorized: () => !!get().token,
+        } as AuthorizationState),
+{
+    name: "decor-auth",
+        storage: indexedDBStorage,
+            partialize: state => ({ tokens: state.tokens }),
+                onRehydrateStorage: () => state => state?.init();
+}
+    )
+));

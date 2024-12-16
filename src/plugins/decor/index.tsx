@@ -49,9 +49,9 @@ export default definePlugin({
         {
             find: "DefaultCustomizationSections",
             replacement: {
-                match: /(?<=USER_SETTINGS_AVATAR_DECORATION},"decoration"\),)/,
-                replace: "$self.DecorSection(),",
-            },
+                match: /(?<=#{intl::USER_SETTINGS_AVATAR_DECORATION}\)},"decoration"\),)/,
+                replace: "$self.DecorSection(),"
+            }
         },
         // Decoration modal module
         {

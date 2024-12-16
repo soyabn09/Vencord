@@ -80,7 +80,7 @@ export default definePlugin({
     },
 
     contextMenus: {
-        "dev-context"(children, { id }: { id: string }) {
+        "dev-context"(children, { id }: { id: string; }) {
             const guild = getCurrentGuild();
             if (!guild) return;
 
@@ -104,9 +104,11 @@ export default definePlugin({
                         id="vc-view-role-icon"
                         label="View Role Icon"
                         action={() => {
-                            openImageModal(
-                                `${location.protocol}//${window.GLOBAL_ENV.CDN_HOST}/role-icons/${role.id}/${role.icon}.${settings.store.roleIconFileFormat}`,
-                            );
+                            openImageModal({
+                                url: `${location.protocol}//${window.GLOBAL_ENV.CDN_HOST}/role-icons/${role.id}/${role.icon}.${settings.store.roleIconFileFormat}`,
+                                height: 128,
+                                width: 128
+                            });
                         }}
                         icon={ImageIcon}
                     />,

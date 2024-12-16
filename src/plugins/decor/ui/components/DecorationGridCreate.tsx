@@ -5,7 +5,8 @@
  */
 
 import { PlusIcon } from "@components/Icons";
-import { i18n, Text } from "@webpack/common";
+import { getIntlMessage } from "@utils/discord";
+import { Text } from "@webpack/common";
 import { HTMLProps } from "react";
 
 import { DecorationGridItem } from ".";
@@ -15,12 +16,16 @@ type DecorationGridCreateProps = HTMLProps<HTMLDivElement> & {
 };
 
 export default function DecorationGridCreate(props: DecorationGridCreateProps) {
-    return (
-        <DecorationGridItem {...props} isSelected={false}>
-            <PlusIcon />
-            <Text variant="text-xs/normal" color="header-primary">
-                {i18n.Messages.CREATE}
-            </Text>
-        </DecorationGridItem>
-    );
+    return <DecorationGridItem
+        {...props}
+        isSelected={false}
+    >
+        <PlusIcon />
+        <Text
+            variant="text-xs/normal"
+            color="header-primary"
+        >
+            {getIntlMessage("CREATE")}
+        </Text>
+    </DecorationGridItem >;
 }

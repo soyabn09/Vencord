@@ -73,15 +73,14 @@ export default definePlugin({
         },
     },
 
-    patches: [
-        {
-            find: "renderConnectionStatus(){",
-            replacement: {
-                match: /(?<=renderConnectionStatus\(\)\{.+\.channel,children:)\i/,
-                replace: "[$&, $self.renderTimer(this.props.channel.id)]",
-            },
-        },
-    ],
+    patches: [{
+        find: "renderConnectionStatus(){",
+        replacement: {
+            match: /(?<=renderConnectionStatus\(\){.+\.channel,children:).+?}\):\i(?=}\))/,
+            replace: "[$&, $self.renderTimer(this.props.channel.id)]"
+        }
+    }],
+
     renderTimer(channelId: string) {
         return (
             <ErrorBoundary noop>
@@ -90,7 +89,7 @@ export default definePlugin({
         );
     },
 
-    Timer({ channelId }: { channelId: string }) {
+    Timer({ channelId }: { channelId: string; }) {
         const time = useTimer({
             deps: [channelId],
         });

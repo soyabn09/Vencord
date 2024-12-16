@@ -18,10 +18,7 @@ import {
 } from "@webpack";
 import { Button, Forms, ThemeStore, useStateFromStores } from "@webpack/common";
 
-const ColorPicker = findComponentByCodeLazy(
-    ".Messages.USER_SETTINGS_PROFILE_COLOR_SELECT_COLOR",
-    ".BACKGROUND_PRIMARY)",
-);
+const ColorPicker = findComponentByCodeLazy("#{intl::USER_SETTINGS_PROFILE_COLOR_SELECT_COLOR}", ".BACKGROUND_PRIMARY)");
 
 const colorPresets = [
     "#1E1514",
@@ -176,9 +173,8 @@ const settings = definePluginSettings({
 
 export default definePlugin({
     name: "ClientTheme",
-    authors: [Devs.F53, Devs.Nuckyz],
-    description:
-        "Recreation of the old client theme experiment. Add a color to your Discord client theme",
+    authors: [Devs.Nuckyz],
+    description: "Recreation of the old client theme experiment. Add a color to your Discord client theme",
     settings,
 
     startAt: StartAt.DOMContentLoaded,

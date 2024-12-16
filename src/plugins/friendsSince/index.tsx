@@ -31,24 +31,22 @@ export default definePlugin({
         {
             find: ".PANEL}),nicknameIcons",
             replacement: {
-                match: /USER_PROFILE_MEMBER_SINCE,.{0,100}userId:(\i\.id)}\)}\)/,
-                replace:
-                    "$&,$self.FriendsSinceComponent({userId:$1,isSidebar:true})",
-            },
+                match: /#{intl::USER_PROFILE_MEMBER_SINCE}\),.{0,100}userId:(\i\.id)}\)}\)/,
+                replace: "$&,$self.FriendsSinceComponent({userId:$1,isSidebar:true})"
+            }
         },
         // User Profile Modal
         {
             find: 'action:"PRESS_APP_CONNECTION"',
             replacement: {
-                match: /USER_PROFILE_MEMBER_SINCE,.{0,100}userId:(\i\.id),.{0,100}}\)}\),/,
-                replace:
-                    "$&,$self.FriendsSinceComponent({userId:$1,isSidebar:false}),",
-            },
-        },
+                match: /#{intl::USER_PROFILE_MEMBER_SINCE}\),.{0,100}userId:(\i\.id),.{0,100}}\)}\),/,
+                replace: "$&,$self.FriendsSinceComponent({userId:$1,isSidebar:false}),"
+            }
+        }
     ],
 
     FriendsSinceComponent: ErrorBoundary.wrap(
-        ({ userId, isSidebar }: { userId: string; isSidebar: boolean }) => {
+        ({ userId, isSidebar }: { userId: string; isSidebar: boolean; }) => {
             if (!RelationshipStore.isFriend(userId)) return null;
 
             const friendsSince = RelationshipStore.getSince(userId);

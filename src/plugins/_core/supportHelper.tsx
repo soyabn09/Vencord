@@ -70,7 +70,7 @@ const TrustedRolesIds = [
     "1042507929485586532", // donor
 ];
 
-const AsyncFunction = async function () {}.constructor;
+const AsyncFunction = async function () { }.constructor;
 
 const ShowCurrentGame = getUserSettingLazy<boolean>(
     "status",
@@ -94,7 +94,7 @@ async function generateDebugInfoMessage() {
         if (IS_DISCORD_DESKTOP)
             return `Discord Desktop v${DiscordNative.app.getVersion()}`;
         if (IS_VESKTOP) return `Vesktop v${VesktopNative.app.getVersion()}`;
-        if ("armcord" in window) return `ArmCord v${window.armcord.version}`;
+        if ("legcord" in window) return `Legcord v${window.legcord.version}`;
 
         // @ts-expect-error
         const name = typeof unsafeWindow !== "undefined" ? "UserScript" : "Web";
@@ -183,15 +183,13 @@ export default definePlugin({
 
     settings,
 
-    patches: [
-        {
-            find: ".BEGINNING_DM.format",
-            replacement: {
-                match: /BEGINNING_DM\.format\(\{.+?\}\),(?=.{0,100}userId:(\i\.getRecipientId\(\)))/,
-                replace: "$& $self.ContributorDmWarningCard({ userId: $1 }),",
-            },
-        },
-    ],
+    patches: [{
+        find: "#{intl::BEGINNING_DM}",
+        replacement: {
+            match: /#{intl::BEGINNING_DM},{.+?}\),(?=.{0,300}(\i)\.isMultiUserDM)/,
+            replace: "$& $self.renderContributorDmWarningCard({ channel: $1 }),"
+        }
+    }],
 
     commands: [
         {
@@ -222,7 +220,7 @@ export default definePlugin({
             if (!selfId || isPluginDev(selfId)) return;
 
             if (!IS_UPDATER_DISABLED) {
-                await checkForUpdatesOnce().catch(() => {});
+                await checkForUpdatesOnce().catch(() => { });
 
                 if (isOutdated) {
                     return Alerts.show({
@@ -318,29 +316,25 @@ export default definePlugin({
         },
     },
 
-    ContributorDmWarningCard: ErrorBoundary.wrap(
-        ({ userId }) => {
-            if (!isPluginDev(userId)) return null;
-            if (
-                RelationshipStore.isFriend(userId) ||
-                isPluginDev(UserStore.getCurrentUser()?.id)
-            )
-                return null;
+    renderContributorDmWarningCard: ErrorBoundary.wrap(({ channel }) => {
+        const userId = channel.getRecipientId();
+        if (!isPluginDev(userId)) return null;
+        if (RelationshipStore.isFriend(userId) || isPluginDev(UserStore.getCurrentUser()?.id)) return null;
 
-            return (
-                <Card className={`vc-plugins-restart-card ${Margins.top8}`}>
-                    Please do not private message Vencord plugin developers for
-                    support!
-                    <br />
-                    Instead, use the Vencord support channel:{" "}
-                    {Parser.parse(
-                        "https://discord.com/channels/1015060230222131221/1026515880080842772",
-                    )}
-                    {!ChannelStore.getChannel(SUPPORT_CHANNEL_ID) &&
-                        " (Click the link to join)"}
-                </Card>
-            );
-        },
+        return (
+            <Card className={`vc-plugins-restart-card ${Margins.top8}`}>
+                Please do not private message Vencord plugin developers for
+                support!
+                <br />
+                Instead, use the Vencord support channel:{" "}
+                {Parser.parse(
+                    "https://discord.com/channels/1015060230222131221/1026515880080842772",
+                )}
+                {!ChannelStore.getChannel(SUPPORT_CHANNEL_ID) &&
+                    " (Click the link to join)"}
+            </Card>
+        );
+    },
         { noop: true },
     ),
 
@@ -421,8 +415,8 @@ export default definePlugin({
                 if (props.message.author.id === VENBOT_USER_ID) {
                     const match = CodeBlockRe.exec(
                         props.message.content ||
-                            props.message.embeds[0]?.rawDescription ||
-                            "",
+                        props.message.embeds[0]?.rawDescription ||
+                        "",
                     );
                     if (match) {
                         buttons.push(

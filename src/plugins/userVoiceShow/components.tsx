@@ -37,12 +37,9 @@ import { Channel } from "discord-types/general";
 
 const cl = classNameFactory("vc-uvs-");
 
-const { selectVoiceChannel } = findByPropsLazy(
-    "selectVoiceChannel",
-    "selectChannel",
-);
-const { useChannelName } = mapMangledModuleLazy(".Messages.GROUP_DM_ALONE", {
-    useChannelName: filters.byCode("()=>null=="),
+const { selectVoiceChannel } = findByPropsLazy("selectVoiceChannel", "selectChannel");
+const { useChannelName } = mapMangledModuleLazy("#{intl::GROUP_DM_ALONE}", {
+    useChannelName: filters.byCode("()=>null==")
 });
 const getDMChannelIcon = findByCodeLazy(".getChannelIconURL({");
 const VoiceStateStore = findStoreLazy("VoiceStateStore");
@@ -145,10 +142,10 @@ function VoiceChannelTooltip({ channel, isLocked }: VoiceChannelTooltipProps) {
         guild?.icon == null
             ? undefined
             : IconUtils.getGuildIconURL({
-                  id: guild.id,
-                  icon: guild.icon,
-                  size: 30,
-              });
+                id: guild.id,
+                icon: guild.icon,
+                size: 30,
+            });
 
     const channelIcon = match(channel.type)
         .with(P.union(1, 3), () => {
@@ -221,8 +218,8 @@ export const VoiceChannelIndicator = ErrorBoundary.wrap(
             [VoiceStateStore],
             () =>
                 VoiceStateStore.getVoiceStateForUser(userId)?.channelId as
-                    | string
-                    | undefined,
+                | string
+                | undefined,
         );
 
         const channel =
@@ -289,8 +286,8 @@ export const VoiceChannelIndicator = ErrorBoundary.wrap(
                         className: classes(
                             isMessageIndicator && cl("message-indicator"),
                             !isProfile &&
-                                !isActionButton &&
-                                cl("speaker-margin"),
+                            !isActionButton &&
+                            cl("speaker-margin"),
                             isActionButton && ActionButtonClasses.actionButton,
                             shouldHighlight && ActionButtonClasses.highlight,
                         ),

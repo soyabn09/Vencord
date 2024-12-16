@@ -25,32 +25,11 @@ import {
 import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
 import { ApngBlendOp, ApngDisposeOp, importApngJs } from "@utils/dependencies";
-import { getCurrentGuild } from "@utils/discord";
+import { getCurrentGuild, getEmojiURL } from "@utils/discord";
 import { Logger } from "@utils/Logger";
 import definePlugin, { OptionType, Patch } from "@utils/types";
-import {
-    findByCodeLazy,
-    findByPropsLazy,
-    findStoreLazy,
-    proxyLazyWebpack,
-} from "@webpack";
-import {
-    Alerts,
-    ChannelStore,
-    DraftType,
-    EmojiStore,
-    FluxDispatcher,
-    Forms,
-    GuildMemberStore,
-    IconUtils,
-    lodash,
-    Parser,
-    PermissionsBits,
-    PermissionStore,
-    UploadHandler,
-    UserSettingsActionCreators,
-    UserStore,
-} from "@webpack/common";
+import { findByCodeLazy, findByPropsLazy, findStoreLazy, proxyLazyWebpack } from "@webpack";
+import { Alerts, ChannelStore, DraftType, EmojiStore, FluxDispatcher, Forms, GuildMemberStore, lodash, Parser, PermissionsBits, PermissionStore, UploadHandler, UserSettingsActionCreators, UserStore } from "@webpack/common";
 import type { Emoji } from "@webpack/types";
 import type { Message } from "discord-types/general";
 import { applyPalette, GIFEncoder, quantize } from "gifenc";
@@ -247,7 +226,7 @@ const hasAttachmentPerms = (channelId: string) =>
     hasPermission(channelId, PermissionsBits.ATTACH_FILES);
 
 function makeBypassPatches(): Omit<Patch, "plugin"> {
-    const mapping: Array<{ func: string; predicate?: () => boolean }> = [
+    const mapping: Array<{ func: string; predicate?: () => boolean; }> = [
         {
             func: "canUseCustomStickersEverywhere",
             predicate: () => settings.store.enableStickerBypass,
@@ -268,10 +247,10 @@ function makeBypassPatches(): Omit<Patch, "plugin"> {
     return {
         find: "canUseCustomStickersEverywhere:",
         replacement: mapping.map(({ func, predicate }) => ({
-            match: new RegExp(String.raw`(?<=${func}:function\(\i(?:,\i)?\){)`),
-            replace: "return true;",
-            predicate,
-        })),
+            match: new RegExp(String.raw`(?<=${func}:)\i`),
+            replace: "() => true",
+            predicate
+        }))
     };
 }
 
@@ -357,7 +336,7 @@ export default definePlugin({
         },
         // Remove boost requirements to stream with high quality
         {
-            find: "STREAM_FPS_OPTION.format",
+            find: "#{intl::STREAM_FPS_OPTION}",
             predicate: () => settings.store.enableStreamQualityBypass,
             replacement: {
                 match: /guildPremiumTier:\i\.\i\.TIER_\d,?/g,
@@ -369,9 +348,8 @@ export default definePlugin({
             replacement: [
                 {
                     // Overwrite incoming connection settings proto with our local settings
-                    match: /CONNECTION_OPEN:function\((\i)\){/,
-                    replace: (m, props) =>
-                        `${m}$self.handleProtoChange(${props}.userSettingsProto,${props}.user);`,
+                    match: /function (\i)\((\i)\){(?=.*CONNECTION_OPEN:\1)/,
+                    replace: (m, funcName, props) => `${m}$self.handleProtoChange(${props}.userSettingsProto,${props}.user);`
                 },
                 {
                     // Overwrite non local proto changes with our local settings
@@ -439,14 +417,13 @@ export default definePlugin({
                 {
                     // Filter attachments to remove fake nitro stickers or emojis
                     predicate: () => settings.store.transformStickers,
-                    match: /renderAttachments\(\i\){let{attachments:(\i).+?;/,
-                    replace: (m, attachments) =>
-                        `${m}${attachments}=$self.filterAttachments(${attachments});`,
-                },
-            ],
+                    match: /renderAttachments\(\i\){.+?{attachments:(\i).+?;/,
+                    replace: (m, attachments) => `${m}${attachments}=$self.filterAttachments(${attachments});`
+                }
+            ]
         },
         {
-            find: ".Messages.STICKER_POPOUT_UNJOINED_PRIVATE_GUILD_DESCRIPTION.format",
+            find: "#{intl::STICKER_POPOUT_UNJOINED_PRIVATE_GUILD_DESCRIPTION}",
             predicate: () => settings.store.transformStickers,
             replacement: [
                 {
@@ -473,7 +450,7 @@ export default definePlugin({
             },
         },
         {
-            find: ".Messages.EMOJI_POPOUT_UNJOINED_DISCOVERABLE_GUILD_DESCRIPTION",
+            find: "#{intl::EMOJI_POPOUT_UNJOINED_DISCOVERABLE_GUILD_DESCRIPTION}",
             predicate: () => settings.store.transformEmojis,
             replacement: {
                 // Add the fake nitro emoji notice
@@ -582,11 +559,11 @@ export default definePlugin({
         const newAppearanceProto =
             currentAppearanceSettings != null
                 ? AppearanceSettingsActionCreators.fromBinary(
-                      AppearanceSettingsActionCreators.toBinary(
-                          currentAppearanceSettings,
-                      ),
-                      BINARY_READ_OPTIONS,
-                  )
+                    AppearanceSettingsActionCreators.toBinary(
+                        currentAppearanceSettings,
+                    ),
+                    BINARY_READ_OPTIONS,
+                )
                 : AppearanceSettingsActionCreators.create();
 
         newAppearanceProto.theme = theme;
@@ -668,7 +645,7 @@ export default definePlugin({
                     let url: URL | null = null;
                     try {
                         url = new URL(child.props.href);
-                    } catch {}
+                    } catch { }
 
                     const emojiName =
                         EmojiStore.getCustomEmojiById(fakeNitroMatch[1])
@@ -804,7 +781,7 @@ export default definePlugin({
                 let url: URL | null = null;
                 try {
                     url = new URL(item);
-                } catch {}
+                } catch { }
 
                 const stickerName =
                     StickerStore.getStickerById(imgMatch[1])?.name ??
@@ -1149,13 +1126,7 @@ export default definePlugin({
 
                         const emojiString = `<${emoji.animated ? "a" : ""}:${emoji.originalName || emoji.name}:${emoji.id}>`;
 
-                        const url = new URL(
-                            IconUtils.getEmojiURL({
-                                id: emoji.id,
-                                animated: emoji.animated,
-                                size: s.emojiSize,
-                            }),
-                        );
+                        const url = new URL(getEmojiURL(emoji.id, emoji.animated, s.emojiSize));
                         url.searchParams.set("size", s.emojiSize.toString());
                         url.searchParams.set("name", emoji.name);
 
@@ -1201,13 +1172,7 @@ export default definePlugin({
 
                     hasBypass = true;
 
-                    const url = new URL(
-                        IconUtils.getEmojiURL({
-                            id: emoji.id,
-                            animated: emoji.animated,
-                            size: s.emojiSize,
-                        }),
-                    );
+                    const url = new URL(getEmojiURL(emoji.id, emoji.animated, s.emojiSize));
                     url.searchParams.set("size", s.emojiSize.toString());
                     url.searchParams.set("name", emoji.name);
 

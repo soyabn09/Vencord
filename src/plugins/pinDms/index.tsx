@@ -46,7 +46,7 @@ const headerClasses = findByPropsLazy("privateChannelsHeaderContainer");
 
 export const PrivateChannelSortStore = findStoreLazy(
     "PrivateChannelSortStore",
-) as { getPrivateChannelIds: () => string[] };
+) as { getPrivateChannelIds: () => string[]; };
 
 export let instance: any;
 export const forceUpdate = () => instance?.props?._forceUpdate?.();
@@ -96,9 +96,8 @@ export default definePlugin({
             replacement: [
                 {
                     // Filter out pinned channels from the private channel list
-                    match: /(?<=\i,{channels:\i,)privateChannelIds:(\i)/,
-                    replace:
-                        "privateChannelIds:$1.filter(c=>!$self.isPinned(c))",
+                    match: /(?<=channels:\i,)privateChannelIds:(\i)(?=,listRef:)/,
+                    replace: "privateChannelIds:$1.filter(c=>!$self.isPinned(c))"
                 },
                 {
                     // Insert the pinned channels to sections
@@ -124,8 +123,8 @@ export default definePlugin({
 
                 // Fix Row Height
                 {
-                    match: /(?<="getRowHeight",.{1,100}return 1===)\i/,
-                    replace: "($&-$self.categoryLen())",
+                    match: /(\.startsWith\("section-divider"\).+?return 1===)(\i)/,
+                    replace: "$1($2-$self.categoryLen())"
                 },
                 {
                     match: /"getRowHeight",\((\i),(\i)\)=>{/,
@@ -198,7 +197,7 @@ export default definePlugin({
     getAllUncollapsedChannels,
     requireSettingsMenu,
 
-    makeProps(instance, { sections }: { sections: number[] }) {
+    makeProps(instance, { sections }: { sections: number[]; }) {
         this._instance = instance;
         this.sections = sections;
 
@@ -285,7 +284,7 @@ export default definePlugin({
         return (
             category.collapsed &&
             this.instance.props.selectedChannelId !==
-                this.getCategoryChannels(category)[channelIndex]
+            this.getCategoryChannels(category)[channelIndex]
         );
     },
 
@@ -305,14 +304,14 @@ export default definePlugin({
 
         return (
             rowHeight *
-                (this.getAllUncollapsedChannels().indexOf(channelId) +
-                    preRenderedChildren) +
+            (this.getAllUncollapsedChannels().indexOf(channelId) +
+                preRenderedChildren) +
             padding
         );
     },
 
     renderCategory: ErrorBoundary.wrap(
-        ({ section }: { section: number }) => {
+        ({ section }: { section: number; }) => {
             const category = categories[section - 1];
 
             if (!category) return null;
@@ -360,32 +359,32 @@ export default definePlugin({
                                             category.id,
                                             -1,
                                         ) && (
-                                            <Menu.MenuItem
-                                                id="vc-pindms-move-category-up"
-                                                label="Move Up"
-                                                action={() =>
-                                                    moveCategory(
-                                                        category.id,
-                                                        -1,
-                                                    ).then(() => forceUpdate())
-                                                }
-                                            />
-                                        )}
+                                                <Menu.MenuItem
+                                                    id="vc-pindms-move-category-up"
+                                                    label="Move Up"
+                                                    action={() =>
+                                                        moveCategory(
+                                                            category.id,
+                                                            -1,
+                                                        ).then(() => forceUpdate())
+                                                    }
+                                                />
+                                            )}
                                         {canMoveCategoryInDirection(
                                             category.id,
                                             1,
                                         ) && (
-                                            <Menu.MenuItem
-                                                id="vc-pindms-move-category-down"
-                                                label="Move Down"
-                                                action={() =>
-                                                    moveCategory(
-                                                        category.id,
-                                                        1,
-                                                    ).then(() => forceUpdate())
-                                                }
-                                            />
-                                        )}
+                                                <Menu.MenuItem
+                                                    id="vc-pindms-move-category-down"
+                                                    label="Move Down"
+                                                    action={() =>
+                                                        moveCategory(
+                                                            category.id,
+                                                            1,
+                                                        ).then(() => forceUpdate())
+                                                    }
+                                                />
+                                            )}
                                     </>
                                 )}
 

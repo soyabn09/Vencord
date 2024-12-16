@@ -19,11 +19,7 @@
 import * as DataStore from "@api/DataStore";
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
-import {
-    ChannelRouter,
-    SelectedChannelStore,
-    SelectedGuildStore,
-} from "@webpack/common";
+import { ChannelRouter, ChannelStore, NavigationRouter, SelectedChannelStore, SelectedGuildStore } from "@webpack/common";
 
 export interface LogoutEvent {
     type: "LOGOUT";
@@ -50,6 +46,16 @@ export default definePlugin({
         "Attempt to navigate to the channel you were in before switching accounts or loading Discord.",
     authors: [Devs.Nuckyz],
 
+    patches: [
+        {
+            find: '"Switching accounts"',
+            replacement: {
+                match: /goHomeAfterSwitching:\i/,
+                replace: "goHomeAfterSwitching:!1"
+            }
+        }
+    ],
+
     flux: {
         LOGOUT(e: LogoutEvent) {
             ({ isSwitchingAccount } = e);
@@ -60,7 +66,11 @@ export default definePlugin({
             isSwitchingAccount = false;
 
             if (previousCache?.channelId) {
-                ChannelRouter.transitionToChannel(previousCache.channelId);
+                if (ChannelStore.hasChannel(previousCache.channelId)) {
+                    ChannelRouter.transitionToChannel(previousCache.channelId);
+                } else {
+                    NavigationRouter.transitionToGuild("@me");
+                }
             }
         },
 

@@ -50,13 +50,10 @@ import { AvatarDecorationModalPreview } from "../components";
 
 const FileUpload = findComponentByCodeLazy("fileUploadInput,");
 
-const { HelpMessage, HelpMessageTypes } = mapMangledModuleLazy(
-    'POSITIVE=3]="POSITIVE',
-    {
-        HelpMessageTypes: filters.byProps("POSITIVE", "WARNING"),
-        HelpMessage: filters.byCode(".iconDiv"),
-    },
-);
+const { HelpMessage, HelpMessageTypes } = mapMangledModuleLazy('POSITIVE=3]="POSITIVE', {
+    HelpMessageTypes: filters.byProps("POSITIVE", "WARNING", "INFO"),
+    HelpMessage: filters.byCode(".iconDiv")
+});
 
 function useObjectURL(object: Blob | MediaSource | null) {
     const [url, setUrl] = useState<string | null>(null);
@@ -180,27 +177,21 @@ function CreateDecorationModal(props: ModalProps) {
                             />
                         </div>
                     </div>
-                    <Forms.FormText
-                        type="description"
-                        className={Margins.bottom16}
-                    >
-                        <br />
-                        You can receive updates on your decoration's review by
-                        joining{" "}
-                        <Link
-                            href={`https://discord.gg/${INVITE_KEY}`}
-                            onClick={async (e) => {
-                                e.preventDefault();
-                                if (!GuildStore.getGuild(GUILD_ID)) {
-                                    const inviteAccepted =
-                                        await openInviteModal(INVITE_KEY);
-                                    if (inviteAccepted) {
-                                        closeAllModals();
-                                        FluxDispatcher.dispatch({
-                                            type: "LAYER_POP_ALL",
-                                        });
-                                    }
-                                } else {
+                    <div>
+                        <AvatarDecorationModalPreview
+                            avatarDecorationOverride={decoration}
+                            user={UserStore.getCurrentUser()}
+                        />
+                    </div>
+                </div>
+                <HelpMessage messageType={HelpMessageTypes.INFO} className={Margins.bottom8}>
+                    To receive updates on your decoration's review, join <Link
+                        href={`https://discord.gg/${INVITE_KEY}`}
+                        onClick={async e => {
+                            e.preventDefault();
+                            if (!GuildStore.getGuild(GUILD_ID)) {
+                                const inviteAccepted = await openInviteModal(INVITE_KEY);
+                                if (inviteAccepted) {
                                     closeAllModals();
                                     FluxDispatcher.dispatch({
                                         type: "LAYER_POP_ALL",
@@ -209,40 +200,39 @@ function CreateDecorationModal(props: ModalProps) {
                                         GUILD_ID,
                                     );
                                 }
-                            }}
-                        >
-                            Decor's Discord server
-                        </Link>
-                        .
-                    </Forms.FormText>
-                </ErrorBoundary>
-            </ModalContent>
-            <ModalFooter className={cl("modal-footer")}>
-                <Button
-                    onClick={() => {
-                        setSubmitting(true);
-                        createDecoration({ alt: name, file: file! })
-                            .then(props.onClose)
-                            .catch((e) => {
-                                setSubmitting(false);
-                                setError(e);
-                            });
-                    }}
-                    disabled={!file || !name}
-                    submitting={submitting}
-                >
-                    Submit for Review
-                </Button>
-                <Button
-                    onClick={props.onClose}
-                    color={Button.Colors.PRIMARY}
-                    look={Button.Looks.LINK}
-                >
-                    Cancel
-                </Button>
-            </ModalFooter>
-        </ModalRoot>
-    );
+                            } else {
+                                closeAllModals();
+                                FluxDispatcher.dispatch({ type: "LAYER_POP_ALL" });
+                                NavigationRouter.transitionToGuild(GUILD_ID);
+                            }
+                        }}
+                    >
+                        Decor's Discord server
+                    </Link> and allow direct messages.
+                </HelpMessage>
+            </ErrorBoundary>
+        </ModalContent>
+        <ModalFooter className={cl("modal-footer")}>
+            <Button
+                onClick={() => {
+                    setSubmitting(true);
+                    createDecoration({ alt: name, file: file! })
+                        .then(props.onClose).catch(e => { setSubmitting(false); setError(e); });
+                }}
+                disabled={!file || !name}
+                submitting={submitting}
+            >
+                Submit for Review
+            </Button>
+            <Button
+                onClick={props.onClose}
+                color={Button.Colors.PRIMARY}
+                look={Button.Looks.LINK}
+            >
+                Cancel
+            </Button>
+        </ModalFooter>
+    </ModalRoot >;
 }
 
 export const openCreateDecorationModal = () =>

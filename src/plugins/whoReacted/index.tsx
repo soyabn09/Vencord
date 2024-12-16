@@ -133,9 +133,9 @@ export default definePlugin({
         {
             find: '"MessageReactionsStore"',
             replacement: {
-                match: /(?<=CONNECTION_OPEN:function\(\){)(\i)={}/,
-                replace: "$&;$self.reactions=$1",
-            },
+                match: /function (\i)\(\){(\i)={}(?=.*CONNECTION_OPEN:\1)/,
+                replace: "$&;$self.reactions=$2;"
+            }
         },
         {
             find: "cleanAutomaticAnchor(){",

@@ -38,24 +38,20 @@ export default definePlugin({
     description: "Sorts friend requests by date of receipt",
     settings,
 
-    patches: [
-        {
-            find: "getRelationshipCounts(){",
-            replacement: {
-                match: /\}\)\.sortBy\((.+?)\)\.value\(\)/,
-                replace: "}).sortBy(row => $self.wrapSort(($1), row)).value()",
-            },
-        },
-        {
-            find: ".Messages.FRIEND_REQUEST_CANCEL",
-            replacement: {
-                predicate: () => settings.store.showDates,
-                match: /subText:(\i)(?<=user:(\i).+?)/,
-                replace: (_, subtext, user) =>
-                    `subText:$self.makeSubtext(${subtext},${user})`,
-            },
-        },
-    ],
+    patches: [{
+        find: "getRelationshipCounts(){",
+        replacement: {
+            match: /\}\)\.sortBy\((.+?)\)\.value\(\)/,
+            replace: "}).sortBy(row => $self.wrapSort(($1), row)).value()"
+        }
+    }, {
+        find: "#{intl::FRIEND_REQUEST_CANCEL}",
+        replacement: {
+            predicate: () => settings.store.showDates,
+            match: /subText:(\i)(?<=user:(\i).+?)/,
+            replace: (_, subtext, user) => `subText:$self.makeSubtext(${subtext},${user})`
+        }
+    }],
 
     wrapSort(comparator: Function, row: any) {
         return row.type === 3 || row.type === 4

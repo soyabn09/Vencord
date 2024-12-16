@@ -197,10 +197,10 @@ async function printReport() {
                         title: "Discord Errors",
                         description: report.otherErrors.length
                             ? toCodeBlock(
-                                  report.otherErrors.join("\n"),
-                                  0,
-                                  true,
-                              )
+                                report.otherErrors.join("\n"),
+                                0,
+                                true,
+                            )
                             : "None",
                         color: report.otherErrors.length ? 0xff0000 : 0x00ff00,
                     },
@@ -259,8 +259,8 @@ page.on("console", async (e) => {
                     plugin,
                     type,
                     id,
-                    match: regex.replace(/\[A-Za-z_\$\]\[\\w\$\]\*/g, "\\i"),
-                    error: await maybeGetError(e.args()[3]),
+                    match: regex.replace(/\(\?:\[A-Za-z_\$\]\[\\w\$\]\*\)/g, "\\i"),
+                    error: await maybeGetError(e.args()[3])
                 });
 
                 break;

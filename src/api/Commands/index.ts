@@ -132,6 +132,7 @@ function registerSubCommands(cmd: Command, plugin: string) {
         const subCmd = {
             ...cmd,
             ...o,
+            options: o.options !== undefined ? o.options : undefined,
             type: ApplicationCommandType.CHAT_INPUT,
             name: `${cmd.name} ${o.name}`,
             id: `${o.name}-${cmd.id}`,
