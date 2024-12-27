@@ -45,8 +45,8 @@ interface ChannelComponentProps {
 const headerClasses = findByPropsLazy("privateChannelsHeaderContainer");
 
 export const PrivateChannelSortStore = findStoreLazy(
-    "PrivateChannelSortStore",
-) as { getPrivateChannelIds: () => string[]; };
+    "PrivateChannelSortStore"
+) as { getPrivateChannelIds: () => string[] };
 
 export let instance: any;
 export const forceUpdate = () => instance?.props?._forceUpdate?.();
@@ -97,7 +97,8 @@ export default definePlugin({
                 {
                     // Filter out pinned channels from the private channel list
                     match: /(?<=channels:\i,)privateChannelIds:(\i)(?=,listRef:)/,
-                    replace: "privateChannelIds:$1.filter(c=>!$self.isPinned(c))"
+                    replace:
+                        "privateChannelIds:$1.filter(c=>!$self.isPinned(c))",
                 },
                 {
                     // Insert the pinned channels to sections
@@ -124,7 +125,7 @@ export default definePlugin({
                 // Fix Row Height
                 {
                     match: /(\.startsWith\("section-divider"\).+?return 1===)(\i)/,
-                    replace: "$1($2-$self.categoryLen())"
+                    replace: "$1($2-$self.categoryLen())",
                 },
                 {
                     match: /"getRowHeight",\((\i),(\i)\)=>{/,
@@ -150,7 +151,7 @@ export default definePlugin({
         {
             find: '.FRIENDS},"friends"',
             replacement: {
-                match: /(?<=\i=\i=>{).{1,100}premiumTabSelected.{1,800}showDMHeader:.+?,/,
+                match: /(?<=\i=\i=>{).{1,100}premiumTabSelected.{0,950}showDMHeader:.+?,/,
                 replace:
                     "let forceUpdate = Vencord.Util.useForceUpdater();$&_forceUpdate:forceUpdate,",
             },
@@ -197,7 +198,7 @@ export default definePlugin({
     getAllUncollapsedChannels,
     requireSettingsMenu,
 
-    makeProps(instance, { sections }: { sections: number[]; }) {
+    makeProps(instance, { sections }: { sections: number[] }) {
         this._instance = instance;
         this.sections = sections;
 
@@ -284,7 +285,7 @@ export default definePlugin({
         return (
             category.collapsed &&
             this.instance.props.selectedChannelId !==
-            this.getCategoryChannels(category)[channelIndex]
+                this.getCategoryChannels(category)[channelIndex]
         );
     },
 
@@ -293,7 +294,7 @@ export default definePlugin({
         rowHeight: number,
         padding: number,
         preRenderedChildren: number,
-        originalOffset: number,
+        originalOffset: number
     ) {
         if (!isPinned(channelId))
             return (
@@ -304,14 +305,14 @@ export default definePlugin({
 
         return (
             rowHeight *
-            (this.getAllUncollapsedChannels().indexOf(channelId) +
-                preRenderedChildren) +
+                (this.getAllUncollapsedChannels().indexOf(channelId) +
+                    preRenderedChildren) +
             padding
         );
     },
 
     renderCategory: ErrorBoundary.wrap(
-        ({ section }: { section: number; }) => {
+        ({ section }: { section: number }) => {
             const category = categories[section - 1];
 
             if (!category) return null;
@@ -321,15 +322,17 @@ export default definePlugin({
                     className={classes(
                         headerClasses.privateChannelsHeaderContainer,
                         "vc-pindms-section-container",
-                        category.collapsed ? "vc-pindms-collapsed" : "",
+                        category.collapsed ? "vc-pindms-collapsed" : ""
                     )}
                     style={{
-                        color: `#${category.color.toString(16).padStart(6, "0")}`,
+                        color: `#${category.color
+                            .toString(16)
+                            .padStart(6, "0")}`,
                     }}
                     onClick={async () => {
                         await collapseCategory(
                             category.id,
-                            !category.collapsed,
+                            !category.collapsed
                         );
                         forceUpdate();
                     }}
@@ -357,34 +360,34 @@ export default definePlugin({
                                     <>
                                         {canMoveCategoryInDirection(
                                             category.id,
-                                            -1,
+                                            -1
                                         ) && (
-                                                <Menu.MenuItem
-                                                    id="vc-pindms-move-category-up"
-                                                    label="Move Up"
-                                                    action={() =>
-                                                        moveCategory(
-                                                            category.id,
-                                                            -1,
-                                                        ).then(() => forceUpdate())
-                                                    }
-                                                />
-                                            )}
+                                            <Menu.MenuItem
+                                                id="vc-pindms-move-category-up"
+                                                label="Move Up"
+                                                action={() =>
+                                                    moveCategory(
+                                                        category.id,
+                                                        -1
+                                                    ).then(() => forceUpdate())
+                                                }
+                                            />
+                                        )}
                                         {canMoveCategoryInDirection(
                                             category.id,
-                                            1,
+                                            1
                                         ) && (
-                                                <Menu.MenuItem
-                                                    id="vc-pindms-move-category-down"
-                                                    label="Move Down"
-                                                    action={() =>
-                                                        moveCategory(
-                                                            category.id,
-                                                            1,
-                                                        ).then(() => forceUpdate())
-                                                    }
-                                                />
-                                            )}
+                                            <Menu.MenuItem
+                                                id="vc-pindms-move-category-down"
+                                                label="Move Down"
+                                                action={() =>
+                                                    moveCategory(
+                                                        category.id,
+                                                        1
+                                                    ).then(() => forceUpdate())
+                                                }
+                                            />
+                                        )}
                                     </>
                                 )}
 
@@ -395,7 +398,7 @@ export default definePlugin({
                                     label="Delete Category"
                                     action={() =>
                                         removeCategory(category.id).then(() =>
-                                            forceUpdate(),
+                                            forceUpdate()
                                         )
                                     }
                                 />
@@ -424,20 +427,20 @@ export default definePlugin({
                 </h2>
             );
         },
-        { noop: true },
+        { noop: true }
     ),
 
     renderChannel(
         sectionIndex: number,
         index: number,
-        ChannelComponent: React.ComponentType<ChannelComponentProps>,
+        ChannelComponent: React.ComponentType<ChannelComponentProps>
     ) {
         return ErrorBoundary.wrap(
             () => {
                 const { channel, category } = this.getChannel(
                     sectionIndex,
                     index,
-                    this.instance.props.channels,
+                    this.instance.props.channels
                 );
 
                 if (!channel || !category) return null;
@@ -454,14 +457,14 @@ export default definePlugin({
                     </ChannelComponent>
                 );
             },
-            { noop: true },
+            { noop: true }
         );
     },
 
     getChannel(
         sectionIndex: number,
         index: number,
-        channels: Record<string, Channel>,
+        channels: Record<string, Channel>
     ) {
         const category = categories[sectionIndex - 1];
         if (!category) return { channel: null, category: null };
@@ -476,7 +479,7 @@ export default definePlugin({
 
         if (settings.store.pinOrder === PinOrder.LastMessage) {
             return PrivateChannelSortStore.getPrivateChannelIds().filter((c) =>
-                category.channels.includes(c),
+                category.channels.includes(c)
             );
         }
 
