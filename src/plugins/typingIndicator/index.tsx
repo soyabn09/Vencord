@@ -71,10 +71,6 @@ function TypingIndicator({ channelId, guildId }: { channelId: string; guildId: s
             );
         },
     );
-    const currentChannelId: string = useStateFromStores(
-        [SelectedChannelStore],
-        () => SelectedChannelStore.getChannelId(),
-    );
     const currentChannelId: string = useStateFromStores([SelectedChannelStore], () => SelectedChannelStore.getChannelId());
 
     if (!settings.store.includeMutedChannels) {

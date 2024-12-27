@@ -9,20 +9,12 @@ import "./ChatButton.css";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Logger } from "@utils/Logger";
 import { waitFor } from "@webpack";
-import {
-    Button,
-    ButtonLooks,
-    ButtonWrapperClasses,
-    Tooltip,
-} from "@webpack/common";
+import { Button, ButtonLooks, ButtonWrapperClasses, Tooltip } from "@webpack/common";
 import { Channel } from "discord-types/general";
 import { HTMLProps, MouseEventHandler, ReactNode } from "react";
 
 let ChannelTextAreaClasses: Record<"button" | "buttonContainer", string>;
-waitFor(
-    ["buttonContainer", "channelTextArea"],
-    (m) => (ChannelTextAreaClasses = m),
-);
+waitFor(["buttonContainer", "channelTextArea"], m => ChannelTextAreaClasses = m);
 
 export interface ChatBarProps {
     channel: Channel;
@@ -32,59 +24,57 @@ export interface ChatBarProps {
         analyticsName: string;
         attachments: boolean;
         autocomplete: {
-            addReactionShortcut: boolean;
-            forceChatLayer: boolean;
+            addReactionShortcut: boolean,
+            forceChatLayer: boolean,
             reactions: boolean;
-        };
+        },
         commands: {
             enabled: boolean;
-        };
+        },
         drafts: {
-            type: number;
-            commandType: number;
+            type: number,
+            commandType: number,
             autoSave: boolean;
-        };
+        },
         emojis: {
             button: boolean;
-        };
+        },
         gifs: {
-            button: boolean;
+            button: boolean,
             allowSending: boolean;
-        };
+        },
         gifts: {
             button: boolean;
-        };
+        },
         permissions: {
             requireSendMessages: boolean;
-        };
-        showThreadPromptOnReply: boolean;
+        },
+        showThreadPromptOnReply: boolean,
         stickers: {
-            button: boolean;
-            allowSending: boolean;
+            button: boolean,
+            allowSending: boolean,
             autoSuggest: boolean;
-        };
+        },
         users: {
             allowMentioning: boolean;
-        };
+        },
         submit: {
-            button: boolean;
-            ignorePreference: boolean;
-            disableEnterToSubmit: boolean;
-            clearOnSubmit: boolean;
+            button: boolean,
+            ignorePreference: boolean,
+            disableEnterToSubmit: boolean,
+            clearOnSubmit: boolean,
             useDisabledStylesOnSubmit: boolean;
-        };
-        uploadLongMessages: boolean;
+        },
+        uploadLongMessages: boolean,
         upsellLongMessages: {
             iconOnly: boolean;
-        };
-        showCharacterCount: boolean;
+        },
+        showCharacterCount: boolean,
         sedReplace: boolean;
     };
 }
 
-export type ChatBarButton = (
-    props: ChatBarProps & { isMainChat: boolean; },
-) => JSX.Element | null;
+export type ChatBarButton = (props: ChatBarProps & { isMainChat: boolean; }) => JSX.Element | null;
 
 const buttonFactories = new Map<string, ChatBarButton>();
 const logger = new Logger("ChatButtons");
@@ -94,24 +84,14 @@ export function _injectButtons(buttons: ReactNode[], props: ChatBarProps) {
 
     for (const [key, Button] of buttonFactories) {
         buttons.push(
-            <ErrorBoundary
-                noop
-                key={key}
-                onError={(e) =>
-                    logger.error(`Failed to render ${key}`, e.error)
-                }
-            >
-                <Button
-                    {...props}
-                    isMainChat={props.type.analyticsName === "normal"}
-                />
-            </ErrorBoundary>,
+            <ErrorBoundary noop key={key} onError={e => logger.error(`Failed to render ${key}`, e.error)}>
+                <Button {...props} isMainChat={props.type.analyticsName === "normal"} />
+            </ErrorBoundary>
         );
     }
 }
 
-export const addChatBarButton = (id: string, button: ChatBarButton) =>
-    buttonFactories.set(id, button);
+export const addChatBarButton = (id: string, button: ChatBarButton) => buttonFactories.set(id, button);
 export const removeChatBarButton = (id: string) => buttonFactories.delete(id);
 
 export interface ChatBarButtonProps {
@@ -139,25 +119,12 @@ export const ChatBarButton = ErrorBoundary.wrap((props: ChatBarButtonProps) => {
                         onAuxClick={props.onAuxClick}
                         {...props.buttonProps}
                     >
-                        <Button
-                            aria-label={props.tooltip}
-                            size=""
-                            look={ButtonLooks.BLANK}
-                            onMouseEnter={onMouseEnter}
-                            onMouseLeave={onMouseLeave}
-                            innerClassName={`${ButtonWrapperClasses.button} ${ChannelTextAreaClasses?.button}`}
-                            onClick={props.onClick}
-                            onContextMenu={props.onContextMenu}
-                            {...props.buttonProps}
-                        >
-                            <div className={ButtonWrapperClasses.buttonWrapper}>
-                                {props.children}
-                            </div>
-                        </Button>
+                        <div className={ButtonWrapperClasses.buttonWrapper}>
+                            {props.children}
+                        </div>
+                    </Button>
                 </div>
             )}
         </Tooltip>
     );
-},
-    { noop: true },
-);
+}, { noop: true });
