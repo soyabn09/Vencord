@@ -62,7 +62,7 @@ const UrlReplacementRules: Record<string, URLReplacementRule> = {
         description: "Open Tidal links in the Tidal app",
     },
     itunes: {
-        match: /^https:\/\/music\.apple\.com\/([a-z]{2}\/)?(album|artist|playlist|song|curator)\/([^/?#]+)\/?([^/?#]+)?(?:\?.*)?(?:#.*)?$/,
+        match: /^https:\/\/(?:geo\.)?music\.apple\.com\/([a-z]{2}\/)?(album|artist|playlist|song|curator)\/([^/?#]+)\/?([^/?#]+)?(?:\?.*)?(?:#.*)?$/,
         replace: (_, lang, type, name, id) =>
             id
                 ? `itunes://music.apple.com/us/${type}/${name}/${id}`
@@ -79,7 +79,7 @@ const pluginSettings = definePluginSettings(
             default: true,
         };
         return acc;
-    }, {} as SettingsDefinition),
+    }, {} as SettingsDefinition)
 );
 
 const Native = VencordNative.pluginHelpers.OpenInApp as PluginNative<
@@ -97,8 +97,9 @@ export default definePlugin({
             find: "trackAnnouncementMessageLinkClicked({",
             replacement: {
                 match: /function (\i\(\i,\i\)\{)(?=.{0,150}trusted:)/,
-                replace: "async function $1 if(await $self.handleLink(...arguments)) return;"
-            }
+                replace:
+                    "async function $1 if(await $self.handleLink(...arguments)) return;",
+            },
         },
         {
             find: "no artist ids in metadata",
@@ -125,7 +126,7 @@ export default definePlugin({
         },
     ],
 
-    async handleLink(data: { href: string; }, event?: MouseEvent) {
+    async handleLink(data: { href: string }, event?: MouseEvent) {
         if (!data) return false;
 
         let url = data.href;

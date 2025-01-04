@@ -22,6 +22,7 @@ import definePlugin, { OptionType } from "@utils/types";
 import { findByPropsLazy } from "@webpack";
 import {
     ChannelStore,
+    ComponentDispatch,
     FluxDispatcher as Dispatcher,
     MessageStore,
     PermissionsBits,
@@ -68,24 +69,24 @@ export default definePlugin({
     settings,
 
     start() {
-        Dispatcher.subscribe("DELETE_PENDING_REPLY", onDeletePendingReply);
-        Dispatcher.subscribe("MESSAGE_END_EDIT", onEndEdit);
-        Dispatcher.subscribe("MESSAGE_START_EDIT", onStartEdit);
-        Dispatcher.subscribe("CREATE_PENDING_REPLY", onCreatePendingReply);
         document.addEventListener("keydown", onKeydown);
     },
 
     stop() {
-        Dispatcher.unsubscribe("DELETE_PENDING_REPLY", onDeletePendingReply);
-        Dispatcher.unsubscribe("MESSAGE_END_EDIT", onEndEdit);
-        Dispatcher.unsubscribe("MESSAGE_START_EDIT", onStartEdit);
-        Dispatcher.unsubscribe("CREATE_PENDING_REPLY", onCreatePendingReply);
         document.removeEventListener("keydown", onKeydown);
     },
-});
 
-const onDeletePendingReply = () => (replyIdx = -1);
-const onEndEdit = () => (editIdx = -1);
+    flux: {
+        DELETE_PENDING_REPLY() {
+            replyIdx = -1;
+        },
+        MESSAGE_END_EDIT() {
+            editIdx = -1;
+        },
+        MESSAGE_START_EDIT: onStartEdit,
+        CREATE_PENDING_REPLY: onCreatePendingReply,
+    },
+});
 
 function calculateIdx(messages: Message[], id: string) {
     const idx = messages.findIndex((m) => m.id === id);
@@ -98,7 +99,7 @@ function onStartEdit({ channelId, messageId, _isQuickEdit }: any) {
     const meId = UserStore.getCurrentUser().id;
 
     const messages = MessageStore.getMessages(channelId)._array.filter(
-        (m) => m.author.id === meId,
+        (m) => m.author.id === meId
     );
     editIdx = calculateIdx(messages, messageId);
 }
@@ -114,7 +115,7 @@ function onCreatePendingReply({
 
     replyIdx = calculateIdx(
         MessageStore.getMessages(message.channel_id)._array,
-        message.id,
+        message.id
     );
 }
 
@@ -126,6 +127,8 @@ function onKeydown(e: KeyboardEvent) {
     if (!isUp && e.key !== "ArrowDown") return;
     if (!isCtrl(e) || isAltOrMeta(e)) return;
 
+    e.preventDefault();
+
     if (e.shiftKey) nextEdit(isUp);
     else nextReply(isUp);
 }
@@ -136,7 +139,7 @@ function jumpIfOffScreen(channelId: string, messageId: string) {
 
     const vh = Math.max(
         document.documentElement.clientHeight,
-        window.innerHeight,
+        window.innerHeight
     );
     const rect = element.getBoundingClientRect();
     const isOffscreen = rect.bottom < 200 || rect.top - vh >= -200;
@@ -162,7 +165,7 @@ function getNextMessage(isUp: boolean, isReply: boolean) {
 
     if (Vencord.Plugins.isPluginEnabled("NoBlockedMessages")) {
         messages = messages.filter(
-            (m) => !RelationshipStore.isBlocked(m.author.id),
+            (m) => !RelationshipStore.isBlocked(m.author.id)
         );
     }
 
@@ -205,7 +208,7 @@ function shouldMention(message) {
 // handle next/prev reply
 function nextReply(isUp: boolean) {
     const currChannel = ChannelStore.getChannel(
-        SelectedChannelStore.getChannelId(),
+        SelectedChannelStore.getChannelId()
     );
     if (
         currChannel.guild_id &&
@@ -227,17 +230,17 @@ function nextReply(isUp: boolean) {
         channel,
         message,
         shouldMention: shouldMention(message),
-        showMentionToggle:
-            channel.guild_id !== null && message.author.id !== meId,
+        showMentionToggle: channel.isPrivate() && message.author.id !== meId,
         _isQuickReply: true,
     });
+    ComponentDispatch.dispatchToLastSubscribed("TEXTAREA_FOCUS");
     jumpIfOffScreen(channel.id, message.id);
 }
 
 // handle next/prev edit
 function nextEdit(isUp: boolean) {
     const currChannel = ChannelStore.getChannel(
-        SelectedChannelStore.getChannelId(),
+        SelectedChannelStore.getChannelId()
     );
     if (
         currChannel.guild_id &&
