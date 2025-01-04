@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import ErrorBoundary from "@components/ErrorBoundary";
 import { getIntlMessage } from "@utils/discord";
@@ -36,17 +36,15 @@ interface UserPermission {
 
 type UserPermissions = Array<UserPermission>;
 
-const { RoleRootClasses, RoleClasses, RoleBorderClasses } = proxyLazyWebpack(
-    () => {
-        const [RoleRootClasses, RoleClasses, RoleBorderClasses] = findBulk(
-            filters.byProps("root", "expandButton", "collapseButton"),
-            filters.byProps("role", "roleCircle", "roleName"),
-            filters.byProps("roleCircle", "dot", "dotBorderColor"),
-        ) as Record<string, string>[];
+const { RoleRootClasses, RoleClasses, RoleBorderClasses } = proxyLazyWebpack(() => {
+    const [RoleRootClasses, RoleClasses, RoleBorderClasses] = findBulk(
+        filters.byProps("root", "expandButton", "collapseButton"),
+        filters.byProps("role", "roleCircle", "roleName"),
+        filters.byProps("roleCircle", "dot", "dotBorderColor")
+    ) as Record<string, string>[];
 
-        return { RoleRootClasses, RoleClasses, RoleBorderClasses };
-    },
-);
+    return { RoleRootClasses, RoleClasses, RoleBorderClasses };
+});
 
 interface FakeRoleProps extends React.HTMLAttributes<HTMLDivElement> {
     text: string;
@@ -58,10 +56,7 @@ function FakeRole({ text, color, ...props }: FakeRoleProps) {
         <div {...props} className={classes(RoleClasses.role)}>
             <div className={RoleClasses.roleRemoveButton}>
                 <span
-                    className={classes(
-                        RoleBorderClasses.roleCircle,
-                        RoleClasses.roleCircle,
-                    )}
+                    className={classes(RoleBorderClasses.roleCircle, RoleClasses.roleCircle)}
                     style={{ backgroundColor: color }}
                 />
             </div>
@@ -101,20 +96,15 @@ function UserPermissionsComponent({ guild, guildMember, closePopout }: { guild: 
 
         const userRoles = getSortedRoles(guild, guildMember);
 
-        const rolePermissions: Array<RoleOrUserPermission> = userRoles.map(
-            (role) => ({
-                type: PermissionType.Role,
-                ...role,
-            }),
-        );
+        const rolePermissions: Array<RoleOrUserPermission> = userRoles.map(role => ({
+            type: PermissionType.Role,
+            ...role
+        }));
 
         if (guild.ownerId === guildMember.userId) {
             rolePermissions.push({
                 type: PermissionType.Owner,
-                permissions: Object.values(PermissionsBits).reduce(
-                    (prev, curr) => prev | curr,
-                    0n,
-                ),
+                permissions: Object.values(PermissionsBits).reduce((prev, curr) => prev | curr, 0n)
             });
 
             const OWNER = getIntlMessage("GUILD_OWNER") ?? "Server Owner";
@@ -122,7 +112,7 @@ function UserPermissionsComponent({ guild, guildMember, closePopout }: { guild: 
                 permission: OWNER,
                 roleName: "Owner",
                 roleColor: "var(--primary-300)",
-                rolePosition: Infinity,
+                rolePosition: Infinity
             });
         }
 
@@ -135,7 +125,7 @@ function UserPermissionsComponent({ guild, guildMember, closePopout }: { guild: 
                         permission: guildPermissionSpecMap[String(bit)].title,
                         roleName: name,
                         roleColor: colorString || "var(--primary-300)",
-                        rolePosition: position,
+                        rolePosition: position
                     });
 
                     break;
@@ -160,28 +150,16 @@ function UserPermissionsComponent({ guild, guildMember, closePopout }: { guild: 
                             role="button"
                             tabIndex={0}
                             onClick={() => {
-                                settings.store.permissionsSortOrder =
-                                    permissionsSortOrder ===
-                                        PermissionsSortOrder.HighestRole
-                                        ? PermissionsSortOrder.LowestRole
-                                        : PermissionsSortOrder.HighestRole;
+                                settings.store.permissionsSortOrder = permissionsSortOrder === PermissionsSortOrder.HighestRole ? PermissionsSortOrder.LowestRole : PermissionsSortOrder.HighestRole;
                             }}
                         >
                             <svg
                                 width="24"
                                 height="24"
                                 viewBox="0 96 960 960"
-                                transform={
-                                    permissionsSortOrder ===
-                                        PermissionsSortOrder.HighestRole
-                                        ? "scale(1 1)"
-                                        : "scale(1 -1)"
-                                }
+                                transform={permissionsSortOrder === PermissionsSortOrder.HighestRole ? "scale(1 1)" : "scale(1 -1)"}
                             >
-                                <path
-                                    fill="var(--text-normal)"
-                                    d="M440 896V409L216 633l-56-57 320-320 320 320-56 57-224-224v487h-80Z"
-                                />
+                                <path fill="var(--text-normal)" d="M440 896V409L216 633l-56-57 320-320 320 320-56 57-224-224v487h-80Z" />
                             </svg>
                         </div>
                     )}

@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Logger } from "@utils/Logger";
 import { MessageStore } from "@webpack/common";
@@ -25,7 +25,7 @@ import type { Promisable } from "type-fest";
 const MessageEventsLogger = new Logger("MessageEvents", "#e5c890");
 
 export interface MessageObject {
-    content: string;
+    content: string,
     validNonShortcutEmojis: CustomEmoji[];
     invalidEmojis: any[];
     tts: boolean;
@@ -50,13 +50,7 @@ export interface Upload {
     sensitive: boolean;
     showLargeMessageDialog: boolean;
     spoiler: boolean;
-    status:
-        | "NOT_STARTED"
-        | "STARTED"
-        | "UPLOADING"
-        | "ERROR"
-        | "COMPLETED"
-        | "CANCELLED";
+    status: "NOT_STARTED" | "STARTED" | "UPLOADING" | "ERROR" | "COMPLETED" | "CANCELLED";
     uniqueId: string;
     uploadedFilename: string;
 }
@@ -79,26 +73,13 @@ export interface MessageExtra {
     openWarningPopout: (props: any) => any;
 }
 
-export type SendListener = (
-    channelId: string,
-    messageObj: MessageObject,
-    extra: MessageExtra,
-) => Promisable<void | { cancel: boolean }>;
-export type EditListener = (
-    channelId: string,
-    messageId: string,
-    messageObj: MessageObject,
-) => Promisable<void | { cancel: boolean }>;
+export type SendListener = (channelId: string, messageObj: MessageObject, extra: MessageExtra) => Promisable<void | { cancel: boolean; }>;
+export type EditListener = (channelId: string, messageId: string, messageObj: MessageObject) => Promisable<void | { cancel: boolean; }>;
 
 const sendListeners = new Set<SendListener>();
 const editListeners = new Set<EditListener>();
 
-export async function _handlePreSend(
-    channelId: string,
-    messageObj: MessageObject,
-    extra: MessageExtra,
-    replyOptions: MessageReplyOptions,
-) {
+export async function _handlePreSend(channelId: string, messageObj: MessageObject, extra: MessageExtra, replyOptions: MessageReplyOptions) {
     extra.replyOptions = replyOptions;
     for (const listener of sendListeners) {
         try {
@@ -107,20 +88,13 @@ export async function _handlePreSend(
                 return true;
             }
         } catch (e) {
-            MessageEventsLogger.error(
-                "MessageSendHandler: Listener encountered an unknown error\n",
-                e,
-            );
+            MessageEventsLogger.error("MessageSendHandler: Listener encountered an unknown error\n", e);
         }
     }
     return false;
 }
 
-export async function _handlePreEdit(
-    channelId: string,
-    messageId: string,
-    messageObj: MessageObject,
-) {
+export async function _handlePreEdit(channelId: string, messageId: string, messageObj: MessageObject) {
     for (const listener of editListeners) {
         try {
             const result = await listener(channelId, messageId, messageObj);
@@ -128,10 +102,7 @@ export async function _handlePreEdit(
                 return true;
             }
         } catch (e) {
-            MessageEventsLogger.error(
-                "MessageEditHandler: Listener encountered an unknown error\n",
-                e,
-            );
+            MessageEventsLogger.error("MessageEditHandler: Listener encountered an unknown error\n", e);
         }
     }
     return false;
@@ -158,30 +129,20 @@ export function removePreEditListener(listener: EditListener) {
     return editListeners.delete(listener);
 }
 
+
 // Message clicks
-type ClickListener = (
-    message: Message,
-    channel: Channel,
-    event: MouseEvent,
-) => void;
+type ClickListener = (message: Message, channel: Channel, event: MouseEvent) => void;
 
 const listeners = new Set<ClickListener>();
 
-export function _handleClick(
-    message: Message,
-    channel: Channel,
-    event: MouseEvent,
-) {
+export function _handleClick(message: Message, channel: Channel, event: MouseEvent) {
     // message object may be outdated, so (try to) fetch latest one
     message = MessageStore.getMessage(channel.id, message.id) ?? message;
     for (const listener of listeners) {
         try {
             listener(message, channel, event);
         } catch (e) {
-            MessageEventsLogger.error(
-                "MessageClickHandler: Listener encountered an unknown error\n",
-                e,
-            );
+            MessageEventsLogger.error("MessageClickHandler: Listener encountered an unknown error\n", e);
         }
     }
 }

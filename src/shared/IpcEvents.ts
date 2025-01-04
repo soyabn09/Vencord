@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 export const enum IpcEvents {
     QUICK_CSS_UPDATE = "VencordQuickCssUpdate",

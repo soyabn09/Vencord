@@ -33,10 +33,7 @@ export interface UserThemeHeader {
     invite?: string;
 }
 
-function makeHeader(
-    fileName: string,
-    opts: Partial<UserThemeHeader> = {},
-): UserThemeHeader {
+function makeHeader(fileName: string, opts: Partial<UserThemeHeader> = {}): UserThemeHeader {
     return {
         fileName,
         name: opts.name ?? fileName.replace(/\.css$/i, ""),
@@ -46,12 +43,12 @@ function makeHeader(
         license: opts.license,
         source: opts.source,
         website: opts.website,
-        invite: opts.invite,
+        invite: opts.invite
     };
 }
 
 export function stripBOM(fileContent: string) {
-    if (fileContent.charCodeAt(0) === 0xfeff) {
+    if (fileContent.charCodeAt(0) === 0xFEFF) {
         fileContent = fileContent.slice(1);
     }
     return fileContent;
@@ -73,9 +70,9 @@ export function getThemeInfo(css: string, fileName: string): UserThemeHeader {
             const l = line.indexOf(" ");
             field = line.substring(1, l);
             accum = line.substring(l + 1);
-        } else {
-            accum +=
-                " " + line.replace("\\n", "\n").replace(escapedAtRegex, "@");
+        }
+        else {
+            accum += " " + line.replace("\\n", "\n").replace(escapedAtRegex, "@");
         }
     }
     header[field] = accum.trim();

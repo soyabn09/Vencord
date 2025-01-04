@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { NavContextMenuPatchCallback } from "@api/ContextMenu";
 import { definePluginSettings } from "@api/Settings";
@@ -24,6 +24,7 @@ import { openImageModal } from "@utils/discord";
 import definePlugin, { OptionType } from "@utils/types";
 import { GuildMemberStore, IconUtils, Menu } from "@webpack/common";
 import type { Channel, Guild, User } from "discord-types/general";
+
 
 interface UserContextProps {
     channel: Channel;
@@ -42,13 +43,12 @@ interface GroupDMContextProps {
 const settings = definePluginSettings({
     format: {
         type: OptionType.SELECT,
-        description:
-            "Choose the image format to use for non animated images. Animated images will always use .gif",
+        description: "Choose the image format to use for non animated images. Animated images will always use .gif",
         options: [
             {
                 label: "webp",
                 value: "webp",
-                default: true,
+                default: true
             },
             {
                 label: "png",
@@ -57,18 +57,14 @@ const settings = definePluginSettings({
             {
                 label: "jpg",
                 value: "jpg",
-            },
-        ],
+            }
+        ]
     },
     imgSize: {
         type: OptionType.SELECT,
         description: "The image size to use",
-        options: ["128", "256", "512", "1024", "2048", "4096"].map((n) => ({
-            label: n,
-            value: n,
-            default: n === "1024",
-        })),
-    },
+        options: ["128", "256", "512", "1024", "2048", "4096"].map(n => ({ label: n, value: n, default: n === "1024" }))
+    }
 });
 
 const openAvatar = (url: string) => openImage(url, 512, 512);
@@ -93,17 +89,11 @@ function openImage(url: string, width: number, height?: number) {
     });
 }
 
-const UserContext: NavContextMenuPatchCallback = (
-    children,
-    { user, guildId }: UserContextProps,
-) => {
+const UserContext: NavContextMenuPatchCallback = (children, { user, guildId }: UserContextProps) => {
     if (!user) return;
-    const memberAvatar =
-        GuildMemberStore.getMember(guildId!, user.id)?.avatar || null;
+    const memberAvatar = GuildMemberStore.getMember(guildId!, user.id)?.avatar || null;
 
-    children.splice(
-        -1,
-        0,
+    children.splice(-1, 0, (
         <Menu.MenuGroup>
             <Menu.MenuItem
                 id="view-avatar"
@@ -124,22 +114,17 @@ const UserContext: NavContextMenuPatchCallback = (
                     icon={ImageIcon}
                 />
             )}
-        </Menu.MenuGroup>,
-    );
+        </Menu.MenuGroup>
+    ));
 };
 
-const GuildContext: NavContextMenuPatchCallback = (
-    children,
-    { guild }: GuildContextProps,
-) => {
+const GuildContext: NavContextMenuPatchCallback = (children, { guild }: GuildContextProps) => {
     if (!guild) return;
 
     const { id, icon, banner } = guild;
     if (!banner && !icon) return;
 
-    children.splice(
-        -1,
-        0,
+    children.splice(-1, 0, (
         <Menu.MenuGroup>
             {icon ? (
                 <Menu.MenuItem
@@ -165,19 +150,14 @@ const GuildContext: NavContextMenuPatchCallback = (
                     icon={ImageIcon}
                 />
             ) : null}
-        </Menu.MenuGroup>,
-    );
+        </Menu.MenuGroup>
+    ));
 };
 
-const GroupDMContext: NavContextMenuPatchCallback = (
-    children,
-    { channel }: GroupDMContextProps,
-) => {
+const GroupDMContext: NavContextMenuPatchCallback = (children, { channel }: GroupDMContextProps) => {
     if (!channel) return;
 
-    children.splice(
-        -1,
-        0,
+    children.splice(-1, 0, (
         <Menu.MenuGroup>
             <Menu.MenuItem
                 id="view-group-channel-icon"
@@ -187,15 +167,14 @@ const GroupDMContext: NavContextMenuPatchCallback = (
                 }
                 icon={ImageIcon}
             />
-        </Menu.MenuGroup>,
-    );
+        </Menu.MenuGroup>
+    ));
 };
 
 export default definePlugin({
     name: "ViewIcons",
     authors: [Devs.Ven, Devs.TheKodeToad, Devs.Nuckyz, Devs.nyx],
-    description:
-        "Makes avatars and banners in user profiles clickable, adds View Icon/Banner entries in the user, server and group channel context menu.",
+    description: "Makes avatars and banners in user profiles clickable, adds View Icon/Banner entries in the user, server and group channel context menu.",
     tags: ["ImageUtilities"],
     dependencies: ["DynamicImageModalAPI"],
 
@@ -207,7 +186,7 @@ export default definePlugin({
     contextMenus: {
         "user-context": UserContext,
         "guild-context": GuildContext,
-        "gdm-context": GroupDMContext,
+        "gdm-context": GroupDMContext
     },
 
     patches: [
@@ -218,7 +197,7 @@ export default definePlugin({
                 match: /avatarSrc:(\i),eventHandlers:(\i).+?"div",{...\2,/,
                 replace: "$&style:{cursor:\"pointer\"},onClick:()=>{$self.openAvatar($1)},"
             },
-            all: true,
+            all: true
         },
         // Banners
         {

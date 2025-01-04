@@ -8,11 +8,7 @@ import ErrorBoundary from "@components/ErrorBoundary";
 import { Devs } from "@utils/constants";
 import { getCurrentChannel } from "@utils/discord";
 import definePlugin from "@utils/types";
-import {
-    findByCodeLazy,
-    findByPropsLazy,
-    findComponentByCodeLazy,
-} from "@webpack";
+import { findByCodeLazy, findByPropsLazy, findComponentByCodeLazy } from "@webpack";
 import { RelationshipStore, Text } from "@webpack/common";
 
 const containerWrapper = findByPropsLazy("memberSinceWrapper");
@@ -23,8 +19,7 @@ const Section = findComponentByCodeLazy('"auto":"smooth"', ".section");
 
 export default definePlugin({
     name: "FriendsSince",
-    description:
-        "Shows when you became friends with someone in the user popout",
+    description: "Shows when you became friends with someone in the user popout",
     authors: [Devs.Elvyra, Devs.Antti],
     patches: [
         // DM User Sidebar
@@ -37,7 +32,7 @@ export default definePlugin({
         },
         // User Profile Modal
         {
-            find: 'action:"PRESS_APP_CONNECTION"',
+            find: "action:\"PRESS_APP_CONNECTION\"",
             replacement: {
                 match: /#{intl::USER_PROFILE_MEMBER_SINCE}\),.{0,100}userId:(\i\.id),.{0,100}}\)}\),/,
                 replace: "$&,$self.FriendsSinceComponent({userId:$1,isSidebar:false}),"
@@ -45,16 +40,16 @@ export default definePlugin({
         }
     ],
 
-    FriendsSinceComponent: ErrorBoundary.wrap(
-        ({ userId, isSidebar }: { userId: string; isSidebar: boolean; }) => {
-            if (!RelationshipStore.isFriend(userId)) return null;
+    FriendsSinceComponent: ErrorBoundary.wrap(({ userId, isSidebar }: { userId: string; isSidebar: boolean; }) => {
+        if (!RelationshipStore.isFriend(userId)) return null;
 
-            const friendsSince = RelationshipStore.getSince(userId);
-            if (!friendsSince) return null;
+        const friendsSince = RelationshipStore.getSince(userId);
+        if (!friendsSince) return null;
 
-            return (
-                <Section heading="Friends Since">
-                    {isSidebar ? (
+        return (
+            <Section heading="Friends Since">
+                {
+                    isSidebar ? (
                         <Text variant="text-sm/normal">
                             {getCreatedAtDate(friendsSince, locale.getLocale())}
                         </Text>
@@ -74,17 +69,13 @@ export default definePlugin({
                                     </svg>
                                 )}
                                 <Text variant="text-sm/normal">
-                                    {getCreatedAtDate(
-                                        friendsSince,
-                                        locale.getLocale(),
-                                    )}
+                                    {getCreatedAtDate(friendsSince, locale.getLocale())}
                                 </Text>
                             </div>
                         </div>
-                    )}
-                </Section>
-            );
-        },
-        { noop: true },
-    ),
+                    )
+                }
+            </Section>
+        );
+    }, { noop: true }),
 });

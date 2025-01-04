@@ -17,26 +17,25 @@ function onRestartNeeded() {
         body: <p>You have changed settings that require a restart.</p>,
         confirmText: "Restart now",
         cancelText: "Later!",
-        onConfirm: () => location.reload(),
+        onConfirm: () => location.reload()
     });
 }
 
 export default function PluginsSubmenu() {
-    const sortedPlugins = useMemo(
-        () =>
-            Object.values(Plugins).sort((a, b) => a.name.localeCompare(b.name)),
-        [],
-    );
+    const sortedPlugins = useMemo(() => Object.values(Plugins)
+        .sort((a, b) => a.name.localeCompare(b.name)), []);
     const [query, setQuery] = useState("");
 
     const search = query.toLowerCase();
-    const include = (p: (typeof Plugins)[keyof typeof Plugins]) =>
-        Vencord.Plugins.isPluginEnabled(p.name) &&
-        p.options &&
-        !isObjectEmpty(p.options) &&
-        (p.name.toLowerCase().includes(search) ||
-            p.description.toLowerCase().includes(search) ||
-            p.tags?.some((t) => t.toLowerCase().includes(search)));
+    const include = (p: typeof Plugins[keyof typeof Plugins]) => (
+        Vencord.Plugins.isPluginEnabled(p.name)
+        && p.options && !isObjectEmpty(p.options)
+        && (
+            p.name.toLowerCase().includes(search)
+            || p.description.toLowerCase().includes(search)
+            || p.tags?.some(t => t.toLowerCase().includes(search))
+        )
+    );
 
     const plugins = sortedPlugins.filter(include);
 
@@ -57,7 +56,7 @@ export default function PluginsSubmenu() {
 
             {!!plugins.length && <Menu.MenuSeparator />}
 
-            {plugins.map((p) => (
+            {plugins.map(p => (
                 <Menu.MenuItem
                     key={p.name}
                     id={p.name}

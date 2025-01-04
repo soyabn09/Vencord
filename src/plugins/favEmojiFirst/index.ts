@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
@@ -28,7 +28,7 @@ interface EmojiAutocompleteState {
             sentinel: string;
         };
         results: {
-            emojis: Emoji[] & { sliceTo?: number };
+            emojis: Emoji[] & { sliceTo?: number; };
         };
     };
 }
@@ -44,7 +44,7 @@ export default definePlugin({
                 {
                     // https://regex101.com/r/N7kpLM/1
                     match: /let \i=.{1,100}renderResults\({results:(\i)\.query\.results,/,
-                    replace: "$self.sortEmojis($1);$&",
+                    replace: "$self.sortEmojis($1);$&"
                 },
             ],
         },
@@ -59,35 +59,30 @@ export default definePlugin({
                     // searchEmojis(...,maxCount: stuff) ... endEmojis = emojis.slice(0, maxCount - gifResults.length)
                     match: /,maxCount:(\i)(.{1,500}\i)=(\i)\.slice\(0,(Math\.max\(\i,\i(?:-\i\.length){2}\))\)/,
                     // ,maxCount:Infinity ... endEmojis = (emojis.sliceTo = n, emojis)
-                    replace: ",maxCount:Infinity$2=($3.sliceTo = $4, $3)",
-                },
-            ],
-        },
+                    replace: ",maxCount:Infinity$2=($3.sliceTo = $4, $3)"
+                }
+            ]
+        }
     ],
 
     sortEmojis({ query }: EmojiAutocompleteState) {
         if (
-            query?.type !== "EMOJIS_AND_STICKERS" ||
-            query.typeInfo?.sentinel !== ":" ||
-            !query.results?.emojis?.length
-        )
-            return;
+            query?.type !== "EMOJIS_AND_STICKERS"
+            || query.typeInfo?.sentinel !== ":"
+            || !query.results?.emojis?.length
+        ) return;
 
         const emojiContext = EmojiStore.getDisambiguatedEmojiContext();
 
-        query.results.emojis = query.results.emojis
-            .sort((a, b) => {
-                const aIsFavorite =
-                    emojiContext.isFavoriteEmojiWithoutFetchingLatest(a);
-                const bIsFavorite =
-                    emojiContext.isFavoriteEmojiWithoutFetchingLatest(b);
+        query.results.emojis = query.results.emojis.sort((a, b) => {
+            const aIsFavorite = emojiContext.isFavoriteEmojiWithoutFetchingLatest(a);
+            const bIsFavorite = emojiContext.isFavoriteEmojiWithoutFetchingLatest(b);
 
-                if (aIsFavorite && !bIsFavorite) return -1;
+            if (aIsFavorite && !bIsFavorite) return -1;
 
-                if (!aIsFavorite && bIsFavorite) return 1;
+            if (!aIsFavorite && bIsFavorite) return 1;
 
-                return 0;
-            })
-            .slice(0, query.results.emojis.sliceTo ?? Infinity);
-    },
+            return 0;
+        }).slice(0, query.results.emojis.sliceTo ?? Infinity);
+    }
 });

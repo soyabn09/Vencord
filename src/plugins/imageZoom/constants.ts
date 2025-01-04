@@ -14,6 +14,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 export const ELEMENT_ID = "vc-imgzoom-magnify-modal";

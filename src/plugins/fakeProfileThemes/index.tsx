@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 // This plugin is a port from Alyxia's Vendetta plugin
 import "./index.css";
@@ -27,16 +27,7 @@ import { classes, copyWithToast } from "@utils/misc";
 import { useAwaiter } from "@utils/react";
 import definePlugin, { OptionType } from "@utils/types";
 import { extractAndLoadChunksLazy, findComponentByCodeLazy } from "@webpack";
-import {
-    Button,
-    Flex,
-    Forms,
-    React,
-    Text,
-    UserProfileStore,
-    UserStore,
-    useState,
-} from "@webpack/common";
+import { Button, Flex, Forms, React, Text, UserProfileStore, UserStore, useState } from "@webpack/common";
 import { User } from "discord-types/general";
 import virtualMerge from "virtual-merge";
 
@@ -53,9 +44,9 @@ function encode(primary: number, accent: number): string {
     const message = `[#${primary.toString(16).padStart(6, "0")},#${accent.toString(16).padStart(6, "0")}]`;
     const padding = "";
     const encoded = Array.from(message)
-        .map((x) => x.codePointAt(0))
-        .filter((x) => x! >= 0x20 && x! <= 0x7f)
-        .map((x) => String.fromCodePoint(x! + 0xe0000))
+        .map(x => x.codePointAt(0))
+        .filter(x => x! >= 0x20 && x! <= 0x7f)
+        .map(x => String.fromCodePoint(x! + 0xe0000))
         .join("");
 
     return (padding || "") + " " + encoded;
@@ -70,12 +61,12 @@ function decode(bio: string): Array<number> | null {
     );
     if (colorString != null) {
         const parsed = [...colorString[0]]
-            .map((x) => String.fromCodePoint(x.codePointAt(0)! - 0xe0000))
+            .map(x => String.fromCodePoint(x.codePointAt(0)! - 0xe0000))
             .join("");
         const colors = parsed
             .substring(1, parsed.length - 1)
             .split(",")
-            .map((x) => parseInt(x.replace("#", "0x"), 16));
+            .map(x => parseInt(x.replace("#", "0x"), 16));
 
         return colors;
     } else {
@@ -90,8 +81,8 @@ const settings = definePluginSettings({
         options: [
             { label: "Nitro colors", value: true, default: true },
             { label: "Fake colors", value: false },
-        ],
-    },
+        ]
+    }
 });
 
 interface ColorPickerProps {
@@ -124,16 +115,15 @@ const requireColorPicker = extractAndLoadChunksLazy(["#{intl::USER_SETTINGS_PROF
 
 export default definePlugin({
     name: "FakeProfileThemes",
-    description:
-        "Allows profile theming by hiding the colors in your bio thanks to invisible 3y3 encoding",
+    description: "Allows profile theming by hiding the colors in your bio thanks to invisible 3y3 encoding",
     authors: [Devs.Alyxia, Devs.Remty],
     patches: [
         {
             find: "UserProfileStore",
             replacement: {
                 match: /(?<=getUserProfile\(\i\){return )(.+?)(?=})/,
-                replace: "$self.colorDecodeHook($1)",
-            },
+                replace: "$self.colorDecodeHook($1)"
+            }
         },
         {
             find: "#{intl::USER_SETTINGS_RESET_PROFILE_THEME}",
@@ -145,7 +135,7 @@ export default definePlugin({
     ],
     settingsAboutComponent: () => {
         const existingColors = decode(
-            UserProfileStore.getUserProfile(UserStore.getCurrentUser().id).bio,
+            UserProfileStore.getUserProfile(UserStore.getCurrentUser().id).bio
         ) ?? [0, 0];
         const [color1, setColor1] = useState(existingColors[0]);
         const [color2, setColor2] = useState(existingColors[1]);
@@ -166,8 +156,7 @@ export default definePlugin({
                         </li>
                         <li>• click the "Copy 3y3" button</li>
                         <li>• paste the invisible text anywhere in your bio</li>
-                    </ul>
-                    <br />
+                    </ul><br />
                     <Forms.FormDivider
                         className={classes(Margins.top8, Margins.bottom8)}
                     />
@@ -234,8 +223,7 @@ export default definePlugin({
                         />
                     </div>
                 </Forms.FormText>
-            </Forms.FormSection>
-        );
+            </Forms.FormSection>);
     },
     settings,
     colorDecodeHook(user: UserProfile) {
@@ -246,28 +234,22 @@ export default definePlugin({
             if (colors) {
                 return virtualMerge(user, {
                     premiumType: 2,
-                    themeColors: colors,
+                    themeColors: colors
                 });
             }
         }
         return user;
     },
-    addCopy3y3Button: ErrorBoundary.wrap(
-        function ({ primary, accent }: Colors) {
-            return (
-                <Button
-                    onClick={() => {
-                        const colorString = encode(primary, accent);
-                        copyWithToast(colorString);
-                    }}
-                    color={Button.Colors.PRIMARY}
-                    size={Button.Sizes.XLARGE}
-                    className={Margins.left16}
-                >
-                    Copy 3y3
-                </Button>
-            );
-        },
-        { noop: true },
-    ),
+    addCopy3y3Button: ErrorBoundary.wrap(function ({ primary, accent }: Colors) {
+        return <Button
+            onClick={() => {
+                const colorString = encode(primary, accent);
+                copyWithToast(colorString);
+            }}
+            color={Button.Colors.PRIMARY}
+            size={Button.Sizes.XLARGE}
+            className={Margins.left16}
+        >Copy 3y3
+        </Button >;
+    }, { noop: true }),
 });

@@ -14,15 +14,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 
 export default definePlugin({
     name: "MemberListDecoratorsAPI",
-    description:
-        "API to add decorators to member list (both in servers and DMs)",
+    description: "API to add decorators to member list (both in servers and DMs)",
     authors: [Devs.TheSun, Devs.Ven],
     patches: [
         {
@@ -41,9 +40,8 @@ export default definePlugin({
             find: "PrivateChannel.renderAvatar",
             replacement: {
                 match: /decorators:(\i\.isSystemDM\(\))\?(.+?):null/,
-                replace:
-                    "decorators:[...Vencord.Api.MemberListDecorators.__getDecorators(arguments[0]), $1?$2:null]",
-            },
-        },
+                replace: "decorators:[...Vencord.Api.MemberListDecorators.__getDecorators(arguments[0]), $1?$2:null]"
+            }
+        }
     ],
 });

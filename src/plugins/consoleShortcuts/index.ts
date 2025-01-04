@@ -14,18 +14,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Devs } from "@utils/constants";
 import { getCurrentChannel, getCurrentGuild } from "@utils/discord";
 import { runtimeHashMessageKey } from "@utils/intlHash";
 import { SYM_LAZY_CACHED, SYM_LAZY_GET } from "@utils/lazy";
 import { relaunch } from "@utils/native";
-import {
-    canonicalizeMatch,
-    canonicalizeReplace,
-    canonicalizeReplacement,
-} from "@utils/patches";
+import { canonicalizeMatch, canonicalizeReplace, canonicalizeReplacement } from "@utils/patches";
 import definePlugin, { PluginNative, StartAt } from "@utils/types";
 import * as Webpack from "@webpack";
 import { extract, filters, findAll, findModuleId, search } from "@webpack";
@@ -37,20 +33,20 @@ const DESKTOP_ONLY = (f: string) => () => {
     throw new Error(`'${f}' is Discord Desktop only.`);
 };
 
-const define: typeof Object.defineProperty = (obj, prop, desc) => {
-    if (Object.hasOwn(desc, "value")) desc.writable = true;
+const define: typeof Object.defineProperty =
+    (obj, prop, desc) => {
+        if (Object.hasOwn(desc, "value"))
+            desc.writable = true;
 
-    return Object.defineProperty(obj, prop, {
-        configurable: true,
-        enumerable: true,
-        ...desc,
-    });
-};
+        return Object.defineProperty(obj, prop, {
+            configurable: true,
+            enumerable: true,
+            ...desc
+        });
+    };
 
 function makeShortcuts() {
-    function newFindWrapper(
-        filterFactory: (...props: any[]) => Webpack.FilterFn,
-    ) {
+    function newFindWrapper(filterFactory: (...props: any[]) => Webpack.FilterFn) {
         const cache = new Map<string, unknown>();
 
         return function (...filterProps: unknown[]) {
@@ -61,17 +57,12 @@ function makeShortcuts() {
 
             const result = (() => {
                 switch (matches.length) {
-                    case 0:
-                        return null;
-                    case 1:
-                        return matches[0];
+                    case 0: return null;
+                    case 1: return matches[0];
                     default:
                         const uniqueMatches = [...new Set(matches)];
                         if (uniqueMatches.length > 1)
-                            console.warn(
-                                `Warning: This filter matches ${matches.length} modules. Make it more specific!\n`,
-                                uniqueMatches,
-                            );
+                            console.warn(`Warning: This filter matches ${matches.length} modules. Make it more specific!\n`, uniqueMatches);
 
                         return matches[0];
                 }
@@ -82,39 +73,27 @@ function makeShortcuts() {
     }
 
     let fakeRenderWin: WeakRef<Window> | undefined;
-    const find = newFindWrapper((f) => f);
+    const find = newFindWrapper(f => f);
     const findByProps = newFindWrapper(filters.byProps);
 
     return {
-        ...Object.fromEntries(
-            Object.keys(Common).map((key) => [
-                key,
-                { getter: () => Common[key] },
-            ]),
-        ),
+        ...Object.fromEntries(Object.keys(Common).map(key => [key, { getter: () => Common[key] }])),
         wp: Webpack,
         wpc: { getter: () => Webpack.cache },
         wreq: { getter: () => Webpack.wreq },
         wpsearch: search,
         wpex: extract,
         wpexs: (code: string) => extract(findModuleId(code)!),
-        loadLazyChunks: IS_DEV
-            ? loadLazyChunks
-            : () => {
-                  throw new Error("loadLazyChunks is dev only.");
-              },
+        loadLazyChunks: IS_DEV ? loadLazyChunks : () => { throw new Error("loadLazyChunks is dev only."); },
         find,
         findAll: findAll,
         findByProps,
-        findAllByProps: (...props: string[]) =>
-            findAll(filters.byProps(...props)),
+        findAllByProps: (...props: string[]) => findAll(filters.byProps(...props)),
         findByCode: newFindWrapper(filters.byCode),
         findAllByCode: (code: string) => findAll(filters.byCode(code)),
         findComponentByCode: newFindWrapper(filters.componentByCode),
-        findAllComponentsByCode: (...code: string[]) =>
-            findAll(filters.componentByCode(...code)),
-        findExportedComponent: (...props: string[]) =>
-            findByProps(...props)[props[0]],
+        findAllComponentsByCode: (...code: string[]) => findAll(filters.componentByCode(...code)),
+        findExportedComponent: (...props: string[]) => findByProps(...props)[props[0]],
         findStore: newFindWrapper(filters.byStoreName),
         PluginsApi: { getter: () => Vencord.Plugins },
         plugins: { getter: () => Vencord.Plugins.plugins },
@@ -129,14 +108,9 @@ function makeShortcuts() {
         runtimeHashMessageKey,
         fakeRender: (component: ComponentType, props: any) => {
             const prevWin = fakeRenderWin?.deref();
-            const win =
-                prevWin?.closed === false
-                    ? prevWin
-                    : window.open(
-                          "about:blank",
-                          "Fake Render",
-                          "popup,width=500,height=500",
-                      )!;
+            const win = prevWin?.closed === false
+                ? prevWin
+                : window.open("about:blank", "Fake Render", "popup,width=500,height=500")!;
             fakeRenderWin = new WeakRef(win);
             win.focus();
 
@@ -146,65 +120,38 @@ function makeShortcuts() {
             if (!win.prepared) {
                 win.prepared = true;
 
-                [
-                    ...document.querySelectorAll("style"),
-                    ...document.querySelectorAll("link[rel=stylesheet]"),
-                ].forEach((s) => {
-                    const n = s.cloneNode(true) as
-                        | HTMLStyleElement
-                        | HTMLLinkElement;
+                [...document.querySelectorAll("style"), ...document.querySelectorAll("link[rel=stylesheet]")].forEach(s => {
+                    const n = s.cloneNode(true) as HTMLStyleElement | HTMLLinkElement;
 
-                    if (s.parentElement?.tagName === "HEAD") doc.head.append(n);
-                    else if (
-                        n.id?.startsWith("vencord-") ||
-                        n.id?.startsWith("vcd-")
-                    )
+                    if (s.parentElement?.tagName === "HEAD")
+                        doc.head.append(n);
+                    else if (n.id?.startsWith("vencord-") || n.id?.startsWith("vcd-"))
                         doc.documentElement.append(n);
-                    else doc.body.append(n);
+                    else
+                        doc.body.append(n);
                 });
             }
 
-            Common.ReactDOM.render(
-                Common.React.createElement(component, props),
-                doc.body.appendChild(document.createElement("div")),
-            );
+            Common.ReactDOM.render(Common.React.createElement(component, props), doc.body.appendChild(document.createElement("div")));
         },
 
-        preEnable: (plugin: string) =>
-            ((Vencord.Settings.plugins[plugin] ??= { enabled: true }).enabled =
-                true),
+        preEnable: (plugin: string) => (Vencord.Settings.plugins[plugin] ??= { enabled: true }).enabled = true,
 
         channel: { getter: () => getCurrentChannel(), preload: false },
-        channelId: {
-            getter: () => Common.SelectedChannelStore.getChannelId(),
-            preload: false,
-        },
+        channelId: { getter: () => Common.SelectedChannelStore.getChannelId(), preload: false },
         guild: { getter: () => getCurrentGuild(), preload: false },
-        guildId: {
-            getter: () => Common.SelectedGuildStore.getGuildId(),
-            preload: false,
-        },
+        guildId: { getter: () => Common.SelectedGuildStore.getGuildId(), preload: false },
         me: { getter: () => Common.UserStore.getCurrentUser(), preload: false },
-        meId: {
-            getter: () => Common.UserStore.getCurrentUser().id,
-            preload: false,
-        },
-        messages: {
-            getter: () =>
-                Common.MessageStore.getMessages(
-                    Common.SelectedChannelStore.getChannelId(),
-                ),
-            preload: false,
-        },
+        meId: { getter: () => Common.UserStore.getCurrentUser().id, preload: false },
+        messages: { getter: () => Common.MessageStore.getMessages(Common.SelectedChannelStore.getChannelId()), preload: false },
 
         Stores: {
-            getter: () =>
-                Object.fromEntries(
-                    Common.Flux.Store.getAll()
-                        .map((store) => [store.getName(), store] as const)
-                        .filter(([name]) => name.length > 1),
-                ),
-        },
+            getter: () => Object.fromEntries(
+                Common.Flux.Store.getAll()
+                    .map(store => [store.getName(), store] as const)
+                    .filter(([name]) => name.length > 1)
+            )
+        }
     };
 }
 
@@ -213,9 +160,7 @@ function loadAndCacheShortcut(key: string, val: any, forceLoad: boolean) {
     if (!currentVal || val.preload === false) return currentVal;
 
     const value = currentVal[SYM_LAZY_GET]
-        ? forceLoad
-            ? currentVal[SYM_LAZY_GET]()
-            : currentVal[SYM_LAZY_CACHED]
+        ? forceLoad ? currentVal[SYM_LAZY_GET]() : currentVal[SYM_LAZY_CACHED]
         : currentVal;
 
     if (value) define(window.shortcutList, key, { value });
@@ -225,8 +170,7 @@ function loadAndCacheShortcut(key: string, val: any, forceLoad: boolean) {
 
 export default definePlugin({
     name: "ConsoleShortcuts",
-    description:
-        "Adds shorter Aliases for many things on the window. Run `shortcutList` for a list.",
+    description: "Adds shorter Aliases for many things on the window. Run `shortcutList` for a list.",
     authors: [Devs.Ven],
 
     startAt: StartAt.Init,
@@ -237,11 +181,11 @@ export default definePlugin({
         for (const [key, val] of Object.entries(shortcuts)) {
             if ("getter" in val) {
                 define(window.shortcutList, key, {
-                    get: () => loadAndCacheShortcut(key, val, true),
+                    get: () => loadAndCacheShortcut(key, val, true)
                 });
 
                 define(window, key, {
-                    get: () => window.shortcutList[key],
+                    get: () => window.shortcutList[key]
                 });
             } else {
                 window.shortcutList[key] = val;
@@ -254,10 +198,7 @@ export default definePlugin({
             setTimeout(() => this.eagerLoad(false), 1000);
 
             if (!IS_WEB) {
-                const Native = VencordNative.pluginHelpers
-                    .ConsoleShortcuts as PluginNative<
-                    typeof import("./native")
-                >;
+                const Native = VencordNative.pluginHelpers.ConsoleShortcuts as PluginNative<typeof import("./native")>;
                 Native.initDevtoolsOpenEagerLoad();
             }
         });
@@ -269,12 +210,11 @@ export default definePlugin({
         const shortcuts = makeShortcuts();
 
         for (const [key, val] of Object.entries(shortcuts)) {
-            if (!Object.hasOwn(val, "getter") || (val as any).preload === false)
-                continue;
+            if (!Object.hasOwn(val, "getter") || (val as any).preload === false) continue;
 
             try {
                 loadAndCacheShortcut(key, val, forceLoad);
-            } catch {} // swallow not found errors in DEV
+            } catch { } // swallow not found errors in DEV
         }
     },
 
@@ -283,5 +223,5 @@ export default definePlugin({
         for (const key in makeShortcuts()) {
             delete window[key];
         }
-    },
+    }
 });

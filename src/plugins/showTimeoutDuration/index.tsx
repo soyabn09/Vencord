@@ -22,7 +22,7 @@ const CountDown = findComponentLazy(m => m.prototype?.render?.toString().include
 
 const enum DisplayStyle {
     Tooltip = "tooltip",
-    Inline = "ssalggnikool",
+    Inline = "ssalggnikool"
 }
 
 const settings = definePluginSettings({
@@ -31,13 +31,9 @@ const settings = definePluginSettings({
         type: OptionType.SELECT,
         options: [
             { label: "In the Tooltip", value: DisplayStyle.Tooltip },
-            {
-                label: "Next to the timeout icon",
-                value: DisplayStyle.Inline,
-                default: true,
-            },
+            { label: "Next to the timeout icon", value: DisplayStyle.Inline, default: true },
         ],
-    },
+    }
 });
 
 function renderTimeout(message: Message, inline: boolean) {
@@ -70,8 +66,7 @@ function renderTimeout(message: Message, inline: boolean) {
 
 export default definePlugin({
     name: "ShowTimeoutDuration",
-    description:
-        "Shows how much longer a user's timeout will last, either in the timeout icon tooltip or next to it",
+    description: "Shows how much longer a user's timeout will last, either in the timeout icon tooltip or next to it",
     authors: [Devs.Ven, Devs.Sqaaakoi],
 
     settings,
@@ -88,32 +83,18 @@ export default definePlugin({
         }
     ],
 
-    TooltipWrapper: ErrorBoundary.wrap(
-        ({
-            message,
-            children,
-            text,
-        }: {
-            message: Message;
-            children: FunctionComponent<any>;
-            text: ReactNode;
-        }) => {
-            if (settings.store.displayStyle === DisplayStyle.Tooltip)
-                return (
-                    <Tooltip
-                        children={children}
-                        text={renderTimeout(message, false)}
-                    />
-                );
-            return (
-                <div className="vc-std-wrapper">
-                    <Tooltip text={text} children={children} />
-                    <Text variant="text-md/normal" color="status-danger">
-                        {renderTimeout(message, true)} timeout remaining
-                    </Text>
-                </div>
-            );
-        },
-        { noop: true },
-    ),
+    TooltipWrapper: ErrorBoundary.wrap(({ message, children, text }: { message: Message; children: FunctionComponent<any>; text: ReactNode; }) => {
+        if (settings.store.displayStyle === DisplayStyle.Tooltip) return <Tooltip
+            children={children}
+            text={renderTimeout(message, false)}
+        />;
+        return (
+            <div className="vc-std-wrapper">
+                <Tooltip text={text} children={children} />
+                <Text variant="text-md/normal" color="status-danger">
+                    {renderTimeout(message, true)} timeout remaining
+                </Text>
+            </div>
+        );
+    }, { noop: true })
 });

@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 const styles = new Map<string, HTMLStyleElement>();
 
@@ -31,6 +31,6 @@ export function removeStyle(id: string) {
 }
 
 export const clearStyles = () => {
-    styles.forEach((style) => style.remove());
+    styles.forEach(style => style.remove());
     styles.clear();
 };

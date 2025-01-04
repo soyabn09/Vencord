@@ -19,7 +19,7 @@ const NoopLogger = {
     error: Noop,
     trace: Noop,
     time: Noop,
-    fileOnly: Noop,
+    fileOnly: Noop
 };
 
 const logAllow = new Set();
@@ -29,28 +29,23 @@ const settings = definePluginSettings({
         type: OptionType.BOOLEAN,
         description: "Disables Discords loggers",
         default: false,
-        restartNeeded: true,
+        restartNeeded: true
     },
     disableSpotifyLogger: {
         type: OptionType.BOOLEAN,
-        description:
-            "Disable the Spotify logger, which leaks account information and access token",
+        description: "Disable the Spotify logger, which leaks account information and access token",
         default: true,
-        restartNeeded: true,
+        restartNeeded: true
     },
     whitelistedLoggers: {
         type: OptionType.STRING,
-        description:
-            "Semi colon separated list of loggers to allow even if others are hidden",
+        description: "Semi colon separated list of loggers to allow even if others are hidden",
         default: "GatewaySocket; Routing/Utils",
         onChange(newVal: string) {
             logAllow.clear();
-            newVal
-                .split(";")
-                .map((x) => x.trim())
-                .forEach(logAllow.add.bind(logAllow));
-        },
-    },
+            newVal.split(";").map(x => x.trim()).forEach(logAllow.add.bind(logAllow));
+        }
+    }
 });
 
 export default definePlugin({
@@ -62,10 +57,7 @@ export default definePlugin({
     startAt: StartAt.Init,
     start() {
         logAllow.clear();
-        this.settings.store.whitelistedLoggers
-            ?.split(";")
-            .map((x) => x.trim())
-            .forEach(logAllow.add.bind(logAllow));
+        this.settings.store.whitelistedLoggers?.split(";").map(x => x.trim()).forEach(logAllow.add.bind(logAllow));
     },
 
     NoopLogger: () => NoopLogger,
@@ -92,51 +84,51 @@ export default definePlugin({
             find: 'console.warn("Window state not initialized"',
             replacement: {
                 match: /console\.warn\("Window state not initialized",\i\),/,
-                replace: "",
-            },
+                replace: ""
+            }
         },
         {
             find: "is not a valid locale.",
             replacement: {
                 match: /\i\.error\(""\.concat\(\i," is not a valid locale."\)\);/,
-                replace: "",
-            },
+                replace: ""
+            }
         },
         {
             find: 'console.warn("[DEPRECATED] Please use `subscribeWithSelector` middleware");',
             all: true,
             replacement: {
                 match: /console\.warn\("\[DEPRECATED\] Please use `subscribeWithSelector` middleware"\);/,
-                replace: "",
-            },
+                replace: ""
+            }
         },
         {
             find: "RPCServer:WSS",
             replacement: {
                 match: /\i\.error\("Error: "\.concat\((\i)\.message/,
-                replace: '!$1.message.includes("EADDRINUSE")&&$&',
-            },
+                replace: '!$1.message.includes("EADDRINUSE")&&$&'
+            }
         },
         {
             find: "Tried getting Dispatch instance before instantiated",
             replacement: {
                 match: /null==\i&&\i\.warn\("Tried getting Dispatch instance before instantiated"\),/,
-                replace: "",
-            },
+                replace: ""
+            }
         },
         {
             find: "Unable to determine render window for element",
             replacement: {
                 match: /console\.warn\("Unable to determine render window for element",\i\),/,
-                replace: "",
-            },
+                replace: ""
+            }
         },
         {
             find: "failed to send analytics events",
             replacement: {
                 match: /console\.error\("\[analytics\] failed to send analytics events query: "\.concat\(\i\)\)/,
-                replace: "",
-            },
+                replace: ""
+            }
         },
         {
             find: "Slow dispatch on",
@@ -151,8 +143,8 @@ export default definePlugin({
             predicate: () => settings.store.disableLoggers,
             replacement: {
                 match: /(?<=&&)(?=console)/,
-                replace: "$self.shouldLog(arguments[0])&&",
-            },
+                replace: "$self.shouldLog(arguments[0])&&"
+            }
         },
         {
             find: '("Spotify")',

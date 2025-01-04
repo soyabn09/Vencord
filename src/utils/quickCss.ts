@@ -14,10 +14,11 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Settings, SettingsStore } from "@api/Settings";
 import { ThemeStore } from "@webpack/common";
+
 
 let style: HTMLStyleElement;
 let themesStyle: HTMLStyleElement;
@@ -43,14 +44,15 @@ export async function toggle(isEnabled: boolean) {
     if (!style) {
         if (isEnabled) {
             style = createStyle("vencord-custom-css");
-            VencordNative.quickCss.addChangeListener((css) => {
+            VencordNative.quickCss.addChangeListener(css => {
                 style.textContent = css;
                 // At the time of writing this, changing textContent resets the disabled state
                 style.disabled = !Settings.useQuickCss;
             });
             style.textContent = await VencordNative.quickCss.get();
         }
-    } else style.disabled = !isEnabled;
+    } else
+        style.disabled = !isEnabled;
 }
 
 async function initThemes() {
@@ -62,14 +64,14 @@ async function initThemes() {
     const activeTheme = ThemeStore.theme === "light" ? "light" : "dark";
 
     const links = themeLinks
-        .map((rawLink) => {
+        .map(rawLink => {
             const match = /^@(light|dark) (.*)/.exec(rawLink);
             if (!match) return rawLink;
 
             const [, mode, link] = match;
             return mode === activeTheme ? link : null;
         })
-        .filter((link) => link !== null);
+        .filter(link => link !== null);
 
     if (IS_WEB) {
         for (const theme of enabledThemes) {
@@ -79,15 +81,11 @@ async function initThemes() {
             links.push(URL.createObjectURL(blob));
         }
     } else {
-        const localThemes = enabledThemes.map(
-            (theme) => `vencord:///themes/${theme}?v=${Date.now()}`,
-        );
+        const localThemes = enabledThemes.map(theme => `vencord:///themes/${theme}?v=${Date.now()}`);
         links.push(...localThemes);
     }
 
-    themesStyle.textContent = links
-        .map((link) => `@import url("${link.trim()}");`)
-        .join("\n");
+    themesStyle.textContent = links.map(link => `@import url("${link.trim()}");`).join("\n");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -101,5 +99,6 @@ document.addEventListener("DOMContentLoaded", () => {
     SettingsStore.addChangeListener("enabledThemes", initThemes);
     ThemeStore.addChangeListener(initThemes);
 
-    if (!IS_WEB) VencordNative.quickCss.addThemeChangeListener(initThemes);
+    if (!IS_WEB)
+        VencordNative.quickCss.addThemeChangeListener(initThemes);
 });

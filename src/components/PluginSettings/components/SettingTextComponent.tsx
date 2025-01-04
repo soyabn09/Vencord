@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Margins } from "@utils/margins";
 import { wordsFromCamel, wordsToTitle } from "@utils/text";
@@ -23,17 +23,8 @@ import { Forms, React, TextInput } from "@webpack/common";
 
 import { ISettingElementProps } from ".";
 
-export function SettingTextComponent({
-    option,
-    pluginSettings,
-    definedSettings,
-    id,
-    onChange,
-    onError,
-}: ISettingElementProps<PluginOptionString>) {
-    const [state, setState] = React.useState(
-        pluginSettings[id] ?? option.default ?? null,
-    );
+export function SettingTextComponent({ option, pluginSettings, definedSettings, id, onChange, onError }: ISettingElementProps<PluginOptionString>) {
+    const [state, setState] = React.useState(pluginSettings[id] ?? option.default ?? null);
     const [error, setError] = React.useState<string | null>(null);
 
     React.useEffect(() => {
@@ -52,12 +43,8 @@ export function SettingTextComponent({
 
     return (
         <Forms.FormSection>
-            <Forms.FormTitle>
-                {wordsToTitle(wordsFromCamel(id))}
-            </Forms.FormTitle>
-            <Forms.FormText className={Margins.bottom20} type="description">
-                {option.description}
-            </Forms.FormText>
+            <Forms.FormTitle>{wordsToTitle(wordsFromCamel(id))}</Forms.FormTitle>
+            <Forms.FormText className={Margins.bottom20} type="description">{option.description}</Forms.FormText>
             <TextInput
                 type="text"
                 value={state}
@@ -66,11 +53,7 @@ export function SettingTextComponent({
                 disabled={option.disabled?.call(definedSettings) ?? false}
                 {...option.componentProps}
             />
-            {error && (
-                <Forms.FormText style={{ color: "var(--text-danger)" }}>
-                    {error}
-                </Forms.FormText>
-            )}
+            {error && <Forms.FormText style={{ color: "var(--text-danger)" }}>{error}</Forms.FormText>}
         </Forms.FormSection>
     );
 }

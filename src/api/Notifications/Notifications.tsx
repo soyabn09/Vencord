@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Settings } from "@api/Settings";
 import { Queue } from "@utils/Queue";
@@ -65,17 +65,13 @@ export interface NotificationData {
 
 function _showNotification(notification: NotificationData, id: number) {
     const root = getRoot();
-    return new Promise<void>((resolve) => {
+    return new Promise<void>(resolve => {
         root.render(
-            <NotificationComponent
-                key={id}
-                {...notification}
-                onClose={() => {
-                    notification.onClose?.();
-                    root.render(null);
-                    resolve();
-                }}
-            />,
+            <NotificationComponent key={id} {...notification} onClose={() => {
+                notification.onClose?.();
+                root.render(null);
+                resolve();
+            }} />,
         );
     });
 }
@@ -92,28 +88,20 @@ function shouldBeNative() {
 export async function requestPermission() {
     return (
         Notification.permission === "granted" ||
-        (Notification.permission !== "denied" &&
-            (await Notification.requestPermission()) === "granted")
+        (Notification.permission !== "denied" && (await Notification.requestPermission()) === "granted")
     );
 }
 
 export async function showNotification(data: NotificationData) {
     persistNotification(data);
 
-    if (shouldBeNative() && (await requestPermission())) {
-        const {
-            title,
-            body,
-            icon,
-            image,
-            onClick = null,
-            onClose = null,
-        } = data;
+    if (shouldBeNative() && await requestPermission()) {
+        const { title, body, icon, image, onClick = null, onClose = null } = data;
         const n = new Notification(title, {
             body,
             icon,
             // @ts-expect-error ts is drunk
-            image,
+            image
         });
         n.onclick = onClick;
         n.onclose = onClose;

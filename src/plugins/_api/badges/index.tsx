@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import "./fixDiscordBadgePadding.css";
 
@@ -40,39 +40,34 @@ const ContributorBadge: ProfileBadge = {
     image: CONTRIBUTOR_BADGE,
     position: BadgePosition.START,
     shouldShow: ({ userId }) => isPluginDev(userId),
-    onClick: (_, { userId }) => openContributorModal(UserStore.getUser(userId)),
+    onClick: (_, { userId }) => openContributorModal(UserStore.getUser(userId))
 };
 
-let DonorBadges = {} as Record<
-    string,
-    Array<Record<"tooltip" | "badge", string>>
->;
+let DonorBadges = {} as Record<string, Array<Record<"tooltip" | "badge", string>>>;
 
 async function loadBadges(noCache = false) {
     DonorBadges = {};
 
     const init = {} as RequestInit;
-    if (noCache) init.cache = "no-cache";
+    if (noCache)
+        init.cache = "no-cache";
 
-    DonorBadges = await fetch(
-        "https://cdn.soyab.uk/files/badges.json",
-        init,
-    ).then((r) => r.json());
+    DonorBadges = await fetch("https://cdn.soyab.uk/files/badges.json", init)
+        .then(r => r.json());
 }
 
 export default definePlugin({
     name: "BadgeAPI",
     description: "API to add badges to users.",
-    authors: [Devs.Megu, Devs.Ven, Devs.TheSun, Devs.Soya],
+    authors: [Devs.Megu, Devs.Ven, Devs.TheSun],
     required: true,
     patches: [
         {
             find: ".FULL_SIZE]:26",
             replacement: {
                 match: /(?<=(\i)=\(0,\i\.\i\)\(\i\);)return 0===\i.length\?/,
-                replace:
-                    "$1.unshift(...$self.getBadges(arguments[0].displayProfile));$&",
-            },
+                replace: "$1.unshift(...$self.getBadges(arguments[0].displayProfile));$&"
+            }
         },
         {
             find: ".description,delay:",
@@ -81,21 +76,19 @@ export default definePlugin({
                     // alt: "", aria-hidden: false, src: originalSrc
                     match: /alt:" ","aria-hidden":!0,src:(?=.{0,20}(\i)\.icon)/,
                     // ...badge.props, ..., src: badge.image ?? ...
-                    replace: "...$1.props,$& $1.image??",
+                    replace: "...$1.props,$& $1.image??"
                 },
                 {
                     match: /(?<=text:(\i)\.description,.{0,200})children:/,
-                    replace:
-                        "children:$1.component ? $self.renderBadgeComponent({ ...$1 }) :",
+                    replace: "children:$1.component ? $self.renderBadgeComponent({ ...$1 }) :"
                 },
                 // conditionally override their onClick with badge.onClick if it exists
                 {
                     match: /href:(\i)\.link/,
-                    replace:
-                        "...($1.onClick && { onClick: vcE => $1.onClick(vcE, $1) }),$&",
-                },
-            ],
-        },
+                    replace: "...($1.onClick && { onClick: vcE => $1.onClick(vcE, $1) }),$&"
+                }
+            ]
+        }
     ],
 
     toolboxActions: {
@@ -104,9 +97,9 @@ export default definePlugin({
             Toasts.show({
                 id: Toasts.genId(),
                 message: "Successfully refetched badges!",
-                type: Toasts.Type.SUCCESS,
+                type: Toasts.Type.SUCCESS
             });
-        },
+        }
     },
 
     async start() {
@@ -127,50 +120,38 @@ export default definePlugin({
         }
     },
 
-    renderBadgeComponent: ErrorBoundary.wrap(
-        (badge: ProfileBadge & BadgeUserArgs) => {
-            const Component = badge.component!;
-            return <Component {...badge} />;
-        },
-        { noop: true },
-    ),
+    renderBadgeComponent: ErrorBoundary.wrap((badge: ProfileBadge & BadgeUserArgs) => {
+        const Component = badge.component!;
+        return <Component {...badge} />;
+    }, { noop: true }),
+
 
     getDonorBadges(userId: string) {
-        return DonorBadges[userId]?.map((badge) => ({
+        return DonorBadges[userId]?.map(badge => ({
             image: badge.badge,
             description: badge.tooltip,
             position: BadgePosition.START,
             props: {
                 style: {
                     borderRadius: "50%",
-                    transform: "scale(0.9)", // The image is a bit too big compared to default badges
-                },
+                    transform: "scale(0.9)" // The image is a bit too big compared to default badges
+                }
             },
             onClick() {
-                const modalKey = openModal((props) => (
-                    <ErrorBoundary
-                        noop
-                        onError={() => {
-                            closeModal(modalKey);
-                            VencordNative.native.openExternal(
-                                "https://github.com/sponsors/Vendicated",
-                            );
-                        }}
-                    >
+                const modalKey = openModal(props => (
+                    <ErrorBoundary noop onError={() => {
+                        closeModal(modalKey);
+                        VencordNative.native.openExternal("https://github.com/sponsors/Vendicated");
+                    }}>
                         <Modals.ModalRoot {...props}>
                             <Modals.ModalHeader>
-                                <Flex
-                                    style={{
-                                        width: "100%",
-                                        justifyContent: "center",
-                                    }}
-                                >
+                                <Flex style={{ width: "100%", justifyContent: "center" }}>
                                     <Forms.FormTitle
                                         tag="h2"
                                         style={{
                                             width: "100%",
                                             textAlign: "center",
-                                            margin: 0,
+                                            margin: 0
                                         }}
                                     >
                                         <Heart />
@@ -195,23 +176,15 @@ export default definePlugin({
                                 </Flex>
                                 <div style={{ padding: "1em" }}>
                                     <Forms.FormText>
-                                        This Badge is a special perk for Vencord
-                                        Donors
+                                        This Badge is a special perk for Vencord Donors
                                     </Forms.FormText>
                                     <Forms.FormText className={Margins.top20}>
-                                        Please consider supporting the
-                                        development of Vencord by becoming a
-                                        donor. It would mean a lot!!
+                                        Please consider supporting the development of Vencord by becoming a donor. It would mean a lot!!
                                     </Forms.FormText>
                                 </div>
                             </Modals.ModalContent>
                             <Modals.ModalFooter>
-                                <Flex
-                                    style={{
-                                        width: "100%",
-                                        justifyContent: "center",
-                                    }}
-                                >
+                                <Flex style={{ width: "100%", justifyContent: "center" }}>
                                     <DonateButton />
                                 </Flex>
                             </Modals.ModalFooter>
@@ -220,5 +193,5 @@ export default definePlugin({
                 ));
             },
         }));
-    },
+    }
 });

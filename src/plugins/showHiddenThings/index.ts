@@ -14,40 +14,29 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
 import definePlugin, { OptionType, PluginSettingDef } from "@utils/types";
 
-const opt = (description: string) =>
-    ({
-        type: OptionType.BOOLEAN,
-        description,
-        default: true,
-        restartNeeded: true,
-    } satisfies PluginSettingDef);
+const opt = (description: string) => ({
+    type: OptionType.BOOLEAN,
+    description,
+    default: true,
+    restartNeeded: true
+} satisfies PluginSettingDef);
 
 const settings = definePluginSettings({
     showTimeouts: opt("Show member timeout icons in chat."),
-    showInvitesPaused: opt(
-        "Show the invites paused tooltip in the server list."
-    ),
-    showModView: opt(
-        "Show the member mod view context menu item in all servers."
-    ),
+    showInvitesPaused: opt("Show the invites paused tooltip in the server list."),
+    showModView: opt("Show the member mod view context menu item in all servers.")
 });
 
 export default definePlugin({
     name: "ShowHiddenThings",
-    tags: [
-        "ShowTimeouts",
-        "ShowInvitesPaused",
-        "ShowModView",
-        "DisableDiscoveryFilters",
-    ],
-    description:
-        "Displays various hidden & moderator-only things regardless of permissions.",
+    tags: ["ShowTimeouts", "ShowInvitesPaused", "ShowModView", "DisableDiscoveryFilters"],
+    description: "Displays various hidden & moderator-only things regardless of permissions.",
     authors: [Devs.Dolfies],
     settings,
 
@@ -74,7 +63,7 @@ export default definePlugin({
             replacement: {
                 match: /return \i\.\i\(\i\.\i\(\{user:\i,context:\i,checkElevated:!1\}\),\i\.\i\)/,
                 replace: "return true",
-            },
+            }
         },
         // fixes a bug where Members page must be loaded to see highest role, why is Discord depending on MemberSafetyStore.getEnhancedMember for something that can be obtained here?
         {
@@ -83,7 +72,7 @@ export default definePlugin({
             replacement: {
                 match: /(role:)\i(?=,guildId.{0,100}role:(\i\[))/,
                 replace: "$1$2arguments[0].member.highestRoleId]",
-            },
+            }
         },
         // allows you to open mod view on yourself
         {
@@ -91,8 +80,8 @@ export default definePlugin({
             predicate: () => settings.store.showModView,
             replacement: {
                 match: /\i(?=\?null)/,
-                replace: "false",
-            },
-        },
-    ],
+                replace: "false"
+            }
+        }
+    ]
 });

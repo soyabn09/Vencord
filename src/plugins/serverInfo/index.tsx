@@ -12,10 +12,7 @@ import { Guild } from "discord-types/general";
 
 import { openGuildInfoModal } from "./GuildInfoModal";
 
-const Patch: NavContextMenuPatchCallback = (
-    children,
-    { guild }: { guild: Guild; },
-) => {
+const Patch: NavContextMenuPatchCallback = (children, { guild }: { guild: Guild; }) => {
     const group = findGroupChildrenByChildId("privacy", children);
 
     group?.push(
@@ -23,7 +20,7 @@ const Patch: NavContextMenuPatchCallback = (
             id="vc-server-info"
             label="Server Info"
             action={() => openGuildInfoModal(guild)}
-        />,
+        />
     );
 };
 
@@ -36,6 +33,6 @@ export default definePlugin({
 
     contextMenus: {
         "guild-context": Patch,
-        "guild-header-popout": Patch,
-    },
+        "guild-header-popout": Patch
+    }
 });

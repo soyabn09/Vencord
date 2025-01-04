@@ -14,15 +14,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import "./styles.css";
 
 import { addChatBarButton, removeChatBarButton } from "@api/ChatButtons";
-import {
-    findGroupChildrenByChildId,
-    NavContextMenuPatchCallback,
-} from "@api/ContextMenu";
+import { findGroupChildrenByChildId, NavContextMenuPatchCallback } from "@api/ContextMenu";
 import { addAccessory, removeAccessory } from "@api/MessageAccessories";
 import { addPreSendListener, removePreSendListener } from "@api/MessageEvents";
 import { addButton, removeButton } from "@api/MessagePopover";
@@ -31,26 +28,17 @@ import definePlugin from "@utils/types";
 import { ChannelStore, Menu } from "@webpack/common";
 
 import { settings } from "./settings";
-import {
-    setShouldShowTranslateEnabledTooltip,
-    TranslateChatBarIcon,
-    TranslateIcon,
-} from "./TranslateIcon";
+import { setShouldShowTranslateEnabledTooltip, TranslateChatBarIcon, TranslateIcon } from "./TranslateIcon";
 import { handleTranslate, TranslationAccessory } from "./TranslationAccessory";
 import { translate } from "./utils";
 
-const messageCtxPatch: NavContextMenuPatchCallback = (
-    children,
-    { message },
-) => {
+const messageCtxPatch: NavContextMenuPatchCallback = (children, { message }) => {
     if (!message.content) return;
 
     const group = findGroupChildrenByChildId("copy-text", children);
     if (!group) return;
 
-    group.splice(
-        group.findIndex((c) => c?.props?.id === "copy-text") + 1,
-        0,
+    group.splice(group.findIndex(c => c?.props?.id === "copy-text") + 1, 0, (
         <Menu.MenuItem
             id="vc-trans"
             label="Translate"
@@ -59,35 +47,28 @@ const messageCtxPatch: NavContextMenuPatchCallback = (
                 const trans = await translate("received", message.content);
                 handleTranslate(message.id, trans);
             }}
-        />,
-    );
+        />
+    ));
 };
 
 export default definePlugin({
     name: "Translate",
     description: "Translate messages with Google Translate or DeepL",
     authors: [Devs.Ven, Devs.AshtonMemer],
-    dependencies: [
-        "MessageAccessoriesAPI",
-        "MessagePopoverAPI",
-        "MessageEventsAPI",
-        "ChatInputButtonAPI",
-    ],
+    dependencies: ["MessageAccessoriesAPI", "MessagePopoverAPI", "MessageEventsAPI", "ChatInputButtonAPI"],
     settings,
     contextMenus: {
-        message: messageCtxPatch,
+        "message": messageCtxPatch
     },
     // not used, just here in case some other plugin wants it or w/e
     translate,
 
     start() {
-        addAccessory("vc-translation", (props) => (
-            <TranslationAccessory message={props.message} />
-        ));
+        addAccessory("vc-translation", props => <TranslationAccessory message={props.message} />);
 
         addChatBarButton("vc-translate", TranslateChatBarIcon);
 
-        addButton("vc-translate", (message) => {
+        addButton("vc-translate", message => {
             if (!message.content) return null;
 
             return {
@@ -98,7 +79,7 @@ export default definePlugin({
                 onClick: async () => {
                     const trans = await translate("received", message.content);
                     handleTranslate(message.id, trans);
-                },
+                }
             };
         });
 
@@ -109,13 +90,11 @@ export default definePlugin({
 
             setShouldShowTranslateEnabledTooltip?.(true);
             clearTimeout(tooltipTimeout);
-            tooltipTimeout = setTimeout(
-                () => setShouldShowTranslateEnabledTooltip?.(false),
-                2000,
-            );
+            tooltipTimeout = setTimeout(() => setShouldShowTranslateEnabledTooltip?.(false), 2000);
 
             const trans = await translate("sent", message.content);
             message.content = trans.text;
+
         });
     },
 

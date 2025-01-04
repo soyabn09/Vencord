@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import type {
     ILanguageRegistration,
@@ -25,17 +25,16 @@ import type {
 
 /** This must be atleast a subset of the `@vap/shiki-worker` spec */
 export type ShikiSpec = {
-    setOnigasm: ({ wasm }: { wasm: string }) => Promise<void>;
-    setHighlighter: ({
-        theme,
-        langs,
-    }: {
+    setOnigasm: ({ wasm }: { wasm: string; }) => Promise<void>;
+    setHighlighter: ({ theme, langs }: {
         theme: IThemeRegistration | void;
         langs: ILanguageRegistration[];
     }) => Promise<void>;
-    loadTheme: ({ theme }: { theme: string | IShikiTheme }) => Promise<void>;
-    getTheme: ({ theme }: { theme: string }) => Promise<{ themeData: string }>;
-    loadLanguage: ({ lang }: { lang: ILanguageRegistration }) => Promise<void>;
+    loadTheme: ({ theme }: {
+        theme: string | IShikiTheme;
+    }) => Promise<void>;
+    getTheme: ({ theme }: { theme: string; }) => Promise<{ themeData: string; }>;
+    loadLanguage: ({ lang }: { lang: ILanguageRegistration; }) => Promise<void>;
     codeToThemedTokens: ({
         code,
         lang,
@@ -61,5 +60,5 @@ export const enum HljsSetting {
 export const enum DeviconSetting {
     Disabled = "DISABLED",
     Greyscale = "GREYSCALE",
-    Color = "COLOR",
+    Color = "COLOR"
 }

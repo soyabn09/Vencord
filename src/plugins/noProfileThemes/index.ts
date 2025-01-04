@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
@@ -22,19 +22,17 @@ import { UserStore } from "@webpack/common";
 
 export default definePlugin({
     name: "NoProfileThemes",
-    description:
-        "Completely removes Nitro profile themes from everyone but yourself",
+    description: "Completely removes Nitro profile themes from everyone but yourself",
     authors: [Devs.TheKodeToad],
     patches: [
         {
             find: "hasThemeColors(){",
             replacement: {
                 match: /get canUsePremiumProfileCustomization\(\){return /,
-                replace: "$&$self.isCurrentUser(this.userId)&&",
-            },
+                replace: "$&$self.isCurrentUser(this.userId)&&"
+            }
         },
     ],
 
-    isCurrentUser: (userId: string) =>
-        userId === UserStore.getCurrentUser()?.id,
+    isCurrentUser: (userId: string) => userId === UserStore.getCurrentUser()?.id,
 });

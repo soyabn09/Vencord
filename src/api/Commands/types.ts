@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Channel, Guild } from "discord-types/general";
 import { Promisable } from "type-fest";
@@ -102,8 +102,5 @@ export interface Command {
     options?: Option[];
     predicate?(ctx: CommandContext): boolean;
 
-    execute(
-        args: Argument[],
-        ctx: CommandContext,
-    ): Promisable<void | CommandReturnValue>;
+    execute(args: Argument[], ctx: CommandContext): Promisable<void | CommandReturnValue>;
 }

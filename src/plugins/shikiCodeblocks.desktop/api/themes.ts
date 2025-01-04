@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { IShikiTheme } from "@vap/shiki";
 
@@ -27,8 +27,7 @@ export const themes = {
     DarkPlus: shikiRepoTheme("dark-plus"),
 
     // Dev Choices
-    MaterialCandy:
-        "https://raw.githubusercontent.com/millsp/material-candy/master/material-candy.json",
+    MaterialCandy: "https://raw.githubusercontent.com/millsp/material-candy/master/material-candy.json",
 
     // More from Shiki repo
     Andromeeda: shikiRepoTheme("andromeeda"),
@@ -90,5 +89,5 @@ export const themeCache = new Map<string, IShikiTheme>();
 
 export const getTheme = (url: string): Promise<IShikiTheme> => {
     if (themeCache.has(url)) return Promise.resolve(themeCache.get(url)!);
-    return fetch(url).then((res) => res.json());
+    return fetch(url).then(res => res.json());
 };

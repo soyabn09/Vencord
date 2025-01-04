@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import type { IThemedToken } from "@vap/shiki";
 import { hljs } from "@webpack/common";
@@ -30,7 +30,13 @@ export interface CodeProps {
     tokens: IThemedToken[][] | null;
 }
 
-export const Code = ({ theme, useHljs, lang, content, tokens }: CodeProps) => {
+export const Code = ({
+    theme,
+    useHljs,
+    lang,
+    content,
+    tokens,
+}: CodeProps) => {
     let lines!: JSX.Element[];
 
     if (useHljs) {
@@ -38,22 +44,18 @@ export const Code = ({ theme, useHljs, lang, content, tokens }: CodeProps) => {
             const { value: hljsHtml } = hljs.highlight(lang!, content, true);
             lines = hljsHtml
                 .split("\n")
-                .map((line, i) => (
-                    <span key={i} dangerouslySetInnerHTML={{ __html: line }} />
-                ));
+                .map((line, i) => <span key={i} dangerouslySetInnerHTML={{ __html: line }} />);
         } catch {
-            lines = content.split("\n").map((line) => <span>{line}</span>);
+            lines = content.split("\n").map(line => <span>{line}</span>);
         }
     } else {
         const renderTokens =
             tokens ??
             content
                 .split("\n")
-                .map((line) => [
-                    { color: theme.plainColor, content: line } as IThemedToken,
-                ]);
+                .map(line => [{ color: theme.plainColor, content: line } as IThemedToken]);
 
-        lines = renderTokens.map((line) => {
+        lines = renderTokens.map(line => {
             // [Cynthia] this makes it so when you highlight the codeblock
             // empty lines are also selected and copied when you Ctrl+C.
             if (line.length === 0) {
@@ -67,14 +69,9 @@ export const Code = ({ theme, useHljs, lang, content, tokens }: CodeProps) => {
                             key={i}
                             style={{
                                 color,
-                                fontStyle:
-                                    (fontStyle ?? 0) & 1 ? "italic" : undefined,
-                                fontWeight:
-                                    (fontStyle ?? 0) & 2 ? "bold" : undefined,
-                                textDecoration:
-                                    (fontStyle ?? 0) & 4
-                                        ? "underline"
-                                        : undefined,
+                                fontStyle: (fontStyle ?? 0) & 1 ? "italic" : undefined,
+                                fontWeight: (fontStyle ?? 0) & 2 ? "bold" : undefined,
+                                textDecoration: (fontStyle ?? 0) & 4 ? "underline" : undefined,
                             }}
                         >
                             {content}

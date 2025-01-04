@@ -14,26 +14,16 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { showNotification } from "@api/Notifications";
 import { Settings, useSettings } from "@api/Settings";
 import { CheckedTextInput } from "@components/CheckedTextInput";
 import { Grid } from "@components/Grid";
 import { Link } from "@components/Link";
-import {
-    authorizeCloud,
-    cloudLogger,
-    deauthorizeCloud,
-    getCloudAuth,
-    getCloudUrl,
-} from "@utils/cloud";
+import { authorizeCloud, cloudLogger, deauthorizeCloud, getCloudAuth, getCloudUrl } from "@utils/cloud";
 import { Margins } from "@utils/margins";
-import {
-    deleteCloudSettings,
-    getCloudSettings,
-    putCloudSettings,
-} from "@utils/settingsSync";
+import { deleteCloudSettings, getCloudSettings, putCloudSettings } from "@utils/settingsSync";
 import { Alerts, Button, Forms, Switch, Tooltip } from "@webpack/common";
 
 import { SettingsTab, wrapTab } from "./shared";
@@ -50,7 +40,7 @@ function validateUrl(url: string) {
 async function eraseAllData() {
     const res = await fetch(new URL("/v1/", getCloudUrl()), {
         method: "DELETE",
-        headers: { Authorization: await getCloudAuth() },
+        headers: { Authorization: await getCloudAuth() }
     });
 
     if (!res.ok) {
@@ -58,7 +48,7 @@ async function eraseAllData() {
         showNotification({
             title: "Cloud Integrations",
             body: `Could not erase all data (API returned ${res.status}), please contact support.`,
-            color: "var(--red-360)",
+            color: "var(--red-360)"
         });
         return;
     }
@@ -69,33 +59,25 @@ async function eraseAllData() {
     showNotification({
         title: "Cloud Integrations",
         body: "Successfully erased all data.",
-        color: "var(--green-360)",
+        color: "var(--green-360)"
     });
 }
 
 function SettingsSyncSection() {
-    const { cloud } = useSettings([
-        "cloud.authenticated",
-        "cloud.settingsSync",
-    ]);
+    const { cloud } = useSettings(["cloud.authenticated", "cloud.settingsSync"]);
     const sectionEnabled = cloud.authenticated && cloud.settingsSync;
 
     return (
         <Forms.FormSection title="Settings Sync" className={Margins.top16}>
-            <Forms.FormText
-                variant="text-md/normal"
-                className={Margins.bottom20}
-            >
-                Synchronize your settings to the cloud. This allows easy
-                synchronization across multiple devices with minimal effort.
+            <Forms.FormText variant="text-md/normal" className={Margins.bottom20}>
+                Synchronize your settings to the cloud. This allows easy synchronization across multiple devices with
+                minimal effort.
             </Forms.FormText>
             <Switch
                 key="cloud-sync"
                 disabled={!cloud.authenticated}
                 value={cloud.settingsSync}
-                onChange={(v) => {
-                    cloud.settingsSync = v;
-                }}
+                onChange={v => { cloud.settingsSync = v; }}
             >
                 Settings Sync
             </Switch>
@@ -140,27 +122,20 @@ function CloudTab() {
     return (
         <SettingsTab title="Vencord Cloud">
             <Forms.FormSection title="Cloud Settings" className={Margins.top16}>
-                <Forms.FormText
-                    variant="text-md/normal"
-                    className={Margins.bottom20}
-                >
-                    Vencord comes with a cloud integration that adds goodies
-                    like settings sync across devices. It{" "}
-                    <Link href="https://vencord.dev/cloud/privacy">
-                        respects your privacy
-                    </Link>
-                    , and the{" "}
-                    <Link href="https://github.com/Vencord/Backend">
-                        source code
-                    </Link>{" "}
-                    is AGPL 3.0 licensed so you can host it yourself.
+                <Forms.FormText variant="text-md/normal" className={Margins.bottom20}>
+                    Vencord comes with a cloud integration that adds goodies like settings sync across devices.
+                    It <Link href="https://vencord.dev/cloud/privacy">respects your privacy</Link>, and
+                    the <Link href="https://github.com/Vencord/Backend">source code</Link> is AGPL 3.0 licensed so you
+                    can host it yourself.
                 </Forms.FormText>
                 <Switch
                     key="backend"
                     value={settings.cloud.authenticated}
-                    onChange={(v) => {
-                        if (v) authorizeCloud();
-                        else settings.cloud.authenticated = v;
+                    onChange={v => {
+                        if (v)
+                            authorizeCloud();
+                        else
+                            settings.cloud.authenticated = v;
                     }}
                     note="This will request authorization if you have not yet set up cloud integrations."
                 >
@@ -173,7 +148,7 @@ function CloudTab() {
                 <CheckedTextInput
                     key="backendUrl"
                     value={settings.cloud.url}
-                    onChange={async (v) => {
+                    onChange={async v => {
                         settings.cloud.url = v;
                         settings.cloud.authenticated = false;
                         deauthorizeCloud();
@@ -197,23 +172,21 @@ function CloudTab() {
                         size={Button.Sizes.MEDIUM}
                         color={Button.Colors.RED}
                         disabled={!settings.cloud.authenticated}
-                        onClick={() =>
-                            Alerts.show({
-                                title: "Are you sure?",
-                                body: "Once your data is erased, we cannot recover it. There's no going back!",
-                                onConfirm: eraseAllData,
-                                confirmText: "Erase it!",
-                                confirmColor: "vc-cloud-erase-data-danger-btn",
-                                cancelText: "Nevermind",
-                            })
-                        }
+                        onClick={() => Alerts.show({
+                            title: "Are you sure?",
+                            body: "Once your data is erased, we cannot recover it. There's no going back!",
+                            onConfirm: eraseAllData,
+                            confirmText: "Erase it!",
+                            confirmColor: "vc-cloud-erase-data-danger-btn",
+                            cancelText: "Nevermind"
+                        })}
                     >
                         Erase All Data
                     </Button>
                 </Grid>
 
                 <Forms.FormDivider className={Margins.top16} />
-            </Forms.FormSection>
+            </Forms.FormSection >
             <SettingsSyncSection />
         </SettingsTab>
     );

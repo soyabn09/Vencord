@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { get, set } from "@api/DataStore";
 import { addButton, removeButton } from "@api/MessagePopover";
@@ -28,17 +28,15 @@ let style: HTMLStyleElement;
 const KEY = "HideAttachments_HiddenIds";
 
 let hiddenMessages: Set<string> = new Set();
-const getHiddenMessages = () =>
-    get(KEY).then((set) => {
-        hiddenMessages = set ?? new Set<string>();
-        return hiddenMessages;
-    });
+const getHiddenMessages = () => get(KEY).then(set => {
+    hiddenMessages = set ?? new Set<string>();
+    return hiddenMessages;
+});
 const saveHiddenMessages = (ids: Set<string>) => set(KEY, ids);
 
 export default definePlugin({
     name: "HideAttachments",
-    description:
-        "Hide attachments and Embeds for individual messages via hover button",
+    description: "Hide attachments and Embeds for individual messages via hover button",
     authors: [Devs.Ven],
     dependencies: ["MessagePopoverAPI"],
 
@@ -50,13 +48,8 @@ export default definePlugin({
         await getHiddenMessages();
         await this.buildCss();
 
-        addButton("HideAttachments", (msg) => {
-            if (
-                !msg.attachments.length &&
-                !msg.embeds.length &&
-                !msg.stickerItems.length
-            )
-                return null;
+        addButton("HideAttachments", msg => {
+            if (!msg.attachments.length && !msg.embeds.length && !msg.stickerItems.length) return null;
 
             const isHidden = hiddenMessages.has(msg.id);
 
@@ -65,7 +58,7 @@ export default definePlugin({
                 icon: isHidden ? ImageVisible : ImageInvisible,
                 message: msg,
                 channel: ChannelStore.getChannel(msg.channel_id),
-                onClick: () => this.toggleHide(msg.id),
+                onClick: () => this.toggleHide(msg.id)
             };
         });
     },
@@ -77,9 +70,7 @@ export default definePlugin({
     },
 
     async buildCss() {
-        const elements = [...hiddenMessages]
-            .map((id) => `#message-accessories-${id}`)
-            .join(",");
+        const elements = [...hiddenMessages].map(id => `#message-accessories-${id}`).join(",");
         style.textContent = `
         :is(${elements}) :is([class*="embedWrapper"], [class*="clickableSticker"]) {
             /* important is not necessary, but add it to make sure bad themes won't break it */
@@ -95,9 +86,10 @@ export default definePlugin({
 
     async toggleHide(id: string) {
         const ids = await getHiddenMessages();
-        if (!ids.delete(id)) ids.add(id);
+        if (!ids.delete(id))
+            ids.add(id);
 
         await saveHiddenMessages(ids);
         await this.buildCss();
-    },
+    }
 });

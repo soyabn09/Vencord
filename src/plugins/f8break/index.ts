@@ -14,15 +14,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 
 export default definePlugin({
     name: "F8Break",
-    description:
-        "Pause the client when you press F8 with DevTools (+ breakpoints) open.",
+    description: "Pause the client when you press F8 with DevTools (+ breakpoints) open.",
     authors: [Devs.lewisakura],
 
     start() {
@@ -39,5 +38,5 @@ export default definePlugin({
             // It's up to you on what to do, friend. Happy travels!
             debugger;
         }
-    },
+    }
 });

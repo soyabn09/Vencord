@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { findOption, OptionalMessageOption } from "@api/Commands";
 import { Devs } from "@utils/constants";
@@ -36,11 +36,12 @@ export default definePlugin({
         { name: "confused", description: "(•ิ_•ิ)?" },
         { name: "sleeping", description: "(ᴗ_ᴗ)" },
         { name: "laughing", description: "o(≧▽≦)o" },
-    ].map((data) => ({
+
+    ].map(data => ({
         ...data,
         options: [OptionalMessageOption],
-        execute: (opts) => ({
-            content: findOption(opts, "message", "") + " " + data.description,
-        }),
-    })),
+        execute: opts => ({
+            content: findOption(opts, "message", "") + " " + data.description
+        })
+    }))
 });

@@ -14,12 +14,9 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
-import {
-    findGroupChildrenByChildId,
-    NavContextMenuPatchCallback,
-} from "@api/ContextMenu";
+import { findGroupChildrenByChildId, NavContextMenuPatchCallback } from "@api/ContextMenu";
 import { migratePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
 import { getIntlMessage } from "@utils/discord";
@@ -36,20 +33,12 @@ interface CopyIdMenuItemProps {
     label: string;
 }
 
-let CopyIdMenuItem: (props: CopyIdMenuItemProps) => React.ReactElement | null =
-    NoopComponent;
-waitFor(
-    filters.componentByCode('"devmode-copy-id-".concat'),
-    (m) => (CopyIdMenuItem = m),
-);
+let CopyIdMenuItem: (props: CopyIdMenuItemProps) => React.ReactElement | null = NoopComponent;
+waitFor(filters.componentByCode('"devmode-copy-id-".concat'), m => CopyIdMenuItem = m);
 
 function MessageMenu({ message, channel, onHeightUpdate }) {
-    const canReport =
-        message.author &&
-        !(
-            message.author.id === UserStore.getCurrentUser().id ||
-            message.author.system
-        );
+    const canReport = message.author &&
+        !(message.author.id === UserStore.getCurrentUser().id || message.author.system);
 
     return useMessageMenu({
         navId: "message-actions",
@@ -70,7 +59,7 @@ function MessageMenu({ message, channel, onHeightUpdate }) {
         itemSafeSrc: void 0,
         itemTextContent: void 0,
 
-        isFullSearchContextMenu: true,
+        isFullSearchContextMenu: true
     });
 }
 
@@ -79,10 +68,7 @@ interface MessageActionsProps {
     isFullSearchContextMenu?: boolean;
 }
 
-const contextMenuPatch: NavContextMenuPatchCallback = (
-    children,
-    props: MessageActionsProps,
-) => {
+const contextMenuPatch: NavContextMenuPatchCallback = (children, props: MessageActionsProps) => {
     if (props?.isFullSearchContextMenu == null) return;
 
     const group = findGroupChildrenByChildId("devmode-copy-id", children, true);
@@ -94,19 +80,16 @@ const contextMenuPatch: NavContextMenuPatchCallback = (
 migratePluginSettings("FullSearchContext", "SearchReply");
 export default definePlugin({
     name: "FullSearchContext",
-    description:
-        "Makes the message context menu in message search results have all options you'd expect",
+    description: "Makes the message context menu in message search results have all options you'd expect",
     authors: [Devs.Ven, Devs.Aria],
 
-    patches: [
-        {
-            find: "onClick:this.handleMessageClick,",
-            replacement: {
-                match: /this(?=\.handleContextMenu\(\i,\i\))/,
-                replace: "$self",
-            },
-        },
-    ],
+    patches: [{
+        find: "onClick:this.handleMessageClick,",
+        replacement: {
+            match: /this(?=\.handleContextMenu\(\i,\i\))/,
+            replace: "$self"
+        }
+    }],
 
     handleContextMenu(event: React.MouseEvent, message: Message) {
         const channel = ChannelStore.getChannel(message.channel_id);
@@ -114,16 +97,16 @@ export default definePlugin({
 
         event.stopPropagation();
 
-        ContextMenuApi.openContextMenu(event, (contextMenuProps) => (
+        ContextMenuApi.openContextMenu(event, contextMenuProps =>
             <MessageMenu
                 message={message}
                 channel={channel}
                 onHeightUpdate={contextMenuProps.onHeightUpdate}
             />
-        ));
+        );
     },
 
     contextMenus: {
-        "message-actions": contextMenuPatch,
-    },
+        "message-actions": contextMenuPatch
+    }
 });

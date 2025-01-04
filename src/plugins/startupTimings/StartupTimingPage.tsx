@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Flex } from "@components/Flex";
@@ -45,11 +45,7 @@ interface Log {
     delta?: number;
 }
 
-const AppStartPerformance = findByPropsLazy(
-    "markWithDelta",
-    "markAndLog",
-    "markAt",
-) as AppStartPerformance;
+const AppStartPerformance = findByPropsLazy("markWithDelta", "markAndLog", "markAt") as AppStartPerformance;
 
 interface TimerItemProps extends Log {
     instance: {
@@ -64,12 +60,7 @@ function TimerItem({ emoji, prefix, log, delta, instance }: TimerItemProps) {
             <span>{instance.sinceStart.toFixed(3)}s</span>
             <span>{instance.sinceLast.toFixed(3)}s</span>
             <span>{delta?.toFixed(0) ?? ""}</span>
-            <span>
-                <pre>
-                    {emoji} {prefix ?? " "}
-                    {log}
-                </pre>
-            </span>
+            <span><pre>{emoji} {prefix ?? " "}{log}</pre></span>
         </React.Fragment>
     );
 }
@@ -81,10 +72,10 @@ interface TimingSectionProps {
 }
 
 function TimingSection({ title, logs, traceEnd }: TimingSectionProps) {
-    const startTime = logs.find((l) => l.timestamp)?.timestamp ?? 0;
+    const startTime = logs.find(l => l.timestamp)?.timestamp ?? 0;
 
     let lastTimestamp = startTime;
-    const timings = logs.map((log) => {
+    const timings = logs.map(log => {
         // Get last log entry with valid timestamp
         const timestamp = log.timestamp ?? lastTimestamp;
 
@@ -100,25 +91,11 @@ function TimingSection({ title, logs, traceEnd }: TimingSectionProps) {
         <Forms.FormSection title={title} tag="h1">
             <code>
                 {traceEnd && (
-                    <div
-                        style={{
-                            color: "var(--header-primary)",
-                            marginBottom: 5,
-                            userSelect: "text",
-                        }}
-                    >
-                        Trace ended at: {new Date(traceEnd).toTimeString()}
+                    <div style={{ color: "var(--header-primary)", marginBottom: 5, userSelect: "text" }}>
+                        Trace ended at: {(new Date(traceEnd)).toTimeString()}
                     </div>
                 )}
-                <div
-                    style={{
-                        color: "var(--header-primary)",
-                        display: "grid",
-                        gridTemplateColumns: "repeat(3, auto) 1fr",
-                        gap: "2px 10px",
-                        userSelect: "text",
-                    }}
-                >
+                <div style={{ color: "var(--header-primary)", display: "grid", gridTemplateColumns: "repeat(3, auto) 1fr", gap: "2px 10px", userSelect: "text" }}>
                     <span>Start</span>
                     <span>Interval</span>
                     <span>Delta</span>
@@ -142,15 +119,8 @@ function ServerTrace({ trace }: ServerTraceProps) {
     return (
         <Forms.FormSection title="Server Trace" tag="h2">
             <code>
-                <Flex
-                    flexDirection="column"
-                    style={{
-                        color: "var(--header-primary)",
-                        gap: 5,
-                        userSelect: "text",
-                    }}
-                >
-                    {lines.map((line) => (
+                <Flex flexDirection="column" style={{ color: "var(--header-primary)", gap: 5, userSelect: "text" }}>
+                    {lines.map(line => (
                         <span>{line}</span>
                     ))}
                 </Flex>
@@ -162,9 +132,7 @@ function ServerTrace({ trace }: ServerTraceProps) {
 function StartupTimingPage() {
     if (!AppStartPerformance?.logs) return <div>Loading...</div>;
 
-    const serverTrace = AppStartPerformance.logGroups.find(
-        (g) => g.serverTrace,
-    )?.serverTrace;
+    const serverTrace = AppStartPerformance.logGroups.find(g => g.serverTrace)?.serverTrace;
 
     return (
         <React.Fragment>

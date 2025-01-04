@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { mergeDefaults } from "@utils/mergeDefaults";
 import { findByCodeLazy } from "@webpack";
@@ -36,16 +36,10 @@ export function generateId() {
  * @param {Message} message Message to send
  * @returns {Message}
  */
-export function sendBotMessage(
-    channelId: string,
-    message: PartialDeep<Message>,
-): Message {
+export function sendBotMessage(channelId: string, message: PartialDeep<Message>): Message {
     const botMessage = createBotMessage({ channelId, content: "", embeds: [] });
 
-    MessageActions.receiveMessage(
-        channelId,
-        mergeDefaults(message, botMessage),
-    );
+    MessageActions.receiveMessage(channelId, mergeDefaults(message, botMessage));
 
     return message as Message;
 }

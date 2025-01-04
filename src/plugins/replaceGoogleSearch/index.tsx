@@ -4,10 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import {
-    findGroupChildrenByChildId,
-    NavContextMenuPatchCallback,
-} from "@api/ContextMenu";
+import { findGroupChildrenByChildId, NavContextMenuPatchCallback } from "@api/ContextMenu";
 import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
 import definePlugin, { OptionType } from "@utils/types";
@@ -29,13 +26,13 @@ const settings = definePluginSettings({
     customEngineName: {
         description: "Name of the custom search engine",
         type: OptionType.STRING,
-        placeholder: "Google",
+        placeholder: "Google"
     },
     customEngineURL: {
         description: "The URL of your Engine",
         type: OptionType.STRING,
-        placeholder: "https://google.com/search?q=",
-    },
+        placeholder: "https://google.com/search?q="
+    }
 });
 
 function search(src: string, engine: string) {
@@ -46,8 +43,7 @@ function makeSearchItem(src: string) {
     let Engines = {};
 
     if (settings.store.customEngineName && settings.store.customEngineURL) {
-        Engines[settings.store.customEngineName] =
-            settings.store.customEngineURL;
+        Engines[settings.store.customEngineName] = settings.store.customEngineURL;
     }
 
     Engines = { ...Engines, ...DefaultEngines };
@@ -58,19 +54,17 @@ function makeSearchItem(src: string) {
             key="search-text"
             id="vc-search-text"
         >
-            {Object.keys(Engines).map((engine) => {
+            {Object.keys(Engines).map(engine => {
                 const key = "vc-search-content-" + engine;
                 return (
                     <Menu.MenuItem
                         key={key}
                         id={key}
                         label={
-                            <Flex
-                                style={{ alignItems: "center", gap: "0.5em" }}
-                            >
+                            <Flex style={{ alignItems: "center", gap: "0.5em" }}>
                                 <img
                                     style={{
-                                        borderRadius: "50%",
+                                        borderRadius: "50%"
                                     }}
                                     aria-hidden="true"
                                     height={16}
@@ -88,16 +82,13 @@ function makeSearchItem(src: string) {
     );
 }
 
-const messageContextMenuPatch: NavContextMenuPatchCallback = (
-    children,
-    _props,
-) => {
+const messageContextMenuPatch: NavContextMenuPatchCallback = (children, _props) => {
     const selection = document.getSelection()?.toString();
     if (!selection) return;
 
     const group = findGroupChildrenByChildId("search-google", children);
     if (group) {
-        const idx = group.findIndex((c) => c?.props?.id === "search-google");
+        const idx = group.findIndex(c => c?.props?.id === "search-google");
         if (idx !== -1) group[idx] = makeSearchItem(selection);
     }
 };
@@ -110,6 +101,6 @@ export default definePlugin({
     settings,
 
     contextMenus: {
-        message: messageContextMenuPatch,
-    },
+        "message": messageContextMenuPatch
+    }
 });

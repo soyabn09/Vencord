@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Settings } from "@api/Settings";
 import ErrorBoundary from "@components/ErrorBoundary";
@@ -27,8 +27,8 @@ function formatDuration(ms: number) {
     // here be dragons (moment fucking sucks)
     const human = Settings.plugins.CallTimer.format === "human";
 
-    const format = (n: number) => (human ? n : n.toString().padStart(2, "0"));
-    const unit = (s: string) => (human ? s : "");
+    const format = (n: number) => human ? n : n.toString().padStart(2, "0");
+    const unit = (s: string) => human ? s : "";
     const delim = human ? " " : ":";
 
     // thx copilot
@@ -57,20 +57,19 @@ export default definePlugin({
     options: {
         format: {
             type: OptionType.SELECT,
-            description:
-                "The timer format. This can be any valid moment.js format",
+            description: "The timer format. This can be any valid moment.js format",
             options: [
                 {
                     label: "30d 23:00:42",
                     value: "stopwatch",
-                    default: true,
+                    default: true
                 },
                 {
                     label: "30d 23h 00m 42s",
-                    value: "human",
-                },
-            ],
-        },
+                    value: "human"
+                }
+            ]
+        }
     },
 
     patches: [{
@@ -82,25 +81,16 @@ export default definePlugin({
     }],
 
     renderTimer(channelId: string) {
-        return (
-            <ErrorBoundary noop>
-                <this.Timer channelId={channelId} />
-            </ErrorBoundary>
-        );
+        return <ErrorBoundary noop>
+            <this.Timer channelId={channelId} />
+        </ErrorBoundary>;
     },
 
     Timer({ channelId }: { channelId: string; }) {
         const time = useTimer({
-            deps: [channelId],
+            deps: [channelId]
         });
 
-        return (
-            <p style={{ margin: 0 }}>
-                Connected for{" "}
-                <span style={{ fontFamily: "var(--font-code)" }}>
-                    {formatDuration(time)}
-                </span>
-            </p>
-        );
-    },
+        return <p style={{ margin: 0 }}>Connected for <span style={{ fontFamily: "var(--font-code)" }}>{formatDuration(time)}</span></p>;
+    }
 });

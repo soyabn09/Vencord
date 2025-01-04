@@ -2,10 +2,8 @@
     background: center / cover no-repeat;
 }
 
-[class*="NonPremium"]:has([class*="bannerPremium"])
-    [class*="avatarPositionNormal"],
-[class*="PremiumWithoutBanner"]:has([class*="bannerPremium"])
-    [class*="avatarPositionPremiumNoBanner"] {
+[class*="NonPremium"]:has([class*="bannerPremium"]) [class*="avatarPositionNormal"],
+[class*="PremiumWithoutBanner"]:has([class*="bannerPremium"]) [class*="avatarPositionPremiumNoBanner"] {
     top: 76px;
 }
 

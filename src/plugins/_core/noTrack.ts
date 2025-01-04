@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
@@ -26,14 +26,13 @@ const settings = definePluginSettings({
         type: OptionType.BOOLEAN,
         description: "Disable Discord's tracking (analytics/'science')",
         default: true,
-        restartNeeded: true,
-    },
+        restartNeeded: true
+    }
 });
 
 export default definePlugin({
     name: "NoTrack",
-    description:
-        "Disable Discord's tracking (analytics/'science'), metrics and Sentry crash reporting",
+    description: "Disable Discord's tracking (analytics/'science'), metrics and Sentry crash reporting",
     authors: [Devs.Cyn, Devs.Ven, Devs.Nuckyz, Devs.Arrow],
     required: true,
 
@@ -53,13 +52,13 @@ export default definePlugin({
             replacement: [
                 {
                     match: /this\._intervalId=/,
-                    replace: "this._intervalId=void 0&&",
+                    replace: "this._intervalId=void 0&&"
                 },
                 {
                     match: /(?:increment|distribution)\(\i(?:,\i)?\){/g,
-                    replace: "$&return;",
-                },
-            ],
+                    replace: "$&return;"
+                }
+            ]
         },
         {
             find: ".BetterDiscord||null!=",
@@ -87,20 +86,13 @@ export default definePlugin({
                     value: v,
                     configurable: true,
                     enumerable: true,
-                    writable: true,
+                    writable: true
                 });
 
                 // Ensure this is most likely the Sentry WebpackInstance.
                 // Function.g is a very generic property and is not uncommon for another WebpackInstance (or even a React component: <g></g>) to include it
                 const { stack } = new Error();
-                if (
-                    !(
-                        stack?.includes("discord.com") ||
-                        stack?.includes("discordapp.com")
-                    ) ||
-                    !String(this).includes("exports:{}") ||
-                    this.c != null
-                ) {
+                if (!(stack?.includes("discord.com") || stack?.includes("discordapp.com")) || !String(this).includes("exports:{}") || this.c != null) {
                     return;
                 }
 
@@ -114,34 +106,28 @@ export default definePlugin({
                 srcRequest.send();
 
                 // Final condition to see if this is the Sentry WebpackInstance
-                if (
-                    !srcRequest.responseText.includes("window.DiscordSentry=")
-                ) {
+                if (!srcRequest.responseText.includes("window.DiscordSentry=")) {
                     return;
                 }
 
-                new Logger("NoTrack", "#8caaee").info(
-                    "Disabling Sentry by erroring its WebpackInstance",
-                );
+                new Logger("NoTrack", "#8caaee").info("Disabling Sentry by erroring its WebpackInstance");
 
                 Reflect.deleteProperty(Function.prototype, "g");
                 Reflect.deleteProperty(window, "DiscordSentry");
 
                 throw new Error("Sentry successfully disabled");
-            },
+            }
         });
 
         Object.defineProperty(window, "DiscordSentry", {
             configurable: true,
 
             set() {
-                new Logger("NoTrack", "#8caaee").error(
-                    "Failed to disable Sentry. Falling back to deleting window.DiscordSentry",
-                );
+                new Logger("NoTrack", "#8caaee").error("Failed to disable Sentry. Falling back to deleting window.DiscordSentry");
 
                 Reflect.deleteProperty(Function.prototype, "g");
                 Reflect.deleteProperty(window, "DiscordSentry");
-            },
+            }
         });
-    },
+    }
 });

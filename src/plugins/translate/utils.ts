@@ -14,25 +14,19 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { classNameFactory } from "@api/Styles";
 import { onlyOnce } from "@utils/onlyOnce";
 import { PluginNative } from "@utils/types";
 import { showToast, Toasts } from "@webpack/common";
 
-import {
-    DeeplLanguages,
-    deeplLanguageToGoogleLanguage,
-    GoogleLanguages,
-} from "./languages";
+import { DeeplLanguages, deeplLanguageToGoogleLanguage, GoogleLanguages } from "./languages";
 import { resetLanguageDefaults, settings } from "./settings";
 
 export const cl = classNameFactory("vc-trans-");
 
-const Native = VencordNative.pluginHelpers.Translate as PluginNative<
-    typeof import("./native")
->;
+const Native = VencordNative.pluginHelpers.Translate as PluginNative<typeof import("./native")>;
 
 interface GoogleData {
     src: string;
@@ -54,109 +48,85 @@ export interface TranslationValue {
     text: string;
 }
 
-export const getLanguages = () =>
-    IS_WEB || settings.store.service === "google"
-        ? GoogleLanguages
-        : DeeplLanguages;
+export const getLanguages = () => IS_WEB || settings.store.service === "google"
+    ? GoogleLanguages
+    : DeeplLanguages;
 
-export async function translate(
-    kind: "received" | "sent",
-    text: string,
-): Promise<TranslationValue> {
-    const translate =
-        IS_WEB || settings.store.service === "google"
-            ? googleTranslate
-            : deeplTranslate;
+export async function translate(kind: "received" | "sent", text: string): Promise<TranslationValue> {
+    const translate = IS_WEB || settings.store.service === "google"
+        ? googleTranslate
+        : deeplTranslate;
 
     try {
         return await translate(
             text,
             settings.store[`${kind}Input`],
-            settings.store[`${kind}Output`],
+            settings.store[`${kind}Output`]
         );
     } catch (e) {
-        const userMessage =
-            typeof e === "string"
-                ? e
-                : "Something went wrong. If this issue persists, please check the console or ask for help in the support server.";
+        const userMessage = typeof e === "string"
+            ? e
+            : "Something went wrong. If this issue persists, please check the console or ask for help in the support server.";
 
         showToast(userMessage, Toasts.Type.FAILURE);
 
-        throw e instanceof Error ? e : new Error(userMessage);
+        throw e instanceof Error
+            ? e
+            : new Error(userMessage);
     }
 }
 
-async function googleTranslate(
-    text: string,
-    sourceLang: string,
-    targetLang: string,
-): Promise<TranslationValue> {
-    const url =
-        "https://translate.googleapis.com/translate_a/single?" +
-        new URLSearchParams({
-            // see https://stackoverflow.com/a/29537590 for more params
-            // holy shidd nvidia
-            client: "gtx",
-            // source language
-            sl: sourceLang,
-            // target language
-            tl: targetLang,
-            // what to return, t = translation probably
-            dt: "t",
-            // Send json object response instead of weird array
-            dj: "1",
-            source: "input",
-            // query, duh
-            q: text,
-        });
+async function googleTranslate(text: string, sourceLang: string, targetLang: string): Promise<TranslationValue> {
+    const url = "https://translate.googleapis.com/translate_a/single?" + new URLSearchParams({
+        // see https://stackoverflow.com/a/29537590 for more params
+        // holy shidd nvidia
+        client: "gtx",
+        // source language
+        sl: sourceLang,
+        // target language
+        tl: targetLang,
+        // what to return, t = translation probably
+        dt: "t",
+        // Send json object response instead of weird array
+        dj: "1",
+        source: "input",
+        // query, duh
+        q: text
+    });
 
     const res = await fetch(url);
     if (!res.ok)
         throw new Error(
-            `Failed to translate "${text}" (${sourceLang} -> ${targetLang})` +
-                `\n${res.status} ${res.statusText}`,
+            `Failed to translate "${text}" (${sourceLang} -> ${targetLang})`
+            + `\n${res.status} ${res.statusText}`
         );
 
     const { src, sentences }: GoogleData = await res.json();
 
     return {
         sourceLanguage: GoogleLanguages[src] ?? src,
-        text: sentences
-            .map((s) => s?.trans)
-            .filter(Boolean)
-            .join(""),
+        text: sentences.
+            map(s => s?.trans).
+            filter(Boolean).
+            join("")
     };
 }
 
-function fallbackToGoogle(
-    text: string,
-    sourceLang: string,
-    targetLang: string,
-): Promise<TranslationValue> {
+function fallbackToGoogle(text: string, sourceLang: string, targetLang: string): Promise<TranslationValue> {
     return googleTranslate(
         text,
         deeplLanguageToGoogleLanguage(sourceLang),
-        deeplLanguageToGoogleLanguage(targetLang),
+        deeplLanguageToGoogleLanguage(targetLang)
     );
 }
 
-const showDeeplApiQuotaToast = onlyOnce(() =>
-    showToast(
-        "Deepl API quota exceeded. Falling back to Google Translate",
-        Toasts.Type.FAILURE,
-    ),
+const showDeeplApiQuotaToast = onlyOnce(
+    () => showToast("Deepl API quota exceeded. Falling back to Google Translate", Toasts.Type.FAILURE)
 );
 
-async function deeplTranslate(
-    text: string,
-    sourceLang: string,
-    targetLang: string,
-): Promise<TranslationValue> {
+async function deeplTranslate(text: string, sourceLang: string, targetLang: string): Promise<TranslationValue> {
     if (!settings.store.deeplApiKey) {
-        showToast(
-            "DeepL API key is not set. Resetting to Google",
-            Toasts.Type.FAILURE,
-        );
+        showToast("DeepL API key is not set. Resetting to Google", Toasts.Type.FAILURE);
 
         settings.store.service = "google";
         resetLanguageDefaults();
@@ -171,8 +141,8 @@ async function deeplTranslate(
         JSON.stringify({
             text: [text],
             target_lang: targetLang,
-            source_lang: sourceLang.split("-")[0],
-        }),
+            source_lang: sourceLang.split("-")[0]
+        })
     );
 
     switch (status) {
@@ -186,9 +156,7 @@ async function deeplTranslate(
             showDeeplApiQuotaToast();
             return fallbackToGoogle(text, sourceLang, targetLang);
         default:
-            throw new Error(
-                `Failed to translate "${text}" (${sourceLang} -> ${targetLang})\n${status} ${data}`,
-            );
+            throw new Error(`Failed to translate "${text}" (${sourceLang} -> ${targetLang})\n${status} ${data}`);
     }
 
     const { translations }: DeeplData = JSON.parse(data);
@@ -196,6 +164,6 @@ async function deeplTranslate(
 
     return {
         sourceLanguage: DeeplLanguages[src] ?? src,
-        text: translations[0].text,
+        text: translations[0].text
     };
 }

@@ -14,47 +14,23 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import * as DataStore from "@api/DataStore";
 import { Settings } from "@api/Settings";
 import { classNameFactory } from "@api/Styles";
 import { Flex } from "@components/Flex";
 import { openNotificationSettingsModal } from "@components/VencordSettings/NotificationSettings";
-import {
-    closeModal,
-    ModalCloseButton,
-    ModalContent,
-    ModalFooter,
-    ModalHeader,
-    ModalProps,
-    ModalRoot,
-    ModalSize,
-    openModal,
-} from "@utils/modal";
+import { closeModal, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalProps, ModalRoot, ModalSize, openModal } from "@utils/modal";
 import { useAwaiter } from "@utils/react";
-import {
-    Alerts,
-    Button,
-    Forms,
-    React,
-    Text,
-    Timestamp,
-    useEffect,
-    useReducer,
-    useState,
-} from "@webpack/common";
+import { Alerts, Button, Forms, React, Text, Timestamp, useEffect, useReducer, useState } from "@webpack/common";
 import { nanoid } from "nanoid";
 import type { DispatchWithoutAction } from "react";
 
 import NotificationComponent from "./NotificationComponent";
 import type { NotificationData } from "./Notifications";
 
-interface PersistentNotificationData
-    extends Pick<
-        NotificationData,
-        "title" | "body" | "image" | "icon" | "color"
-    > {
+interface PersistentNotificationData extends Pick<NotificationData, "title" | "body" | "image" | "icon" | "color"> {
     timestamp: number;
     id: string;
 }
@@ -62,9 +38,7 @@ interface PersistentNotificationData
 const KEY = "notification-log";
 
 const getLog = async () => {
-    const log = (await DataStore.get(KEY)) as
-        | PersistentNotificationData[]
-        | undefined;
+    const log = await DataStore.get(KEY) as PersistentNotificationData[] | undefined;
     return log ?? [];
 };
 
@@ -77,49 +51,42 @@ export async function persistNotification(notification: NotificationData) {
     const limit = Settings.notifications.logLimit;
     if (limit === 0) return;
 
-    await DataStore.update(
-        KEY,
-        (old: PersistentNotificationData[] | undefined) => {
-            const log = old ?? [];
+    await DataStore.update(KEY, (old: PersistentNotificationData[] | undefined) => {
+        const log = old ?? [];
 
-            // Omit stuff we don't need
-            const {
-                onClick,
-                onClose,
-                richBody,
-                permanent,
-                noPersist,
-                dismissOnClick,
-                ...pureNotification
-            } = notification;
+        // Omit stuff we don't need
+        const {
+            onClick, onClose, richBody, permanent, noPersist, dismissOnClick,
+            ...pureNotification
+        } = notification;
 
-            log.unshift({
-                ...pureNotification,
-                timestamp: Date.now(),
-                id: nanoid(),
-            });
+        log.unshift({
+            ...pureNotification,
+            timestamp: Date.now(),
+            id: nanoid()
+        });
 
-            if (log.length > limit && limit !== 200) log.length = limit;
+        if (log.length > limit && limit !== 200)
+            log.length = limit;
 
-            return log;
-        },
-    );
+        return log;
+    });
 
-    signals.forEach((x) => x());
+    signals.forEach(x => x());
 }
 
 export async function deleteNotification(timestamp: number) {
     const log = await getLog();
-    const index = log.findIndex((x) => x.timestamp === timestamp);
+    const index = log.findIndex(x => x.timestamp === timestamp);
     if (index === -1) return;
 
     log.splice(index, 1);
     await DataStore.set(KEY, log);
-    signals.forEach((x) => x());
+    signals.forEach(x => x());
 }
 
 export function useLogs() {
-    const [signal, setSignal] = useReducer((x) => x + 1, 0);
+    const [signal, setSignal] = useReducer(x => x + 1, 0);
 
     useEffect(() => {
         signals.add(setSignal);
@@ -128,13 +95,13 @@ export function useLogs() {
 
     const [log, _, pending] = useAwaiter(getLog, {
         fallbackValue: [],
-        deps: [signal],
+        deps: [signal]
     });
 
     return [log, pending] as const;
 }
 
-function NotificationEntry({ data }: { data: PersistentNotificationData }) {
+function NotificationEntry({ data }: { data: PersistentNotificationData; }) {
     const [removing, setRemoving] = useState(false);
     const ref = React.useRef<HTMLDivElement>(null);
 
@@ -164,10 +131,7 @@ function NotificationEntry({ data }: { data: PersistentNotificationData }) {
                 richBody={
                     <div className={cl("body")}>
                         {data.body}
-                        <Timestamp
-                            timestamp={new Date(data.timestamp)}
-                            className={cl("timestamp")}
-                        />
+                        <Timestamp timestamp={new Date(data.timestamp)} className={cl("timestamp")} />
                     </div>
                 }
             />
@@ -175,13 +139,7 @@ function NotificationEntry({ data }: { data: PersistentNotificationData }) {
     );
 }
 
-export function NotificationLog({
-    log,
-    pending,
-}: {
-    log: PersistentNotificationData[];
-    pending: boolean;
-}) {
+export function NotificationLog({ log, pending }: { log: PersistentNotificationData[], pending: boolean; }) {
     if (!log.length && !pending)
         return (
             <div className={cl("container")}>
@@ -194,28 +152,18 @@ export function NotificationLog({
 
     return (
         <div className={cl("container")}>
-            {log.map((n) => (
-                <NotificationEntry data={n} key={n.id} />
-            ))}
+            {log.map(n => <NotificationEntry data={n} key={n.id} />)}
         </div>
     );
 }
 
-function LogModal({
-    modalProps,
-    close,
-}: {
-    modalProps: ModalProps;
-    close(): void;
-}) {
+function LogModal({ modalProps, close }: { modalProps: ModalProps; close(): void; }) {
     const [log, pending] = useLogs();
 
     return (
         <ModalRoot {...modalProps} size={ModalSize.LARGE}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>
-                    Notification Log
-                </Text>
+                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>Notification Log</Text>
                 <ModalCloseButton onClick={close} />
             </ModalHeader>
 
@@ -238,11 +186,11 @@ function LogModal({
                                 body: `This will permanently remove ${log.length} notification${log.length === 1 ? "" : "s"}. This action cannot be undone.`,
                                 async onConfirm() {
                                     await DataStore.set(KEY, []);
-                                    signals.forEach((x) => x());
+                                    signals.forEach(x => x());
                                 },
                                 confirmText: "Do it!",
                                 confirmColor: "vc-notification-log-danger-btn",
-                                cancelText: "Nevermind",
+                                cancelText: "Nevermind"
                             });
                         }}
                     >
@@ -255,7 +203,10 @@ function LogModal({
 }
 
 export function openNotificationLogModal() {
-    const key = openModal((modalProps) => (
-        <LogModal modalProps={modalProps} close={() => closeModal(key)} />
+    const key = openModal(modalProps => (
+        <LogModal
+            modalProps={modalProps}
+            close={() => closeModal(key)}
+        />
     ));
 }

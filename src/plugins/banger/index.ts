@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
@@ -26,7 +26,7 @@ const settings = definePluginSettings({
         type: OptionType.STRING,
         default: "https://i.imgur.com/wp5q52C.mp4",
         restartNeeded: true,
-    },
+    }
 });
 
 export default definePlugin({
@@ -39,11 +39,11 @@ export default definePlugin({
             find: "#{intl::BAN_CONFIRM_TITLE}",
             replacement: {
                 match: /src:\i\("?\d+"?\)/g,
-                replace: "src:$self.source",
-            },
-        },
+                replace: "src:$self.source"
+            }
+        }
     ],
     get source() {
         return settings.store.source;
-    },
+    }
 });

@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Button } from "@webpack/common";
 
@@ -26,11 +26,7 @@ export default function DonateButton(props: any) {
             {...props}
             look={Button.Looks.LINK}
             color={Button.Colors.TRANSPARENT}
-            onClick={() =>
-                VencordNative.native.openExternal(
-                    "https://github.com/sponsors/Vendicated",
-                )
-            }
+            onClick={() => VencordNative.native.openExternal("https://github.com/sponsors/Vendicated")}
         >
             <Heart />
             Donate

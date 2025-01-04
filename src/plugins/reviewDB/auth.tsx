@@ -19,7 +19,7 @@ const { OAuth2AuthorizeModal } = findByPropsLazy("OAuth2AuthorizeModal");
 export let Auth: ReviewDBAuth = {};
 
 export async function initAuth() {
-    Auth = (await getAuth()) ?? {};
+    Auth = await getAuth() ?? {};
 }
 
 export async function getAuth(): Promise<ReviewDBAuth | undefined> {
@@ -33,7 +33,7 @@ export async function getToken() {
 }
 
 export async function updateAuth(newAuth: ReviewDBAuth) {
-    return DataStore.update(DATA_STORE_KEY, (auth) => {
+    return DataStore.update(DATA_STORE_KEY, auth => {
         auth ??= {};
         Auth = auth[UserStore.getCurrentUser().id] ??= {};
 
@@ -45,7 +45,7 @@ export async function updateAuth(newAuth: ReviewDBAuth) {
 }
 
 export function authorize(callback?: any) {
-    openModal((props) => (
+    openModal(props =>
         <OAuth2AuthorizeModal
             {...props}
             scopes={["identify"]}
@@ -59,15 +59,12 @@ export function authorize(callback?: any) {
                     const url = new URL(response.location);
                     url.searchParams.append("clientMod", "vencord");
                     const res = await fetch(url, {
-                        headers: { Accept: "application/json" },
+                        headers: { Accept: "application/json" }
                     });
 
                     if (!res.ok) {
                         const { message } = await res.json();
-                        showToast(
-                            message || "An error occured while authorizing",
-                            Toasts.Type.FAILURE,
-                        );
+                        showToast(message || "An error occured while authorizing", Toasts.Type.FAILURE);
                         return;
                     }
 
@@ -80,5 +77,5 @@ export function authorize(callback?: any) {
                 }
             }}
         />
-    ));
+    );
 }

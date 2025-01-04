@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import "./discord.css";
 
@@ -65,28 +65,22 @@ export async function openInviteModal(code: string) {
         type: "INVITE_MODAL_OPEN",
         invite,
         code,
-        context: "APP",
+        context: "APP"
     });
 
-    return new Promise<boolean>((r) => {
+    return new Promise<boolean>(r => {
         let onClose: () => void, onAccept: () => void;
         let inviteAccepted = false;
 
-        FluxDispatcher.subscribe(
-            "INVITE_ACCEPT",
-            (onAccept = () => {
-                inviteAccepted = true;
-            }),
-        );
+        FluxDispatcher.subscribe("INVITE_ACCEPT", onAccept = () => {
+            inviteAccepted = true;
+        });
 
-        FluxDispatcher.subscribe(
-            "INVITE_MODAL_CLOSE",
-            (onClose = () => {
-                FluxDispatcher.unsubscribe("INVITE_MODAL_CLOSE", onClose);
-                FluxDispatcher.unsubscribe("INVITE_ACCEPT", onAccept);
-                r(inviteAccepted);
-            }),
-        );
+        FluxDispatcher.subscribe("INVITE_MODAL_CLOSE", onClose = () => {
+            FluxDispatcher.unsubscribe("INVITE_MODAL_CLOSE", onClose);
+            FluxDispatcher.unsubscribe("INVITE_ACCEPT", onAccept);
+            r(inviteAccepted);
+        });
     });
 }
 
@@ -104,18 +98,17 @@ export function openPrivateChannel(userId: string) {
 
 export const enum Theme {
     Dark = 1,
-    Light = 2,
+    Light = 2
 }
 
 export function getTheme(): Theme {
-    return UserSettingsActionCreators.PreloadedUserSettingsActionCreators.getCurrentValue()
-        ?.appearance?.theme;
+    return UserSettingsActionCreators.PreloadedUserSettingsActionCreators.getCurrentValue()?.appearance?.theme;
 }
 
 export function insertTextIntoChatInputBox(text: string) {
     ComponentDispatch.dispatchToLastSubscribed("INSERT_TEXT", {
         rawText: text,
-        plainText: text,
+        plainText: text
     });
 }
 
@@ -132,22 +125,17 @@ export function sendMessage(
     channelId: string,
     data: Partial<MessageObject>,
     waitForChannelReady?: boolean,
-    extra?: Partial<MessageExtra>,
+    extra?: Partial<MessageExtra>
 ) {
     const messageData = {
         content: "",
         invalidEmojis: [],
         tts: false,
         validNonShortcutEmojis: [],
-        ...data,
+        ...data
     };
 
-    return MessageActions.sendMessage(
-        channelId,
-        messageData,
-        waitForChannelReady,
-        extra,
-    );
+    return MessageActions.sendMessage(channelId, messageData, waitForChannelReady, extra);
 }
 
 /**
@@ -178,8 +166,8 @@ export async function openUserProfile(id: string) {
         channelId: SelectedChannelStore.getChannelId(),
         analyticsLocation: {
             page: guildId ? "Guild Channel" : "DM Channel",
-            section: "Profile Popout",
-        },
+            section: "Profile Popout"
+        }
     });
 }
 
@@ -194,10 +182,7 @@ interface FetchUserProfileOptions {
 /**
  * Fetch a user's profile
  */
-export async function fetchUserProfile(
-    id: string,
-    options?: FetchUserProfileOptions,
-) {
+export async function fetchUserProfile(id: string, options?: FetchUserProfileOptions) {
     const cached = UserProfileStore.getUserProfile(id);
     if (cached) return cached;
 
@@ -208,22 +193,15 @@ export async function fetchUserProfile(
         query: {
             with_mutual_guilds: false,
             with_mutual_friends_count: false,
-            ...options,
+            ...options
         },
         oldFormErrors: true,
     });
 
     FluxDispatcher.dispatch({ type: "USER_UPDATE", user: body.user });
-    await FluxDispatcher.dispatch({
-        type: "USER_PROFILE_FETCH_SUCCESS",
-        ...body,
-    });
+    await FluxDispatcher.dispatch({ type: "USER_PROFILE_FETCH_SUCCESS", ...body });
     if (options?.guild_id && body.guild_member)
-        FluxDispatcher.dispatch({
-            type: "GUILD_MEMBER_PROFILE_UPDATE",
-            guildId: options.guild_id,
-            guildMember: body.guild_member,
-        });
+        FluxDispatcher.dispatch({ type: "GUILD_MEMBER_PROFILE_UPDATE", guildId: options.guild_id, guildMember: body.guild_member });
 
     return UserProfileStore.getUserProfile(id);
 }

@@ -14,30 +14,29 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 
 export default definePlugin({
     name: "DisableCallIdle",
-    description:
-        "Disables automatically getting kicked from a DM voice call after 3 minutes and being moved to an AFK voice channel.",
+    description: "Disables automatically getting kicked from a DM voice call after 3 minutes and being moved to an AFK voice channel.",
     authors: [Devs.Nuckyz],
     patches: [
         {
             find: "#{intl::BOT_CALL_IDLE_DISCONNECT_2}",
             replacement: {
                 match: /,?(?=\i\(this,"idleTimeout",new \i\.\i\))/,
-                replace: ";return;",
-            },
+                replace: ";return;"
+            }
         },
         {
             find: "handleIdleUpdate(){",
             replacement: {
                 match: /(?<=_initialize\(\){)/,
-                replace: "return;",
-            },
-        },
-    ],
+                replace: "return;"
+            }
+        }
+    ]
 });

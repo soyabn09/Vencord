@@ -14,15 +14,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 
 export default definePlugin({
     name: "ShowAllMessageButtons",
-    description:
-        "Always show all message buttons no matter if you are holding the shift key or not.",
+    description: "Always show all message buttons no matter if you are holding the shift key or not.",
     authors: [Devs.Nuckyz],
 
     patches: [
@@ -30,8 +29,8 @@ export default definePlugin({
             find: "#{intl::MESSAGE_UTILITIES_A11Y_LABEL}",
             replacement: {
                 match: /isExpanded:\i&&(.+?),/,
-                replace: "isExpanded:$1,",
-            },
-        },
-    ],
+                replace: "isExpanded:$1,"
+            }
+        }
+    ]
 });

@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { React, TextInput } from "@webpack/common";
 
@@ -40,11 +40,7 @@ interface TextInputProps {
  * A very simple wrapper around Discord's TextInput that validates input and shows
  * the user an error message and only calls your onChange when the input is valid
  */
-export function CheckedTextInput({
-    value: initialValue,
-    onChange,
-    validate,
-}: TextInputProps) {
+export function CheckedTextInput({ value: initialValue, onChange, validate }: TextInputProps) {
     const [value, setValue] = React.useState(initialValue);
     const [error, setError] = React.useState<string>();
 

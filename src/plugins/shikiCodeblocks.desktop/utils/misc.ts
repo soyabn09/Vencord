@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { classNameFactory } from "@api/Styles";
 import { hljs } from "@webpack/common";
@@ -29,8 +29,8 @@ export const shouldUseHljs = ({
     lang,
     tryHljs,
 }: {
-    lang: HighlighterProps["lang"];
-    tryHljs: HljsSetting;
+    lang: HighlighterProps["lang"],
+    tryHljs: HljsSetting,
 }) => {
     const hljsLang = lang ? hljs?.getLanguage?.(lang) : null;
     const shikiLang = lang ? resolveLang(lang) : null;
@@ -45,7 +45,6 @@ export const shouldUseHljs = ({
             return !langName && !!hljsLang;
         case HljsSetting.Never:
             return false;
-        default:
-            return false;
+        default: return false;
     }
 };

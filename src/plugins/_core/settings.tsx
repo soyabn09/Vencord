@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Settings } from "@api/Settings";
 import BackupAndRestoreTab from "@components/VencordSettings/BackupAndRestoreTab";
@@ -37,7 +37,7 @@ type SectionTypes = Record<SectionType, SectionType>;
 export default definePlugin({
     name: "Settings",
     description: "Adds Settings UI and debug info",
-    authors: [Devs.Ven, Devs.Megu, Devs.Soya],
+    authors: [Devs.Ven, Devs.Megu],
     required: true,
 
     patches: [
@@ -49,27 +49,20 @@ export default definePlugin({
                     replace: (m, component, props) => {
                         props = props.replace(/children:\[.+\]/, "");
                         return `${m},$self.makeInfoElements(${component}, ${props})`;
-                    },
+                    }
                 },
                 {
                     match: /copyValue:\i\.join\(" "\)/,
-                    replace: "$& + $self.getInfoString()",
-                },
-            ],
+                    replace: "$& + $self.getInfoString()"
+                }
+            ]
         },
         {
             find: ".SEARCH_NO_RESULTS&&0===",
             replacement: [
                 {
                     match: /(?<=section:(.{0,50})\.DIVIDER\}\))([,;])(?=.{0,200}(\i)\.push.{0,100}label:(\i)\.header)/,
-                    replace: (
-                        _,
-                        sectionTypes,
-                        commaOrSemi,
-                        elements,
-                        element,
-                    ) =>
-                        `${commaOrSemi} $self.addSettings(${elements}, ${element}, ${sectionTypes}) ${commaOrSemi}`,
+                    replace: (_, sectionTypes, commaOrSemi, elements, element) => `${commaOrSemi} $self.addSettings(${elements}, ${element}, ${sectionTypes}) ${commaOrSemi}`
                 },
                 {
                     match: /({(?=.+?function (\i).{0,160}(\i)=\i\.useMemo.{0,140}return \i\.useMemo\(\(\)=>\i\(\3).+?function\(\){return )\2(?=})/,
@@ -81,9 +74,9 @@ export default definePlugin({
             find: "#{intl::USER_SETTINGS_ACTIONS_MENU_LABEL}",
             replacement: {
                 match: /(?<=function\((\i),\i\)\{)(?=let \i=Object.values\(\i.\i\).*?(\i\.\i)\.open\()/,
-                replace: "$2.open($1);return;",
-            },
-        },
+                replace: "$2.open($1);return;"
+            }
+        }
     ],
 
     customSections: [] as ((SectionTypes: SectionTypes) => any)[],
@@ -93,74 +86,66 @@ export default definePlugin({
             {
                 section: SectionTypes.HEADER,
                 label: "Vencord",
-                className: "vc-settings-header",
+                className: "vc-settings-header"
             },
             {
                 section: "VencordSettings",
                 label: "Vencord",
                 element: VencordTab,
-                className: "vc-settings",
+                className: "vc-settings"
             },
             {
                 section: "VencordPlugins",
                 label: "Plugins",
                 element: PluginsTab,
-                className: "vc-plugins",
+                className: "vc-plugins"
             },
             {
                 section: "VencordThemes",
                 label: "Themes",
                 element: ThemesTab,
-                className: "vc-themes",
+                className: "vc-themes"
             },
             !IS_UPDATER_DISABLED && {
                 section: "VencordUpdater",
                 label: "Updater",
                 element: UpdaterTab,
-                className: "vc-updater",
+                className: "vc-updater"
             },
             {
                 section: "VencordCloud",
                 label: "Cloud",
                 element: CloudTab,
-                className: "vc-cloud",
+                className: "vc-cloud"
             },
             {
                 section: "VencordSettingsSync",
                 label: "Backup & Restore",
                 element: BackupAndRestoreTab,
-                className: "vc-backup-restore",
+                className: "vc-backup-restore"
             },
             IS_DEV && {
                 section: "VencordPatchHelper",
                 label: "Patch Helper",
                 element: PatchHelperTab,
-                className: "vc-patch-helper",
+                className: "vc-patch-helper"
             },
-            ...this.customSections.map((func) => func(SectionTypes)),
+            ...this.customSections.map(func => func(SectionTypes)),
             {
-                section: SectionTypes.DIVIDER,
-            },
+                section: SectionTypes.DIVIDER
+            }
         ].filter(Boolean);
     },
 
-    isRightSpot({
-        header,
-        settings,
-    }: {
-        header?: string;
-        settings?: string[];
-    }) {
+    isRightSpot({ header, settings }: { header?: string; settings?: string[]; }) {
         const firstChild = settings?.[0];
         // lowest two elements... sanity backup
-        if (firstChild === "LOGOUT" || firstChild === "SOCIAL_LINKS")
-            return true;
+        if (firstChild === "LOGOUT" || firstChild === "SOCIAL_LINKS") return true;
 
         const { settingsLocation } = Settings.plugins.Settings;
 
         if (settingsLocation === "bottom") return firstChild === "LOGOUT";
-        if (settingsLocation === "belowActivity")
-            return firstChild === "CHANGELOG";
+        if (settingsLocation === "belowActivity") return firstChild === "CHANGELOG";
 
         if (!header) return;
 
@@ -180,32 +165,23 @@ export default definePlugin({
 
     patchedSettings: new WeakSet(),
 
-    addSettings(
-        elements: any[],
-        element: { header?: string; settings: string[]; },
-        sectionTypes: SectionTypes,
-    ) {
-        if (this.patchedSettings.has(elements) || !this.isRightSpot(element))
-            return;
+    addSettings(elements: any[], element: { header?: string; settings: string[]; }, sectionTypes: SectionTypes) {
+        if (this.patchedSettings.has(elements) || !this.isRightSpot(element)) return;
 
         this.patchedSettings.add(elements);
 
         elements.push(...this.makeSettingsCategories(sectionTypes));
     },
 
-    wrapSettingsHook(
-        originalHook: (...args: any[]) => Record<string, unknown>[],
-    ) {
+    wrapSettingsHook(originalHook: (...args: any[]) => Record<string, unknown>[]) {
         return (...args: any[]) => {
             const elements = originalHook(...args);
             if (!this.patchedSettings.has(elements))
-                elements.unshift(
-                    ...this.makeSettingsCategories({
-                        HEADER: "HEADER",
-                        DIVIDER: "DIVIDER",
-                        CUSTOM: "CUSTOM",
-                    }),
-                );
+                elements.unshift(...this.makeSettingsCategories({
+                    HEADER: "HEADER",
+                    DIVIDER: "DIVIDER",
+                    CUSTOM: "CUSTOM"
+                }));
 
             return elements;
         };
@@ -217,16 +193,12 @@ export default definePlugin({
             description: "Where to put the Vencord settings section",
             options: [
                 { label: "At the very top", value: "top" },
-                {
-                    label: "Above the Nitro section",
-                    value: "aboveNitro",
-                    default: true,
-                },
+                { label: "Above the Nitro section", value: "aboveNitro", default: true },
                 { label: "Below the Nitro section", value: "belowNitro" },
                 { label: "Above Activity Settings", value: "aboveActivity" },
                 { label: "Below Activity Settings", value: "belowActivity" },
                 { label: "At the very bottom", value: "bottom" },
-            ],
+            ]
         },
     },
 
@@ -236,17 +208,11 @@ export default definePlugin({
 
     get chromiumVersion() {
         try {
-            return (
-                VencordNative.native.getVersions().chrome ||
+            return VencordNative.native.getVersions().chrome
                 // @ts-ignore Typescript will add userAgentData IMMEDIATELY
-                navigator.userAgentData?.brands?.find(
-                    (b) =>
-                        b.brand === "Chromium" || b.brand === "Google Chrome",
-                )?.version ||
-                null
-            );
-        } catch {
-            // inb4 some stupid browser throws unsupported error for navigator.userAgentData, it's only in chromium
+                || navigator.userAgentData?.brands?.find(b => b.brand === "Chromium" || b.brand === "Google Chrome")?.version
+                || null;
+        } catch { // inb4 some stupid browser throws unsupported error for navigator.userAgentData, it's only in chromium
             return null;
         }
     },
@@ -262,7 +228,7 @@ export default definePlugin({
     getInfoRows() {
         const { electronVersion, chromiumVersion, additionalInfo } = this;
 
-        const rows = [`Vencord ${VERSION} (${gitHash})${additionalInfo}`];
+        const rows = [`Vencord ${gitHash}${additionalInfo}`];
 
         if (electronVersion) rows.push(`Electron ${electronVersion}`);
         if (chromiumVersion) rows.push(`Chromium ${chromiumVersion}`);
@@ -274,14 +240,9 @@ export default definePlugin({
         return "\n" + this.getInfoRows().join("\n");
     },
 
-    makeInfoElements(
-        Component: React.ComponentType<React.PropsWithChildren>,
-        props: React.PropsWithChildren,
-    ) {
-        return this.getInfoRows().map((text, i) => (
-            <Component key={i} {...props}>
-                {text}
-            </Component>
-        ));
-    },
+    makeInfoElements(Component: React.ComponentType<React.PropsWithChildren>, props: React.PropsWithChildren) {
+        return this.getInfoRows().map((text, i) =>
+            <Component key={i} {...props}>{text}</Component>
+        );
+    }
 });

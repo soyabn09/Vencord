@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Logger } from "@utils/Logger";
 import { Margins } from "@utils/margins";
@@ -27,15 +27,9 @@ interface Props<T = any> {
     /** Render nothing if an error occurs */
     noop?: boolean;
     /** Fallback component to render if an error occurs */
-    fallback?: React.ComponentType<
-        React.PropsWithChildren<{ error: any; message: string; stack: string }>
-    >;
+    fallback?: React.ComponentType<React.PropsWithChildren<{ error: any; message: string; stack: string; }>>;
     /** called when an error occurs. The props property is only available if using .wrap */
-    onError?(data: {
-        error: Error;
-        errorInfo: React.ErrorInfo;
-        props: T;
-    }): void;
+    onError?(data: { error: Error, errorInfo: React.ErrorInfo, props: T; }): void;
     /** Custom error message */
     message?: string;
 
@@ -52,13 +46,11 @@ const NO_ERROR = {};
 // We might want to import this in a place where React isn't ready yet.
 // Thus, wrap in a LazyComponent
 const ErrorBoundary = LazyComponent(() => {
-    return class ErrorBoundary extends React.PureComponent<
-        React.PropsWithChildren<Props>
-    > {
+    return class ErrorBoundary extends React.PureComponent<React.PropsWithChildren<Props>> {
         state = {
             error: NO_ERROR as any,
             stack: "",
-            message: "",
+            message: ""
         };
 
         static getDerivedStateFromError(error: any) {
@@ -69,9 +61,7 @@ const ErrorBoundary = LazyComponent(() => {
                 const eolIdx = stack.indexOf("\n");
                 if (eolIdx !== -1) {
                     message = stack.slice(0, eolIdx);
-                    stack = stack
-                        .slice(eolIdx + 1)
-                        .replace(/https:\/\/\S+\/assets\//g, "");
+                    stack = stack.slice(eolIdx + 1).replace(/https:\/\/\S+\/assets\//g, "");
                 }
             }
 
@@ -79,11 +69,7 @@ const ErrorBoundary = LazyComponent(() => {
         }
 
         componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-            this.props.onError?.({
-                error,
-                errorInfo,
-                props: this.props.wrappedProps,
-            });
+            this.props.onError?.({ error, errorInfo, props: this.props.wrappedProps });
             logger.error("A component threw an Error\n", error);
             logger.error("Component Stack", errorInfo.componentStack);
         }
@@ -94,16 +80,12 @@ const ErrorBoundary = LazyComponent(() => {
             if (this.props.noop) return null;
 
             if (this.props.fallback)
-                return (
-                    <this.props.fallback
-                        children={this.props.children}
-                        {...this.state}
-                    />
-                );
+                return <this.props.fallback
+                    children={this.props.children}
+                    {...this.state}
+                />;
 
-            const msg =
-                this.props.message ||
-                "An error occurred while rendering this Component. More info can be found below and in your console.";
+            const msg = this.props.message || "An error occurred while rendering this Component. More info can be found below and in your console.";
 
             return (
                 <ErrorCard style={{ overflow: "hidden" }}>
@@ -121,14 +103,12 @@ const ErrorBoundary = LazyComponent(() => {
             );
         }
     };
-}) as React.ComponentType<React.PropsWithChildren<Props>> & {
-    wrap<T extends object = any>(
-        Component: React.ComponentType<T>,
-        errorBoundaryProps?: Omit<Props<T>, "wrappedProps">,
-    ): React.FunctionComponent<T>;
-};
+}) as
+    React.ComponentType<React.PropsWithChildren<Props>> & {
+        wrap<T extends object = any>(Component: React.ComponentType<T>, errorBoundaryProps?: Omit<Props<T>, "wrappedProps">): React.FunctionComponent<T>;
+    };
 
-ErrorBoundary.wrap = (Component, errorBoundaryProps) => (props) => (
+ErrorBoundary.wrap = (Component, errorBoundaryProps) => props => (
     <ErrorBoundary {...errorBoundaryProps} wrappedProps={props}>
         <Component {...props} />
     </ErrorBoundary>

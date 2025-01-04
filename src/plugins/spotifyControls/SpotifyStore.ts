@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Settings } from "@api/Settings";
 import { findByProps, findByPropsLazy, proxyLazyWebpack } from "@webpack";
@@ -46,10 +46,10 @@ export interface Track {
 interface PlayerState {
     accountId: string;
     track: Track | null;
-    volumePercent: number;
-    isPlaying: boolean;
-    repeat: boolean;
-    position: number;
+    volumePercent: number,
+    isPlaying: boolean,
+    repeat: boolean,
+    position: number,
     context?: any;
     device?: Device;
 
@@ -89,12 +89,9 @@ export const SpotifyStore = proxyLazyWebpack(() => {
         public isSettingPosition = false;
 
         public openExternal(path: string) {
-            const url =
-                Settings.plugins.SpotifyControls.useSpotifyUris ||
-                Vencord.Plugins.isPluginEnabled("OpenInApp")
-                    ? "spotify:" +
-                      path.replaceAll("/", (_, idx) => (idx === 0 ? "" : ":"))
-                    : "https://open.spotify.com" + path;
+            const url = Settings.plugins.SpotifyControls.useSpotifyUris || Vencord.Plugins.isPluginEnabled("OpenInApp")
+                ? "spotify:" + path.replaceAll("/", (_, idx) => idx === 0 ? "" : ":")
+                : "https://open.spotify.com" + path;
 
             VencordNative.native.openExternal(url);
         }
@@ -124,8 +121,9 @@ export const SpotifyStore = proxyLazyWebpack(() => {
         setVolume(percent: number) {
             this.req("put", "/volume", {
                 query: {
-                    volume_percent: Math.round(percent),
-                },
+                    volume_percent: Math.round(percent)
+                }
+
             }).then(() => {
                 this.volume = percent;
                 this.emitChange();
@@ -138,13 +136,13 @@ export const SpotifyStore = proxyLazyWebpack(() => {
 
         setRepeat(state: Repeat) {
             this.req("put", "/repeat", {
-                query: { state },
+                query: { state }
             });
         }
 
         setShuffle(state: boolean) {
             this.req("put", "/shuffle", {
-                query: { state },
+                query: { state }
             }).then(() => {
                 this.shuffle = state;
                 this.emitChange();
@@ -158,26 +156,22 @@ export const SpotifyStore = proxyLazyWebpack(() => {
 
             return this.req("put", "/seek", {
                 query: {
-                    position_ms: Math.round(ms),
-                },
+                    position_ms: Math.round(ms)
+                }
             }).catch((e: any) => {
                 console.error("[VencordSpotifyControls] Failed to seek", e);
                 this.isSettingPosition = false;
             });
         }
 
-        private req(
-            method: "post" | "get" | "put",
-            route: string,
-            data: any = {},
-        ) {
+        private req(method: "post" | "get" | "put", route: string, data: any = {}) {
             if (this.device?.is_active)
                 (data.query ??= {}).device_id = this.device.id;
 
             const { socket } = SpotifySocket.getActiveSocketAndDevice();
             return SpotifyAPI[method](socket.accountId, socket.accessToken, {
                 url: API_BASE + route,
-                ...data,
+                ...data
             });
         }
     }
@@ -194,11 +188,10 @@ export const SpotifyStore = proxyLazyWebpack(() => {
             store.isSettingPosition = false;
             store.emitChange();
         },
-        SPOTIFY_SET_DEVICES({ devices }: { devices: Device[] }) {
-            store.device =
-                devices.find((d) => d.is_active) ?? devices[0] ?? null;
+        SPOTIFY_SET_DEVICES({ devices }: { devices: Device[]; }) {
+            store.device = devices.find(d => d.is_active) ?? devices[0] ?? null;
             store.emitChange();
-        },
+        }
     });
 
     return store;

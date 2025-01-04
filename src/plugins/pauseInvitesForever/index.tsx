@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Devs } from "@utils/constants";
@@ -39,8 +39,7 @@ function disableInvites(guildId: string) {
 export default definePlugin({
     name: "PauseInvitesForever",
     tags: ["DisableInvitesForever"],
-    description:
-        "Brings back the option to pause invites indefinitely that stupit Discord removed.",
+    description: "Brings back the option to pause invites indefinitely that stupit Discord removed.",
     authors: [Devs.Dolfies, Devs.amia],
 
     patches: [
@@ -70,5 +69,5 @@ export default definePlugin({
                 }}> Pause Indefinitely.</a>}
             </div>
         );
-    }),
+    })
 });

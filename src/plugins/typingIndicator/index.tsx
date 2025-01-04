@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import "./style.css";
 
@@ -29,55 +29,37 @@ import { GuildMemberStore, RelationshipStore, SelectedChannelStore, Tooltip, Use
 import { buildSeveralUsers } from "../typingTweaks";
 
 const ThreeDots = findExportedComponentLazy("Dots", "AnimatedDots");
-const UserSummaryItem = findComponentByCodeLazy(
-    "defaultRenderUser",
-    "showDefaultAvatarsForNullUsers",
-);
+const UserSummaryItem = findComponentByCodeLazy("defaultRenderUser", "showDefaultAvatarsForNullUsers");
 
 const TypingStore = findStoreLazy("TypingStore");
 const UserGuildSettingsStore = findStoreLazy("UserGuildSettingsStore");
 
 const enum IndicatorMode {
     Dots = 1 << 0,
-    Avatars = 1 << 1,
+    Avatars = 1 << 1
 }
 
 function getDisplayName(guildId: string, userId: string) {
     const user = UserStore.getUser(userId);
-    return (
-        GuildMemberStore.getNick(guildId, userId) ??
-        (user as any).globalName ??
-        user.username
-    );
+    return GuildMemberStore.getNick(guildId, userId) ?? (user as any).globalName ?? user.username;
 }
 
 function TypingIndicator({ channelId, guildId }: { channelId: string; guildId: string; }) {
     const typingUsers: Record<string, number> = useStateFromStores(
         [TypingStore],
-        () => ({
-            ...(TypingStore.getTypingUsers(channelId) as Record<
-                string,
-                number
-            >),
-        }),
+        () => ({ ...TypingStore.getTypingUsers(channelId) as Record<string, number> }),
         null,
         (old, current) => {
             const oldKeys = Object.keys(old);
             const currentKeys = Object.keys(current);
 
-            return (
-                oldKeys.length === currentKeys.length &&
-                currentKeys.every((key) => old[key] != null)
-            );
-        },
+            return oldKeys.length === currentKeys.length && currentKeys.every(key => old[key] != null);
+        }
     );
     const currentChannelId: string = useStateFromStores([SelectedChannelStore], () => SelectedChannelStore.getChannelId());
 
     if (!settings.store.includeMutedChannels) {
-        const isChannelMuted = UserGuildSettingsStore.isChannelMuted(
-            guildId,
-            channelId,
-        );
+        const isChannelMuted = UserGuildSettingsStore.isChannelMuted(guildId, channelId);
         if (isChannelMuted) return null;
     }
 
@@ -87,19 +69,11 @@ function TypingIndicator({ channelId, guildId }: { channelId: string; guildId: s
 
     const myId = UserStore.getCurrentUser()?.id;
 
-    const typingUsersArray = Object.keys(typingUsers).filter(
-        (id) =>
-            id !== myId &&
-            !(
-                RelationshipStore.isBlocked(id) &&
-                !settings.store.includeBlockedUsers
-            ),
-    );
+    const typingUsersArray = Object.keys(typingUsers).filter(id => id !== myId && !(RelationshipStore.isBlocked(id) && !settings.store.includeBlockedUsers));
     let tooltipText: string;
 
     switch (typingUsersArray.length) {
-        case 0:
-            break;
+        case 0: break;
         case 1: {
             tooltipText = getIntlMessage("ONE_USER_TYPING", { a: getDisplayName(guildId, typingUsersArray[0]) });
             break;
@@ -123,30 +97,25 @@ function TypingIndicator({ channelId, guildId }: { channelId: string; guildId: s
     if (typingUsersArray.length > 0) {
         return (
             <Tooltip text={tooltipText!}>
-                {(props) => (
+                {props => (
                     <div className="vc-typing-indicator" {...props}>
-                        {(settings.store.indicatorMode &
-                            IndicatorMode.Avatars) ===
-                            IndicatorMode.Avatars && (
-                                <UserSummaryItem
-                                    users={typingUsersArray.map((id) =>
-                                        UserStore.getUser(id),
-                                    )}
-                                    guildId={guildId}
-                                    renderIcon={false}
-                                    max={3}
-                                    showDefaultAvatarsForNullUsers
-                                    showUserPopout
-                                    size={16}
-                                    className="vc-typing-indicator-avatars"
-                                />
-                            )}
-                        {(settings.store.indicatorMode & IndicatorMode.Dots) ===
-                            IndicatorMode.Dots && (
-                                <div className="vc-typing-indicator-dots">
-                                    <ThreeDots dotRadius={3} themed={true} />
-                                </div>
-                            )}
+                        {((settings.store.indicatorMode & IndicatorMode.Avatars) === IndicatorMode.Avatars) && (
+                            <UserSummaryItem
+                                users={typingUsersArray.map(id => UserStore.getUser(id))}
+                                guildId={guildId}
+                                renderIcon={false}
+                                max={3}
+                                showDefaultAvatarsForNullUsers
+                                showUserPopout
+                                size={16}
+                                className="vc-typing-indicator-avatars"
+                            />
+                        )}
+                        {((settings.store.indicatorMode & IndicatorMode.Dots) === IndicatorMode.Dots) && (
+                            <div className="vc-typing-indicator-dots">
+                                <ThreeDots dotRadius={3} themed={true} />
+                            </div>
+                        )}
                     </div>
                 )}
             </Tooltip>
@@ -159,33 +128,28 @@ function TypingIndicator({ channelId, guildId }: { channelId: string; guildId: s
 const settings = definePluginSettings({
     includeCurrentChannel: {
         type: OptionType.BOOLEAN,
-        description:
-            "Whether to show the typing indicator for the currently selected channel",
-        default: true,
+        description: "Whether to show the typing indicator for the currently selected channel",
+        default: true
     },
     includeMutedChannels: {
         type: OptionType.BOOLEAN,
         description: "Whether to show the typing indicator for muted channels.",
-        default: false,
+        default: false
     },
     includeBlockedUsers: {
         type: OptionType.BOOLEAN,
         description: "Whether to show the typing indicator for blocked users.",
-        default: false,
+        default: false
     },
     indicatorMode: {
         type: OptionType.SELECT,
         description: "How should the indicator be displayed?",
         options: [
-            {
-                label: "Avatars and animated dots",
-                value: IndicatorMode.Dots | IndicatorMode.Avatars,
-                default: true,
-            },
+            { label: "Avatars and animated dots", value: IndicatorMode.Dots | IndicatorMode.Avatars, default: true },
             { label: "Animated dots", value: IndicatorMode.Dots },
             { label: "Avatars", value: IndicatorMode.Avatars },
         ],
-    },
+    }
 });
 
 export default definePlugin({

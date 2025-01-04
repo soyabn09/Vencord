@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import ErrorBoundary from "@components/ErrorBoundary";
 import { ComponentType, HTMLProps } from "react";
@@ -23,7 +23,7 @@ import Plugins from "~plugins";
 
 export const enum BadgePosition {
     START,
-    END,
+    END
 }
 
 export interface ProfileBadge {
@@ -35,10 +35,7 @@ export interface ProfileBadge {
     image?: string;
     link?: string;
     /** Action to perform when you click the badge */
-    onClick?(
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        props: BadgeUserArgs,
-    ): void;
+    onClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>, props: BadgeUserArgs): void;
     /** Should the user display this badge? */
     shouldShow?(userInfo: BadgeUserArgs): boolean;
     /** Optional props (e.g. style) for the badge, ignored for component badges */
@@ -82,12 +79,10 @@ export function _getBadges(args: BadgeUserArgs) {
     for (const badge of Badges) {
         if (!badge.shouldShow || badge.shouldShow(args)) {
             const b = badge.getBadges
-                ? badge.getBadges(args).map((b) => {
-                      b.component &&= ErrorBoundary.wrap(b.component, {
-                          noop: true,
-                      });
-                      return b;
-                  })
+                ? badge.getBadges(args).map(b => {
+                    b.component &&= ErrorBoundary.wrap(b.component, { noop: true });
+                    return b;
+                })
                 : [{ ...badge, ...args }];
 
             badge.position === BadgePosition.START
@@ -95,9 +90,7 @@ export function _getBadges(args: BadgeUserArgs) {
                 : badges.push(...b);
         }
     }
-    const donorBadges = (
-        Plugins.BadgeAPI as unknown as typeof import("../plugins/_api/badges").default
-    ).getDonorBadges(args.userId);
+    const donorBadges = (Plugins.BadgeAPI as unknown as typeof import("../plugins/_api/badges").default).getDonorBadges(args.userId);
     if (donorBadges) badges.unshift(...donorBadges);
 
     return badges;

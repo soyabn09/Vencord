@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { get } from "@main/utils/simpleGet";
 import { IpcEvents } from "@shared/IpcEvents";
@@ -37,8 +37,8 @@ async function githubGet(endpoint: string) {
             Accept: "application/vnd.github+json",
             // "All API requests MUST include a valid User-Agent header.
             // Requests with no User-Agent header will be rejected."
-            "User-Agent": VENCORD_USER_AGENT,
-        },
+            "User-Agent": VENCORD_USER_AGENT
+        }
     });
 }
 
@@ -53,7 +53,7 @@ async function calculateGitChanges() {
         // github api only sends the long sha
         hash: c.sha.slice(0, 7),
         author: c.author.login,
-        message: c.commit.message.split("\n")[0],
+        message: c.commit.message.split("\n")[0]
     }));
 }
 
@@ -62,10 +62,11 @@ async function fetchUpdates() {
 
     const data = JSON.parse(release.toString());
     const hash = data.name.slice(data.name.lastIndexOf(" ") + 1);
-    if (hash === gitHash) return false;
+    if (hash === gitHash)
+        return false;
 
     data.assets.forEach(({ name, browser_download_url }) => {
-        if (VENCORD_FILES.some((s) => name.startsWith(s))) {
+        if (VENCORD_FILES.some(s => name.startsWith(s))) {
             PendingUpdates.push([name, browser_download_url]);
         }
     });
@@ -73,19 +74,17 @@ async function fetchUpdates() {
 }
 
 async function applyUpdates() {
-    await Promise.all(
-        PendingUpdates.map(async ([name, data]) =>
-            writeFile(join(__dirname, name), await get(data)),
-        ),
-    );
+    await Promise.all(PendingUpdates.map(
+        async ([name, data]) => writeFile(
+            join(__dirname, name),
+            await get(data)
+        )
+    ));
     PendingUpdates = [];
     return true;
 }
 
-ipcMain.handle(
-    IpcEvents.GET_REPO,
-    serializeErrors(() => `https://github.com/${gitRemote}`),
-);
+ipcMain.handle(IpcEvents.GET_REPO, serializeErrors(() => `https://github.com/${gitRemote}`));
 ipcMain.handle(IpcEvents.GET_UPDATES, serializeErrors(calculateGitChanges));
 ipcMain.handle(IpcEvents.UPDATE, serializeErrors(fetchUpdates));
 ipcMain.handle(IpcEvents.BUILD, serializeErrors(applyUpdates));

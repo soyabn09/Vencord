@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
@@ -30,17 +30,16 @@ function toggleStreamerMode({ streamKey }: StreamEvent, value: boolean) {
     FluxDispatcher.dispatch({
         type: "STREAMER_MODE_UPDATE",
         key: "enabled",
-        value,
+        value
     });
 }
 
 export default definePlugin({
     name: "StreamerModeOnStream",
-    description:
-        "Automatically enables streamer mode when you start streaming in Discord",
+    description: "Automatically enables streamer mode when you start streaming in Discord",
     authors: [Devs.Kodarru],
     flux: {
-        STREAM_CREATE: (d) => toggleStreamerMode(d, true),
-        STREAM_DELETE: (d) => toggleStreamerMode(d, false),
-    },
+        STREAM_CREATE: d => toggleStreamerMode(d, true),
+        STREAM_DELETE: d => toggleStreamerMode(d, false)
+    }
 });

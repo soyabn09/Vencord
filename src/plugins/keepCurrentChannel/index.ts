@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import * as DataStore from "@api/DataStore";
 import { Devs } from "@utils/constants";
@@ -42,8 +42,7 @@ let previousCache: PreviousChannel | undefined;
 
 export default definePlugin({
     name: "KeepCurrentChannel",
-    description:
-        "Attempt to navigate to the channel you were in before switching accounts or loading Discord.",
+    description: "Attempt to navigate to the channel you were in before switching accounts or loading Discord.",
     authors: [Devs.Nuckyz],
 
     patches: [
@@ -79,31 +78,23 @@ export default definePlugin({
 
             previousCache = {
                 guildId,
-                channelId,
+                channelId
             };
-            await DataStore.set(
-                "KeepCurrentChannel_previousData",
-                previousCache,
-            );
-        },
+            await DataStore.set("KeepCurrentChannel_previousData", previousCache);
+        }
     },
 
     async start() {
-        previousCache = await DataStore.get<PreviousChannel>(
-            "KeepCurrentChannel_previousData",
-        );
+        previousCache = await DataStore.get<PreviousChannel>("KeepCurrentChannel_previousData");
         if (!previousCache) {
             previousCache = {
                 guildId: SelectedGuildStore.getGuildId(),
-                channelId: SelectedChannelStore.getChannelId() ?? null,
+                channelId: SelectedChannelStore.getChannelId() ?? null
             };
 
-            await DataStore.set(
-                "KeepCurrentChannel_previousData",
-                previousCache,
-            );
+            await DataStore.set("KeepCurrentChannel_previousData", previousCache);
         } else if (previousCache.channelId) {
             ChannelRouter.transitionToChannel(previousCache.channelId);
         }
-    },
+    }
 });

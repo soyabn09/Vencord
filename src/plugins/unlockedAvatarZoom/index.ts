@@ -20,8 +20,7 @@ const settings = definePluginSettings({
 
 export default definePlugin({
     name: "UnlockedAvatarZoom",
-    description:
-        "Allows you to zoom in further in the image crop tool when changing your avatar",
+    description: "Allows you to zoom in further in the image crop tool when changing your avatar",
     authors: [Devs.nakoyasha],
     settings,
     patches: [
@@ -30,7 +29,7 @@ export default definePlugin({
             replacement: {
                 match: /maxValue:\d/,
                 replace: "maxValue:$self.settings.store.zoomMultiplier",
-            },
-        },
-    ],
+            }
+        }
+    ]
 });

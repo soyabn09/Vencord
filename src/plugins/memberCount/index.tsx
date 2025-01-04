@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import "./style.css";
 
@@ -28,51 +28,37 @@ import { FluxStore } from "@webpack/types";
 
 import { MemberCount } from "./MemberCount";
 
-export const GuildMemberCountStore = findStoreLazy(
-    "GuildMemberCountStore",
-) as FluxStore & { getMemberCount(guildId?: string): number | null; };
-export const ChannelMemberStore = findStoreLazy(
-    "ChannelMemberStore",
-) as FluxStore & {
-    getProps(
-        guildId?: string,
-        channelId?: string,
-    ): { groups: { count: number; id: string; }[]; };
+export const GuildMemberCountStore = findStoreLazy("GuildMemberCountStore") as FluxStore & { getMemberCount(guildId?: string): number | null; };
+export const ChannelMemberStore = findStoreLazy("ChannelMemberStore") as FluxStore & {
+    getProps(guildId?: string, channelId?: string): { groups: { count: number; id: string; }[]; };
 };
-export const ThreadMemberListStore = findStoreLazy(
-    "ThreadMemberListStore",
-) as FluxStore & {
-    getMemberListSections(channelId?: string): {
-        [sectionId: string]: { sectionId: string; userIds: string[]; };
-    };
+export const ThreadMemberListStore = findStoreLazy("ThreadMemberListStore") as FluxStore & {
+    getMemberListSections(channelId?: string): { [sectionId: string]: { sectionId: string; userIds: string[]; }; };
 };
+
 
 const settings = definePluginSettings({
     toolTip: {
         type: OptionType.BOOLEAN,
-        description:
-            "If the member count should be displayed on the server tooltip",
+        description: "If the member count should be displayed on the server tooltip",
         default: true,
-        restartNeeded: true,
+        restartNeeded: true
     },
     memberList: {
         type: OptionType.BOOLEAN,
-        description:
-            "If the member count should be displayed on the member list",
+        description: "If the member count should be displayed on the member list",
         default: true,
-        restartNeeded: true,
-    },
+        restartNeeded: true
+    }
 });
 
 const sharedIntlNumberFormat = new Intl.NumberFormat();
-export const numberFormat = (value: number) =>
-    sharedIntlNumberFormat.format(value);
+export const numberFormat = (value: number) => sharedIntlNumberFormat.format(value);
 export const cl = classNameFactory("vc-membercount-");
 
 export default definePlugin({
     name: "MemberCount",
-    description:
-        "Shows the amount of online & total members in the server member list and tooltip",
+    description: "Shows the amount of online & total members in the server member list and tooltip",
     authors: [Devs.Ven, Devs.Commandtechno],
     settings,
 
@@ -81,9 +67,9 @@ export default definePlugin({
             find: "{isSidebarVisible:",
             replacement: {
                 match: /(?<=let\{className:(\i),.+?children):\[(\i\.useMemo[^}]+"aria-multiselectable")/,
-                replace: ":[$1?.startsWith('members')?$self.render():null,$2",
+                replace: ":[$1?.startsWith('members')?$self.render():null,$2"
             },
-            predicate: () => settings.store.memberList,
+            predicate: () => settings.store.memberList
         },
         {
             find: ".invitesDisabledTooltip",
@@ -91,12 +77,9 @@ export default definePlugin({
                 match: /#{intl::VIEW_AS_ROLES_MENTIONS_WARNING}.{0,100}(?=])/,
                 replace: "$&,$self.renderTooltip(arguments[0].guild)"
             },
-            predicate: () => settings.store.toolTip,
-        },
+            predicate: () => settings.store.toolTip
+        }
     ],
     render: ErrorBoundary.wrap(MemberCount, { noop: true }),
-    renderTooltip: ErrorBoundary.wrap(
-        (guild) => <MemberCount isTooltip tooltipGuildId={guild.id} />,
-        { noop: true },
-    ),
+    renderTooltip: ErrorBoundary.wrap(guild => <MemberCount isTooltip tooltipGuildId={guild.id} />, { noop: true })
 });

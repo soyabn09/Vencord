@@ -21,6 +21,7 @@ The cutest Discord client mod
 -   Maintained very actively, broken plugins are usually fixed within 12 hours
 -   Settings sync: Keep your plugins and their settings synchronised between devices / apps (optional)
 
+
 ## Installing / Uninstalling
 
 Visit https://vencord.dev/download
@@ -34,7 +35,8 @@ https://discord.gg/D9uwnFnqmd
 |     **Thanks a lot to all Vencord [sponsors](https://github.com/sponsors/Vendicated)!!**     |
 | :------------------------------------------------------------------------------------------: |
 |   [![](https://meow.vendicated.dev/sponsors.png)](https://github.com/sponsors/Vendicated)    |
-| _generated using [github-sponsor-graph](https://github.com/Vendicated/github-sponsor-graph)_ |
+| *generated using [github-sponsor-graph](https://github.com/Vendicated/github-sponsor-graph)* |
+
 
 ## Star History
 

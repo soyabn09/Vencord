@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { definePluginSettings } from "@api/Settings";
 import { Flex } from "@components/Flex";
@@ -28,8 +28,8 @@ const settings = definePluginSettings({
         type: OptionType.BOOLEAN,
         description: "Show dates on friend requests",
         default: false,
-        restartNeeded: true,
-    },
+        restartNeeded: true
+    }
 });
 
 export default definePlugin({
@@ -66,15 +66,10 @@ export default definePlugin({
     makeSubtext(text: string, user: User) {
         const since = this.getSince(user);
         return (
-            <Flex
-                flexDirection="column"
-                style={{ gap: 0, flexWrap: "wrap", lineHeight: "0.9rem" }}
-            >
+            <Flex flexDirection="column" style={{ gap: 0, flexWrap: "wrap", lineHeight: "0.9rem" }}>
                 <span>{text}</span>
-                {!isNaN(since.getTime()) && (
-                    <span>Received &mdash; {since.toDateString()}</span>
-                )}
+                {!isNaN(since.getTime()) && <span>Received &mdash; {since.toDateString()}</span>}
             </Flex>
         );
-    },
+    }
 });

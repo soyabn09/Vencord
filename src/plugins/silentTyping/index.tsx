@@ -14,23 +14,11 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
-import {
-    addChatBarButton,
-    ChatBarButton,
-    removeChatBarButton,
-} from "@api/ChatButtons";
-import {
-    ApplicationCommandInputType,
-    ApplicationCommandOptionType,
-    findOption,
-    sendBotMessage,
-} from "@api/Commands";
-import {
-    findGroupChildrenByChildId,
-    NavContextMenuPatchCallback,
-} from "@api/ContextMenu";
+import { addChatBarButton, ChatBarButton, removeChatBarButton } from "@api/ChatButtons";
+import { ApplicationCommandInputType, ApplicationCommandOptionType, findOption, sendBotMessage } from "@api/Commands";
+import { findGroupChildrenByChildId, NavContextMenuPatchCallback } from "@api/ContextMenu";
 import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
 import definePlugin, { OptionType } from "@utils/types";
@@ -45,28 +33,25 @@ const settings = definePluginSettings({
     },
     contextMenu: {
         type: OptionType.BOOLEAN,
-        description:
-            "Add option to toggle the functionality in the chat input context menu",
-        default: true,
+        description: "Add option to toggle the functionality in the chat input context menu",
+        default: true
     },
     isEnabled: {
         type: OptionType.BOOLEAN,
         description: "Toggle functionality",
         default: true,
-    },
+    }
 });
 
 const SilentTypingToggle: ChatBarButton = ({ isMainChat }) => {
     const { isEnabled, showIcon } = settings.use(["isEnabled", "showIcon"]);
-    const toggle = () => (settings.store.isEnabled = !settings.store.isEnabled);
+    const toggle = () => settings.store.isEnabled = !settings.store.isEnabled;
 
     if (!isMainChat || !showIcon) return null;
 
     return (
         <ChatBarButton
-            tooltip={
-                isEnabled ? "Disable Silent Typing" : "Enable Silent Typing"
-            }
+            tooltip={isEnabled ? "Disable Silent Typing" : "Enable Silent Typing"}
             onClick={toggle}
         >
             <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style={{ scale: "1.2" }}>
@@ -85,32 +70,27 @@ const SilentTypingToggle: ChatBarButton = ({ isMainChat }) => {
     );
 };
 
-const ChatBarContextCheckbox: NavContextMenuPatchCallback = (children) => {
-    const { isEnabled, contextMenu } = settings.use([
-        "isEnabled",
-        "contextMenu",
-    ]);
+
+const ChatBarContextCheckbox: NavContextMenuPatchCallback = children => {
+    const { isEnabled, contextMenu } = settings.use(["isEnabled", "contextMenu"]);
     if (!contextMenu) return;
 
     const group = findGroupChildrenByChildId("submit-button", children);
 
     if (!group) return;
 
-    const idx = group.findIndex((c) => c?.props?.id === "submit-button");
+    const idx = group.findIndex(c => c?.props?.id === "submit-button");
 
-    group.splice(
-        idx + 1,
-        0,
+    group.splice(idx + 1, 0,
         <Menu.MenuCheckboxItem
             id="vc-silent-typing"
             label="Enable Silent Typing"
             checked={isEnabled}
-            action={() =>
-                (settings.store.isEnabled = !settings.store.isEnabled)
-            }
-        />,
+            action={() => settings.store.isEnabled = !settings.store.isEnabled}
+        />
     );
 };
+
 
 export default definePlugin({
     name: "SilentTyping",
@@ -119,47 +99,37 @@ export default definePlugin({
     dependencies: ["ChatInputButtonAPI"],
     settings,
     contextMenus: {
-        "textarea-context": ChatBarContextCheckbox,
+        "textarea-context": ChatBarContextCheckbox
     },
     patches: [
         {
             find: '.dispatch({type:"TYPING_START_LOCAL"',
             replacement: {
                 match: /startTyping\(\i\){.+?},stop/,
-                replace: "startTyping:$self.startTyping,stop",
-            },
+                replace: "startTyping:$self.startTyping,stop"
+            }
         },
     ],
 
-    commands: [
-        {
-            name: "silenttype",
-            description:
-                "Toggle whether you're hiding that you're typing or not.",
-            inputType: ApplicationCommandInputType.BUILT_IN,
-            options: [
-                {
-                    name: "value",
-                    description:
-                        "whether to hide or not that you're typing (default is toggle)",
-                    required: false,
-                    type: ApplicationCommandOptionType.BOOLEAN,
-                },
-            ],
-            execute: async (args, ctx) => {
-                settings.store.isEnabled = !!findOption(
-                    args,
-                    "value",
-                    !settings.store.isEnabled,
-                );
-                sendBotMessage(ctx.channel.id, {
-                    content: settings.store.isEnabled
-                        ? "Silent typing enabled!"
-                        : "Silent typing disabled!",
-                });
+    commands: [{
+        name: "silenttype",
+        description: "Toggle whether you're hiding that you're typing or not.",
+        inputType: ApplicationCommandInputType.BUILT_IN,
+        options: [
+            {
+                name: "value",
+                description: "whether to hide or not that you're typing (default is toggle)",
+                required: false,
+                type: ApplicationCommandOptionType.BOOLEAN,
             },
+        ],
+        execute: async (args, ctx) => {
+            settings.store.isEnabled = !!findOption(args, "value", !settings.store.isEnabled);
+            sendBotMessage(ctx.channel.id, {
+                content: settings.store.isEnabled ? "Silent typing enabled!" : "Silent typing disabled!",
+            });
         },
-    ],
+    }],
 
     async startTyping(channelId: string) {
         if (settings.store.isEnabled) return;

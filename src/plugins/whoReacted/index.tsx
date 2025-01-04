@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Devs } from "@utils/constants";
@@ -23,27 +23,12 @@ import { Queue } from "@utils/Queue";
 import { useForceUpdater } from "@utils/react";
 import definePlugin from "@utils/types";
 import { findByPropsLazy, findComponentByCodeLazy } from "@webpack";
-import {
-    ChannelStore,
-    Constants,
-    FluxDispatcher,
-    React,
-    RestAPI,
-    Tooltip,
-} from "@webpack/common";
+import { ChannelStore, Constants, FluxDispatcher, React, RestAPI, Tooltip } from "@webpack/common";
 import { CustomEmoji } from "@webpack/types";
 import { Message, ReactionEmoji, User } from "discord-types/general";
 
-const UserSummaryItem = findComponentByCodeLazy(
-    "defaultRenderUser",
-    "showDefaultAvatarsForNullUsers",
-);
-const AvatarStyles = findByPropsLazy(
-    "moreUsers",
-    "emptyUser",
-    "avatarContainer",
-    "clickableAvatar",
-);
+const UserSummaryItem = findComponentByCodeLazy("defaultRenderUser", "showDefaultAvatarsForNullUsers");
+const AvatarStyles = findByPropsLazy("moreUsers", "emptyUser", "avatarContainer", "clickableAvatar");
 let Scroll: any = null;
 const queue = new Queue();
 let reactions: Record<string, ReactionCacheEntry>;
@@ -54,15 +39,15 @@ function fetchReactions(msg: Message, emoji: ReactionEmoji, type: number) {
         url: Constants.Endpoints.REACTIONS(msg.channel_id, msg.id, key),
         query: {
             limit: 100,
-            type,
+            type
         },
-        oldFormErrors: true,
+        oldFormErrors: true
     })
-        .then((res) => {
+        .then(res => {
             for (const user of res.body) {
                 FluxDispatcher.dispatch({
                     type: "USER_UPDATE",
-                    user,
+                    user
                 });
             }
 
@@ -72,7 +57,7 @@ function fetchReactions(msg: Message, emoji: ReactionEmoji, type: number) {
                 messageId: msg.id,
                 users: res.body,
                 emoji,
-                reactionType: type,
+                reactionType: type
             });
         })
         .catch(console.error)
@@ -81,7 +66,7 @@ function fetchReactions(msg: Message, emoji: ReactionEmoji, type: number) {
 
 function getReactionsWithQueue(msg: Message, e: ReactionEmoji, type: number) {
     const key = `${msg.id}:${e.name}:${e.id ?? ""}:${type}`;
-    const cache = (reactions[key] ??= { fetched: false, users: {} });
+    const cache = reactions[key] ??= { fetched: false, users: {} };
     if (!cache.fetched) {
         queue.unshift(() => fetchReactions(msg, e, type));
         cache.fetched = true;
@@ -93,12 +78,7 @@ function getReactionsWithQueue(msg: Message, e: ReactionEmoji, type: number) {
 function makeRenderMoreUsers(users: User[]) {
     return function renderMoreUsers(_label: string, _count: number) {
         return (
-            <Tooltip
-                text={users
-                    .slice(4)
-                    .map((u) => u.username)
-                    .join(", ")}
-            >
+            <Tooltip text={users.slice(4).map(u => u.username).join(", ")} >
                 {({ onMouseEnter, onMouseLeave }) => (
                     <div
                         className={AvatarStyles.moreUsers}
@@ -108,7 +88,7 @@ function makeRenderMoreUsers(users: User[]) {
                         +{users.length - 4}
                     </div>
                 )}
-            </Tooltip>
+            </Tooltip >
         );
     };
 }
@@ -127,8 +107,8 @@ export default definePlugin({
             find: ",reactionRef:",
             replacement: {
                 match: /(\i)\?null:\(0,\i\.jsx\)\(\i\.\i,{className:\i\.reactionCount,.*?}\),/,
-                replace: "$&$1?null:$self.renderUsers(this.props),",
-            },
+                replace: "$&$1?null:$self.renderUsers(this.props),"
+            }
         },
         {
             find: '"MessageReactionsStore"',
@@ -138,12 +118,13 @@ export default definePlugin({
             }
         },
         {
+
             find: "cleanAutomaticAnchor(){",
             replacement: {
                 match: /constructor\(\i\)\{(?=.{0,100}automaticAnchor)/,
-                replace: "$&$self.setScrollObj(this);",
-            },
-        },
+                replace: "$&$self.setScrollObj(this);"
+            }
+        }
     ],
 
     setScrollObj(scroll: any) {
@@ -159,34 +140,32 @@ export default definePlugin({
     },
     _renderUsers({ message, emoji, type }: RootObject) {
         const forceUpdate = useForceUpdater();
-        React.useLayoutEffect(() => {
-            // bc need to prevent autoscrolling
+        React.useLayoutEffect(() => { // bc need to prevent autoscrolling
             if (Scroll?.scrollCounter > 0) {
                 Scroll.setAutomaticAnchor(null);
             }
         });
         React.useEffect(() => {
             const cb = (e: any) => {
-                if (e.messageId === message.id) forceUpdate();
+                if (e.messageId === message.id)
+                    forceUpdate();
             };
             FluxDispatcher.subscribe("MESSAGE_REACTION_ADD_USERS", cb);
 
-            return () =>
-                FluxDispatcher.unsubscribe("MESSAGE_REACTION_ADD_USERS", cb);
+            return () => FluxDispatcher.unsubscribe("MESSAGE_REACTION_ADD_USERS", cb);
         }, [message.id]);
 
         const reactions = getReactionsWithQueue(message, emoji, type);
         const users = Object.values(reactions).filter(Boolean) as User[];
 
         return (
-            <div style={{ marginLeft: "0.5em", transform: "scale(0.9)" }}>
+            <div
+                style={{ marginLeft: "0.5em", transform: "scale(0.9)" }}
+            >
                 <div onClick={handleClickAvatar}>
                     <UserSummaryItem
                         users={users}
-                        guildId={
-                            ChannelStore.getChannel(message.channel_id)
-                                ?.guild_id
-                        }
+                        guildId={ChannelStore.getChannel(message.channel_id)?.guild_id}
                         renderIcon={false}
                         max={5}
                         showDefaultAvatarsForNullUsers
@@ -200,7 +179,7 @@ export default definePlugin({
 
     set reactions(value: any) {
         reactions = value;
-    },
+    }
 });
 
 interface ReactionCacheEntry {

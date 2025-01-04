@@ -14,21 +14,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Logger } from "@utils/Logger";
 import { makeCodeblock } from "@utils/text";
 
 import { sendBotMessage } from "./commandHelpers";
-import {
-    ApplicationCommandInputType,
-    ApplicationCommandOptionType,
-    ApplicationCommandType,
-    Argument,
-    Command,
-    CommandContext,
-    Option,
-} from "./types";
+import { ApplicationCommandInputType, ApplicationCommandOptionType, ApplicationCommandType, Argument, Command, CommandContext, Option } from "./types";
 
 export * from "./commandHelpers";
 export * from "./types";
@@ -55,42 +47,29 @@ export let RequiredMessageOption: Option = ReqPlaceholder;
 export const _init = function (cmds: Command[]) {
     try {
         BUILT_IN = cmds;
-        OptionalMessageOption = cmds.find(
-            (c) => (c.untranslatedName || c.displayName) === "shrug",
-        )!.options![0];
-        RequiredMessageOption = cmds.find(
-            (c) => (c.untranslatedName || c.displayName) === "me",
-        )!.options![0];
+        OptionalMessageOption = cmds.find(c => (c.untranslatedName || c.displayName) === "shrug")!.options![0];
+        RequiredMessageOption = cmds.find(c => (c.untranslatedName || c.displayName) === "me")!.options![0];
     } catch (e) {
-        new Logger("CommandsAPI").error(
-            "Failed to load CommandsApi",
-            e,
-            " - cmds is",
-            cmds,
-        );
+        new Logger("CommandsAPI").error("Failed to load CommandsApi", e, " - cmds is", cmds);
     }
     return cmds;
 } as never;
 
-export const _handleCommand = function (
-    cmd: Command,
-    args: Argument[],
-    ctx: CommandContext,
-) {
-    if (!cmd.isVencordCommand) return cmd.execute(args, ctx);
+export const _handleCommand = function (cmd: Command, args: Argument[], ctx: CommandContext) {
+    if (!cmd.isVencordCommand)
+        return cmd.execute(args, ctx);
 
     const handleError = (err: any) => {
         // TODO: cancel send if cmd.inputType === BUILT_IN_TEXT
         const msg = `An Error occurred while executing command "${cmd.name}"`;
-        const reason =
-            err instanceof Error ? err.stack || err.message : String(err);
+        const reason = err instanceof Error ? err.stack || err.message : String(err);
 
         console.error(msg, err);
         sendBotMessage(ctx.channel.id, {
             content: `${msg}:\n${makeCodeblock(reason)}`,
             author: {
-                username: "Vencord",
-            },
+                username: "Vencord"
+            }
         });
     };
 
@@ -101,6 +80,7 @@ export const _handleCommand = function (
         return handleError(err);
     }
 } as never;
+
 
 /**
  * Prepare a Command Option for Discord by filling missing fields
@@ -113,7 +93,7 @@ export function prepareOption<O extends Option | Command>(opt: O): O {
         // See comment above Placeholders
         if (opt === OptPlaceholder) opts[i] = OptionalMessageOption;
         else if (opt === ReqPlaceholder) opts[i] = RequiredMessageOption;
-        opt.choices?.forEach((x) => (x.displayName ||= x.name));
+        opt.choices?.forEach(x => x.displayName ||= x.name);
 
         prepareOption(opts[i]);
     });
@@ -124,11 +104,9 @@ export function prepareOption<O extends Option | Command>(opt: O): O {
 // TODO: This probably doesn't support nested subcommands. If that is ever needed,
 // investigate
 function registerSubCommands(cmd: Command, plugin: string) {
-    cmd.options?.forEach((o) => {
+    cmd.options?.forEach(o => {
         if (o.type !== ApplicationCommandOptionType.SUB_COMMAND)
-            throw new Error(
-                "When specifying sub-command options, all options must be sub-commands.",
-            );
+            throw new Error("When specifying sub-command options, all options must be sub-commands.");
         const subCmd = {
             ...cmd,
             ...o,
@@ -137,14 +115,12 @@ function registerSubCommands(cmd: Command, plugin: string) {
             name: `${cmd.name} ${o.name}`,
             id: `${o.name}-${cmd.id}`,
             displayName: `${cmd.name} ${o.name}`,
-            subCommandPath: [
-                {
-                    name: o.name,
-                    type: o.type,
-                    displayName: o.name,
-                },
-            ],
-            rootCommand: cmd,
+            subCommandPath: [{
+                name: o.name,
+                type: o.type,
+                displayName: o.name
+            }],
+            rootCommand: cmd
         };
         registerCommand(subCmd as any, plugin);
     });
@@ -155,12 +131,12 @@ export function registerCommand<C extends Command>(command: C, plugin: string) {
         console.warn(
             "[CommandsAPI]",
             `Not registering ${command.name} as the CommandsAPI hasn't been initialised.`,
-            "Please restart to use commands",
+            "Please restart to use commands"
         );
         return;
     }
 
-    if (BUILT_IN.some((c) => c.name === command.name))
+    if (BUILT_IN.some(c => c.name === command.name))
         throw new Error(`Command '${command.name}' already exists.`);
 
     command.isVencordCommand = true;
@@ -174,9 +150,7 @@ export function registerCommand<C extends Command>(command: C, plugin: string) {
 
     prepareOption(command);
 
-    if (
-        command.options?.[0]?.type === ApplicationCommandOptionType.SUB_COMMAND
-    ) {
+    if (command.options?.[0]?.type === ApplicationCommandOptionType.SUB_COMMAND) {
         registerSubCommands(command, plugin);
         return;
     }
@@ -186,8 +160,9 @@ export function registerCommand<C extends Command>(command: C, plugin: string) {
 }
 
 export function unregisterCommand(name: string) {
-    const idx = BUILT_IN.findIndex((c) => c.name === name);
-    if (idx === -1) return false;
+    const idx = BUILT_IN.findIndex(c => c.name === name);
+    if (idx === -1)
+        return false;
 
     BUILT_IN.splice(idx, 1);
     delete commands[name];

@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { definePluginSettings } from "@api/Settings";
 import ErrorBoundary from "@components/ErrorBoundary";
@@ -25,35 +25,32 @@ import definePlugin, { OptionType } from "@utils/types";
 import { findByCodeLazy } from "@webpack";
 import { ChannelStore, GuildMemberStore, GuildStore } from "@webpack/common";
 
-const useMessageAuthor = findByCodeLazy(
-    '"Result cannot be null because the message is not null"',
-);
+const useMessageAuthor = findByCodeLazy('"Result cannot be null because the message is not null"');
 
 const settings = definePluginSettings({
     chatMentions: {
         type: OptionType.BOOLEAN,
         default: true,
-        description:
-            "Show role colors in chat mentions (including in the message box)",
-        restartNeeded: true,
+        description: "Show role colors in chat mentions (including in the message box)",
+        restartNeeded: true
     },
     memberList: {
         type: OptionType.BOOLEAN,
         default: true,
         description: "Show role colors in member list role headers",
-        restartNeeded: true,
+        restartNeeded: true
     },
     voiceUsers: {
         type: OptionType.BOOLEAN,
         default: true,
         description: "Show role colors in the voice chat user list",
-        restartNeeded: true,
+        restartNeeded: true
     },
     reactorsList: {
         type: OptionType.BOOLEAN,
         default: true,
         description: "Show role colors in the reactors list",
-        restartNeeded: true,
+        restartNeeded: true
     },
     pollResults: {
         type: OptionType.BOOLEAN,

@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { insertTextIntoChatInputBox } from "@utils/discord";
 import {
@@ -35,8 +35,7 @@ function EncModal(props: ModalProps) {
     const [password, setPassword] = React.useState("password");
     const [noCover, setNoCover] = React.useState(false);
 
-    const isValid =
-        secret && (noCover || (cover && cover.trim().split(" ").length > 1));
+    const isValid = secret && (noCover || (cover && cover.trim().split(" ").length > 1));
 
     return (
         <ModalRoot {...props}>
@@ -45,26 +44,20 @@ function EncModal(props: ModalProps) {
             </ModalHeader>
 
             <ModalContent>
-                <Forms.FormTitle tag="h5" style={{ marginTop: "10px" }}>
-                    Secret
-                </Forms.FormTitle>
+                <Forms.FormTitle tag="h5" style={{ marginTop: "10px" }}>Secret</Forms.FormTitle>
                 <TextInput
                     onChange={(e: string) => {
                         setSecret(e);
                     }}
                 />
-                <Forms.FormTitle tag="h5" style={{ marginTop: "10px" }}>
-                    Cover (2 or more Words!!)
-                </Forms.FormTitle>
+                <Forms.FormTitle tag="h5" style={{ marginTop: "10px" }}>Cover (2 or more Words!!)</Forms.FormTitle>
                 <TextInput
                     disabled={noCover}
                     onChange={(e: string) => {
                         setCover(e);
                     }}
                 />
-                <Forms.FormTitle tag="h5" style={{ marginTop: "10px" }}>
-                    Password
-                </Forms.FormTitle>
+                <Forms.FormTitle tag="h5" style={{ marginTop: "10px" }}>Password</Forms.FormTitle>
                 <TextInput
                     style={{ marginBottom: "20px" }}
                     defaultValue={"password"}
@@ -88,14 +81,8 @@ function EncModal(props: ModalProps) {
                     disabled={!isValid}
                     onClick={() => {
                         if (!isValid) return;
-                        const encrypted = encrypt(
-                            secret,
-                            password,
-                            noCover ? "d d" : cover,
-                        );
-                        const toSend = noCover
-                            ? encrypted.replaceAll("d", "")
-                            : encrypted;
+                        const encrypted = encrypt(secret, password, noCover ? "d d" : cover);
+                        const toSend = noCover ? encrypted.replaceAll("d", "") : encrypted;
                         if (!toSend) return;
 
                         insertTextIntoChatInputBox(toSend);
@@ -121,5 +108,5 @@ function EncModal(props: ModalProps) {
 }
 
 export function buildEncModal(): any {
-    openModal((props) => <EncModal {...props} />);
+    openModal(props => <EncModal {...props} />);
 }

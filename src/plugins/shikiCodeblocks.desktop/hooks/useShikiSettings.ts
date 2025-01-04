@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { PartialExcept } from "@utils/types";
 import { React } from "@webpack/common";
@@ -22,24 +22,15 @@ import { React } from "@webpack/common";
 import { shiki } from "../api/shiki";
 import { settings as pluginSettings, ShikiSettings } from "../settings";
 
-export function useShikiSettings<F extends keyof ShikiSettings>(
-    settingKeys: F[],
-    overrides?: Partial<ShikiSettings>,
-) {
+export function useShikiSettings<F extends keyof ShikiSettings>(settingKeys: F[], overrides?: Partial<ShikiSettings>) {
     const settings: Partial<ShikiSettings> = pluginSettings.use(settingKeys);
     const [isLoading, setLoading] = React.useState(false);
 
-    const withOverrides = { ...settings, ...overrides } as PartialExcept<
-        ShikiSettings,
-        F
-    >;
+    const withOverrides = { ...settings, ...overrides } as PartialExcept<ShikiSettings, F>;
     const themeUrl = withOverrides.customTheme || withOverrides.theme;
 
     if (overrides) {
-        const willChangeTheme =
-            shiki.currentThemeUrl &&
-            themeUrl &&
-            themeUrl !== shiki.currentThemeUrl;
+        const willChangeTheme = shiki.currentThemeUrl && themeUrl && themeUrl !== shiki.currentThemeUrl;
         const noOverrides = Object.keys(overrides).length === 0;
 
         if (isLoading && (!willChangeTheme || noOverrides)) setLoading(false);

@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
@@ -37,7 +37,7 @@ const settings = definePluginSettings({
             { label: "Project X", value: Intensity.ProjectX },
         ],
         restartNeeded: false,
-        onChange: setSettings,
+        onChange: setSettings
     },
 });
 
@@ -63,8 +63,8 @@ function setPoggerState(state: boolean) {
         type: "POGGERMODE_SETTINGS_UPDATE",
         settings: {
             enabled: state,
-            settingsVisible: state,
-        },
+            settingsVisible: state
+        }
     });
 }
 
@@ -74,14 +74,14 @@ function setSettings(intensity: Intensity) {
         shakeIntensity: 1,
         confettiSize: 16,
         confettiCount: 5,
-        combosRequiredCount: 1,
+        combosRequiredCount: 1
     };
 
     switch (intensity) {
         case Intensity.Normal: {
             Object.assign(state, {
                 screenshakeEnabledLocations: { 0: true, 1: false, 2: false },
-                combosRequiredCount: 5,
+                combosRequiredCount: 5
             });
             break;
         }
@@ -104,6 +104,6 @@ function setSettings(intensity: Intensity) {
 
     FluxDispatcher.dispatch({
         type: "POGGERMODE_SETTINGS_UPDATE",
-        settings: state,
+        settings: state
     });
 }

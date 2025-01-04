@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { definePluginSettings, Settings } from "@api/Settings";
 import { Devs } from "@utils/constants";
@@ -26,14 +26,14 @@ const settings = definePluginSettings({
         type: OptionType.BOOLEAN,
         description: "Hide notes",
         default: false,
-        restartNeeded: true,
+        restartNeeded: true
     },
     noSpellCheck: {
         type: OptionType.BOOLEAN,
         description: "Disable spellcheck in notes",
         disabled: () => Settings.plugins.BetterNotesBox.hide,
-        default: false,
-    },
+        default: false
+    }
 });
 
 export default definePlugin({
@@ -54,17 +54,13 @@ export default definePlugin({
                 replace: (m, rest) => {
                     const destructuringMatch = rest.match(/}=.+/);
                     if (destructuringMatch) {
-                        const defaultValueMatch = m.match(
-                            canonicalizeMatch(/hideNote:(\i)=!?\d/),
-                        );
-                        return defaultValueMatch
-                            ? `hideNote:${defaultValueMatch[1]}=!0`
-                            : m;
+                        const defaultValueMatch = m.match(canonicalizeMatch(/hideNote:(\i)=!?\d/));
+                        return defaultValueMatch ? `hideNote:${defaultValueMatch[1]}=!0` : m;
                     }
 
                     return "hideNote:!0";
-                },
-            },
+                }
+            }
         },
         {
             find: "#{intl::NOTE_PLACEHOLDER}",
@@ -77,5 +73,5 @@ export default definePlugin({
 
     get noSpellCheck() {
         return settings.store.noSpellCheck;
-    },
+    }
 });

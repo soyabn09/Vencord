@@ -14,18 +14,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 import { findByPropsLazy } from "@webpack";
-import {
-    ComponentDispatch,
-    FluxDispatcher,
-    NavigationRouter,
-    SelectedGuildStore,
-    SettingsRouter,
-} from "@webpack/common";
+import { ComponentDispatch, FluxDispatcher, NavigationRouter, SelectedGuildStore, SettingsRouter } from "@webpack/common";
 
 const KeyBinds = findByPropsLazy("JUMP_TO_GUILD", "SERVER_NEXT");
 
@@ -36,45 +30,40 @@ export default definePlugin({
     enabledByDefault: true,
 
     onKey(e: KeyboardEvent) {
-        const hasCtrl =
-            e.ctrlKey || (e.metaKey && navigator.platform.includes("Mac"));
+        const hasCtrl = e.ctrlKey || (e.metaKey && navigator.platform.includes("Mac"));
 
-        if (hasCtrl)
-            switch (e.key) {
-                case "t":
-                case "T":
-                    if (!IS_VESKTOP) return;
+        if (hasCtrl) switch (e.key) {
+            case "t":
+            case "T":
+                if (!IS_VESKTOP) return;
+                e.preventDefault();
+                if (e.shiftKey) {
+                    if (SelectedGuildStore.getGuildId()) NavigationRouter.transitionToGuild("@me");
+                    ComponentDispatch.safeDispatch("TOGGLE_DM_CREATE");
+                } else {
+                    FluxDispatcher.dispatch({
+                        type: "QUICKSWITCHER_SHOW",
+                        query: "",
+                        queryMode: null
+                    });
+                }
+                break;
+            case "Tab":
+                if (!IS_VESKTOP) return;
+                const handler = e.shiftKey ? KeyBinds.SERVER_PREV : KeyBinds.SERVER_NEXT;
+                handler.action(e);
+                break;
+            case ",":
+                e.preventDefault();
+                SettingsRouter.open("My Account");
+                break;
+            default:
+                if (e.key >= "1" && e.key <= "9") {
                     e.preventDefault();
-                    if (e.shiftKey) {
-                        if (SelectedGuildStore.getGuildId())
-                            NavigationRouter.transitionToGuild("@me");
-                        ComponentDispatch.safeDispatch("TOGGLE_DM_CREATE");
-                    } else {
-                        FluxDispatcher.dispatch({
-                            type: "QUICKSWITCHER_SHOW",
-                            query: "",
-                            queryMode: null,
-                        });
-                    }
-                    break;
-                case "Tab":
-                    if (!IS_VESKTOP) return;
-                    const handler = e.shiftKey
-                        ? KeyBinds.SERVER_PREV
-                        : KeyBinds.SERVER_NEXT;
-                    handler.action(e);
-                    break;
-                case ",":
-                    e.preventDefault();
-                    SettingsRouter.open("My Account");
-                    break;
-                default:
-                    if (e.key >= "1" && e.key <= "9") {
-                        e.preventDefault();
-                        KeyBinds.JUMP_TO_GUILD.action(e, `mod+${e.key}`);
-                    }
-                    break;
-            }
+                    KeyBinds.JUMP_TO_GUILD.action(e, `mod+${e.key}`);
+                }
+                break;
+        }
     },
 
     start() {
@@ -83,5 +72,5 @@ export default definePlugin({
 
     stop() {
         document.removeEventListener("keydown", this.onKey);
-    },
+    }
 });

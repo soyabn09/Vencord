@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 /**
  * Returns a new function that will call the wrapped function
@@ -27,8 +27,6 @@ export function debounce<T extends Function>(func: T, delay = 300): T {
     let timeout: NodeJS.Timeout;
     return function (...args: any[]) {
         clearTimeout(timeout);
-        timeout = setTimeout(() => {
-            func(...args);
-        }, delay);
+        timeout = setTimeout(() => { func(...args); }, delay);
     } as any;
 }

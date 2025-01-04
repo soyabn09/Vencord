@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 /**
  * Prompts the user to save a file to their system
@@ -39,7 +39,7 @@ export function saveFile(file: File) {
  * @returns A promise that resolves to the chosen file or null if the user cancels
  */
 export function chooseFile(mimeTypes: string) {
-    return new Promise<File | null>((resolve) => {
+    return new Promise<File | null>(resolve => {
         const input = document.createElement("input");
         input.type = "file";
         input.style.display = "none";

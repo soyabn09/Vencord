@@ -14,15 +14,11 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { React } from "@webpack/common";
 
-interface Props
-    extends React.DetailedHTMLProps<
-        React.AnchorHTMLAttributes<HTMLAnchorElement>,
-        HTMLAnchorElement
-    > {
+interface Props extends React.DetailedHTMLProps<React.AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement> {
     disabled?: boolean;
 }
 

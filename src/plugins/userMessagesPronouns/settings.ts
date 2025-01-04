@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { definePluginSettings } from "@api/Settings";
 import { OptionType } from "@utils/types";
@@ -32,13 +32,13 @@ export const settings = definePluginSettings({
             {
                 label: "Lowercase",
                 value: PronounsFormat.Lowercase,
-                default: true,
+                default: true
             },
             {
                 label: "Capitalized",
-                value: PronounsFormat.Capitalized,
-            },
-        ],
+                value: PronounsFormat.Capitalized
+            }
+        ]
     },
     showSelf: {
         type: OptionType.BOOLEAN,

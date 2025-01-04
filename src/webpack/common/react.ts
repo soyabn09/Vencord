@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 // eslint-disable-next-line path-alias/no-relative
 import { findByPropsLazy, waitFor } from "../webpack";
@@ -28,13 +28,9 @@ export let useRef: typeof React.useRef;
 export let useReducer: typeof React.useReducer;
 export let useCallback: typeof React.useCallback;
 
-export const ReactDOM: typeof import("react-dom") &
-    typeof import("react-dom/client") = findByPropsLazy(
-    "createPortal",
-    "render",
-);
+export const ReactDOM: typeof import("react-dom") & typeof import("react-dom/client") = findByPropsLazy("createPortal", "render");
 
-waitFor("useState", (m) => {
+waitFor("useState", m => {
     React = m;
     ({ useEffect, useState, useLayoutEffect, useMemo, useRef, useReducer, useCallback } = React);
 });

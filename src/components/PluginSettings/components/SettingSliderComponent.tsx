@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Margins } from "@utils/margins";
 import { wordsFromCamel, wordsToTitle } from "@utils/text";
@@ -31,14 +31,7 @@ export function makeRange(start: number, end: number, step = 1) {
     return ranges;
 }
 
-export function SettingSliderComponent({
-    option,
-    pluginSettings,
-    definedSettings,
-    id,
-    onChange,
-    onError,
-}: ISettingElementProps<PluginOptionSlider>) {
+export function SettingSliderComponent({ option, pluginSettings, definedSettings, id, onChange, onError }: ISettingElementProps<PluginOptionSlider>) {
     const def = pluginSettings[id] ?? option.default;
 
     const [error, setError] = React.useState<string | null>(null);
@@ -59,12 +52,8 @@ export function SettingSliderComponent({
 
     return (
         <Forms.FormSection>
-            <Forms.FormTitle>
-                {wordsToTitle(wordsFromCamel(id))}
-            </Forms.FormTitle>
-            <Forms.FormText className={Margins.bottom20} type="description">
-                {option.description}
-            </Forms.FormText>
+            <Forms.FormTitle>{wordsToTitle(wordsFromCamel(id))}</Forms.FormTitle>
+            <Forms.FormText className={Margins.bottom20} type="description">{option.description}</Forms.FormText>
             <Slider
                 disabled={option.disabled?.call(definedSettings) ?? false}
                 markers={option.markers}
@@ -79,3 +68,4 @@ export function SettingSliderComponent({
         </Forms.FormSection>
     );
 }
+

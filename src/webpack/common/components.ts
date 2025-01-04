@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { filters, findByPropsLazy, waitFor } from "@webpack";
 
@@ -22,10 +22,10 @@ import { waitForComponent } from "./internal";
 import * as t from "./types/components";
 
 export let Forms = {} as {
-    FormTitle: t.FormTitle;
-    FormSection: t.FormSection;
-    FormDivider: t.FormDivider;
-    FormText: t.FormText;
+    FormTitle: t.FormTitle,
+    FormSection: t.FormSection,
+    FormDivider: t.FormDivider,
+    FormText: t.FormText,
 };
 
 export let Icons = {} as t.Icons;
@@ -61,7 +61,7 @@ export const Flex = waitForComponent<t.Flex>("Flex", ["Justify", "Align", "Wrap"
 
 export const { OAuth2AuthorizeModal } = findByPropsLazy("OAuth2AuthorizeModal");
 
-waitFor(["FormItem", "Button"], (m) => {
+waitFor(["FormItem", "Button"], m => {
     ({
         useToken,
         Card,
@@ -84,7 +84,7 @@ waitFor(["FormItem", "Button"], (m) => {
         Clickable,
         Avatar,
         FocusLock,
-        Heading,
+        Heading
     } = m);
     Forms = m;
     Icons = m;

@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Settings } from "@api/Settings";
 import { Devs } from "@utils/constants";
@@ -42,15 +42,16 @@ export default definePlugin({
             replacement: [
                 {
                     match: /let\{[^}]*collapsedReason[^}]*\}/,
-                    replace: "if($self.shouldHide(arguments[0]))return null;$&",
-                },
-            ],
+                    replace: "if($self.shouldHide(arguments[0]))return null;$&"
+                }
+            ]
         },
-        ...['"MessageStore"', '"ReadStateStore"'].map((find) => ({
+        ...[
+            '"MessageStore"',
+            '"ReadStateStore"'
+        ].map(find => ({
             find,
-            predicate: () =>
-                Settings.plugins.NoBlockedMessages.ignoreBlockedMessages ===
-                true,
+            predicate: () => Settings.plugins.NoBlockedMessages.ignoreBlockedMessages === true,
             replacement: [
                 {
                     match: /(?<=function (\i)\((\i)\){)(?=.*MESSAGE_CREATE:\1)/,
@@ -61,8 +62,7 @@ export default definePlugin({
     ],
     options: {
         ignoreBlockedMessages: {
-            description:
-                "Completely ignores (recent) incoming messages from blocked users (locally).",
+            description: "Completely ignores (recent) incoming messages from blocked users (locally).",
             type: OptionType.BOOLEAN,
             default: false,
             restartNeeded: true,
@@ -73,10 +73,7 @@ export default definePlugin({
         try {
             return RelationshipStore.isBlocked(message.author.id);
         } catch (e) {
-            new Logger("NoBlockedMessages").error(
-                "Failed to check if user is blocked:",
-                e,
-            );
+            new Logger("NoBlockedMessages").error("Failed to check if user is blocked:", e);
         }
     },
 

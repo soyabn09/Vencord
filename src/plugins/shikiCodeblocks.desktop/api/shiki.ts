@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { shikiOnigasmSrc, shikiWorkerSrc } from "@utils/dependencies";
 import { WorkerClient } from "@vap/core/ipc";
@@ -38,22 +38,18 @@ export const shiki = {
     themes,
     loadedThemes: new Set<string>(),
     loadedLangs: new Set<string>(),
-    clientPromise: new Promise<WorkerClient<ShikiSpec>>(
-        (resolve) => (resolveClient = resolve),
-    ),
+    clientPromise: new Promise<WorkerClient<ShikiSpec>>(resolve => resolveClient = resolve),
 
     init: async (initThemeUrl: string | undefined) => {
         /** https://stackoverflow.com/q/58098143 */
-        const workerBlob = await fetch(shikiWorkerSrc).then((res) =>
-            res.blob(),
-        );
+        const workerBlob = await fetch(shikiWorkerSrc).then(res => res.blob());
 
-        const client = (shiki.client = new WorkerClient<ShikiSpec>(
+        const client = shiki.client = new WorkerClient<ShikiSpec>(
             "shiki-client",
             "shiki-host",
             workerBlob,
             { name: "ShikiWorker" },
-        ));
+        );
         await client.init();
 
         const themeUrl = initThemeUrl || themeUrls[0];
@@ -67,9 +63,7 @@ export const shiki = {
     },
     _setTheme: async (themeUrl: string) => {
         shiki.currentThemeUrl = themeUrl;
-        const { themeData } = await shiki.client!.run("getTheme", {
-            theme: themeUrl,
-        });
+        const { themeData } = await shiki.client!.run("getTheme", { theme: themeUrl });
         shiki.currentTheme = JSON.parse(themeData);
         dispatchTheme({ id: themeUrl, theme: shiki.currentTheme });
     },
@@ -97,15 +91,12 @@ export const shiki = {
         await client.run("loadLanguage", {
             lang: {
                 ...lang,
-                grammar: lang.grammar ?? (await getGrammar(lang)),
-            },
+                grammar: lang.grammar ?? await getGrammar(lang),
+            }
         });
         shiki.loadedLangs.add(lang.id);
     },
-    tokenizeCode: async (
-        code: string,
-        langId: string,
-    ): Promise<IThemedToken[][]> => {
+    tokenizeCode: async (code: string, langId: string): Promise<IThemedToken[][]> => {
         const client = await shiki.clientPromise;
         const lang = resolveLang(langId);
         if (!lang) return [];
@@ -123,5 +114,5 @@ export const shiki = {
         shiki.currentThemeUrl = null;
         dispatchTheme({ id: null, theme: null });
         shiki.client?.destroy();
-    },
+    }
 };

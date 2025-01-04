@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
@@ -30,15 +30,13 @@ export default definePlugin({
             replacement: [
                 {
                     match: /(?<=!1;)\i=null;(?=.{0,80}getPremiumSubscription\(\))/g,
-                    replace:
-                        "if(Vencord.Api.Notices.currentNotice)return false;$&",
+                    replace: "if(Vencord.Api.Notices.currentNotice)return false;$&"
                 },
                 {
                     match: /(?<=,NOTICE_DISMISS:function\(\i\){)return null!=(\i)/,
-                    replace:
-                        'if($1.id=="VencordNotice")return($1=null,Vencord.Api.Notices.nextNotice(),true);$&',
-                },
-            ],
-        },
+                    replace: "if($1.id==\"VencordNotice\")return($1=null,Vencord.Api.Notices.nextNotice(),true);$&"
+                }
+            ]
+        }
     ],
 });

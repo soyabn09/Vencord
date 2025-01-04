@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Margins } from "@utils/margins";
 import { wordsFromCamel, wordsToTitle } from "@utils/text";
@@ -23,16 +23,8 @@ import { Forms, React, Select } from "@webpack/common";
 
 import { ISettingElementProps } from ".";
 
-export function SettingSelectComponent({
-    option,
-    pluginSettings,
-    definedSettings,
-    onChange,
-    onError,
-    id,
-}: ISettingElementProps<PluginOptionSelect>) {
-    const def =
-        pluginSettings[id] ?? option.options?.find((o) => o.default)?.value;
+export function SettingSelectComponent({ option, pluginSettings, definedSettings, onChange, onError, id }: ISettingElementProps<PluginOptionSelect>) {
+    const def = pluginSettings[id] ?? option.options?.find(o => o.default)?.value;
 
     const [state, setState] = React.useState<any>(def ?? null);
     const [error, setError] = React.useState<string | null>(null);
@@ -54,12 +46,8 @@ export function SettingSelectComponent({
 
     return (
         <Forms.FormSection>
-            <Forms.FormTitle>
-                {wordsToTitle(wordsFromCamel(id))}
-            </Forms.FormTitle>
-            <Forms.FormText className={Margins.bottom16} type="description">
-                {option.description}
-            </Forms.FormText>
+            <Forms.FormTitle>{wordsToTitle(wordsFromCamel(id))}</Forms.FormTitle>
+            <Forms.FormText className={Margins.bottom16} type="description">{option.description}</Forms.FormText>
             <Select
                 isDisabled={option.disabled?.call(definedSettings) ?? false}
                 options={option.options}
@@ -67,15 +55,11 @@ export function SettingSelectComponent({
                 maxVisibleItems={5}
                 closeOnSelect={true}
                 select={handleChange}
-                isSelected={(v) => v === state}
-                serialize={(v) => String(v)}
+                isSelected={v => v === state}
+                serialize={v => String(v)}
                 {...option.componentProps}
             />
-            {error && (
-                <Forms.FormText style={{ color: "var(--text-danger)" }}>
-                    {error}
-                </Forms.FormText>
-            )}
+            {error && <Forms.FormText style={{ color: "var(--text-danger)" }}>{error}</Forms.FormText>}
         </Forms.FormSection>
     );
 }

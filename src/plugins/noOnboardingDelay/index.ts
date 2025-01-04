@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
@@ -28,7 +28,7 @@ export default definePlugin({
             find: "#{intl::ONBOARDING_COVER_WELCOME_SUBTITLE}",
             replacement: {
                 match: "3e3",
-                replace: "0",
+                replace: "0"
             },
         },
     ],

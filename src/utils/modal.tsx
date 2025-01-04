@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { findByPropsLazy, findModuleId, proxyLazyWebpack, wreq } from "@webpack";
 import type { ComponentType, PropsWithChildren, ReactNode, Ref } from "react";
@@ -43,63 +43,55 @@ export interface ModalProps {
 
 export interface ModalOptions {
     modalKey?: string;
-    onCloseRequest?: () => void;
-    onCloseCallback?: () => void;
+    onCloseRequest?: (() => void);
+    onCloseCallback?: (() => void);
 }
 
 type RenderFunction = (props: ModalProps) => ReactNode;
 
 export const Modals = findByPropsLazy("ModalRoot", "ModalCloseButton") as {
-    ModalRoot: ComponentType<
-        PropsWithChildren<{
-            transitionState: ModalTransitionState;
-            size?: ModalSize;
-            role?: "alertdialog" | "dialog";
-            className?: string;
-            fullscreenOnMobile?: boolean;
-            "aria-label"?: string;
-            "aria-labelledby"?: string;
-            onAnimationEnd?(): string;
-        }>
-    >;
-    ModalHeader: ComponentType<
-        PropsWithChildren<{
-            /** Flex.Justify.START */
-            justify?: string;
-            /** Flex.Direction.HORIZONTAL */
-            direction?: string;
-            /** Flex.Align.CENTER */
-            align?: string;
-            /** Flex.Wrap.NO_WRAP */
-            wrap?: string;
-            separator?: boolean;
+    ModalRoot: ComponentType<PropsWithChildren<{
+        transitionState: ModalTransitionState;
+        size?: ModalSize;
+        role?: "alertdialog" | "dialog";
+        className?: string;
+        fullscreenOnMobile?: boolean;
+        "aria-label"?: string;
+        "aria-labelledby"?: string;
+        onAnimationEnd?(): string;
+    }>>;
+    ModalHeader: ComponentType<PropsWithChildren<{
+        /** Flex.Justify.START */
+        justify?: string;
+        /** Flex.Direction.HORIZONTAL */
+        direction?: string;
+        /** Flex.Align.CENTER */
+        align?: string;
+        /** Flex.Wrap.NO_WRAP */
+        wrap?: string;
+        separator?: boolean;
 
-            className?: string;
-        }>
-    >;
+        className?: string;
+    }>>;
     /** This also accepts Scroller props but good luck with that */
-    ModalContent: ComponentType<
-        PropsWithChildren<{
-            className?: string;
-            scrollerRef?: Ref<HTMLElement>;
-            [prop: string]: any;
-        }>
-    >;
-    ModalFooter: ComponentType<
-        PropsWithChildren<{
-            /** Flex.Justify.START */
-            justify?: string;
-            /** Flex.Direction.HORIZONTAL_REVERSE */
-            direction?: string;
-            /** Flex.Align.STRETCH */
-            align?: string;
-            /** Flex.Wrap.NO_WRAP */
-            wrap?: string;
-            separator?: boolean;
+    ModalContent: ComponentType<PropsWithChildren<{
+        className?: string;
+        scrollerRef?: Ref<HTMLElement>;
+        [prop: string]: any;
+    }>>;
+    ModalFooter: ComponentType<PropsWithChildren<{
+        /** Flex.Justify.START */
+        justify?: string;
+        /** Flex.Direction.HORIZONTAL_REVERSE */
+        direction?: string;
+        /** Flex.Align.STRETCH */
+        align?: string;
+        /** Flex.Wrap.NO_WRAP */
+        wrap?: string;
+        separator?: boolean;
 
-            className?: string;
-        }>
-    >;
+        className?: string;
+    }>>;
     ModalCloseButton: ComponentType<{
         focusProps?: any;
         onClick(): void;
@@ -156,10 +148,7 @@ const ModalAPI = findByPropsLazy("openModalLazy");
  * This is equivalent to render().then(openModal)
  * You should use the Modal components exported by this file
  */
-export function openModalLazy(
-    render: () => Promise<RenderFunction>,
-    options?: ModalOptions & { contextKey?: string; },
-): Promise<string> {
+export function openModalLazy(render: () => Promise<RenderFunction>, options?: ModalOptions & { contextKey?: string; }): Promise<string> {
     return ModalAPI.openModalLazy(render, options);
 }
 
@@ -167,11 +156,7 @@ export function openModalLazy(
  * Open a Modal with the given render function.
  * You should use the Modal components exported by this file
  */
-export function openModal(
-    render: RenderFunction,
-    options?: ModalOptions,
-    contextKey?: string,
-): string {
+export function openModal(render: RenderFunction, options?: ModalOptions, contextKey?: string): string {
     return ModalAPI.openModal(render, options, contextKey);
 }
 

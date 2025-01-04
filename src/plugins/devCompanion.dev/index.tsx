@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { showNotification } from "@api/Notifications";
 import { definePluginSettings } from "@api/Settings";
@@ -66,11 +66,10 @@ interface FindData {
 
 const settings = definePluginSettings({
     notifyOnAutoConnect: {
-        description:
-            "Whether to notify when Dev Companion has automatically connected.",
+        description: "Whether to notify when Dev Companion has automatically connected.",
         type: OptionType.BOOLEAN,
-        default: true,
-    },
+        default: true
+    }
 });
 
 function parseNode(node: Node) {
@@ -92,22 +91,21 @@ function parseNode(node: Node) {
 function initWs(isManual = false) {
     let wasConnected = isManual;
     let hasErrored = false;
-    const ws = (socket = new WebSocket(`ws://localhost:${PORT}`));
+    const ws = socket = new WebSocket(`ws://localhost:${PORT}`);
 
     ws.addEventListener("open", () => {
         wasConnected = true;
 
         logger.info("Connected to WebSocket");
 
-        (settings.store.notifyOnAutoConnect || isManual) &&
-            showNotification({
-                title: "Dev Companion Connected",
-                body: "Connected to WebSocket",
-                noPersist: true,
-            });
+        (settings.store.notifyOnAutoConnect || isManual) && showNotification({
+            title: "Dev Companion Connected",
+            body: "Connected to WebSocket",
+            noPersist: true
+        });
     });
 
-    ws.addEventListener("error", (e) => {
+    ws.addEventListener("error", e => {
         if (!wasConnected) return;
 
         hasErrored = true;
@@ -122,7 +120,7 @@ function initWs(isManual = false) {
         });
     });
 
-    ws.addEventListener("close", (e) => {
+    ws.addEventListener("close", e => {
         if (!wasConnected || hasErrored) return;
 
         logger.info("Dev Companion Disconnected:", e.code, e.reason);
@@ -135,7 +133,7 @@ function initWs(isManual = false) {
         });
     });
 
-    ws.addEventListener("message", (e) => {
+    ws.addEventListener("message", e => {
         try {
             var { nonce, type, data } = JSON.parse(e.data);
         } catch (err) {
@@ -159,10 +157,7 @@ function initWs(isManual = false) {
                 const candidates = search(find);
                 const keys = Object.keys(candidates);
                 if (keys.length !== 1)
-                    return reply(
-                        "Expected exactly one 'find' matches, found " +
-                            keys.length,
-                    );
+                    return reply("Expected exactly one 'find' matches, found " + keys.length);
 
                 const mod = candidates[keys[0]];
                 let src = String(mod.original ?? mod).replaceAll("\n", "");
@@ -178,15 +173,9 @@ function initWs(isManual = false) {
 
                     try {
                         const matcher = canonicalizeMatch(parseNode(match));
-                        const replacement = canonicalizeReplace(
-                            parseNode(replace),
-                            "PlaceHolderPluginName",
-                        );
+                        const replacement = canonicalizeReplace(parseNode(replace), "PlaceHolderPluginName");
 
-                        const newSource = src.replace(
-                            matcher,
-                            replacement as string,
-                        );
+                        const newSource = src.replace(matcher, replacement as string);
 
                         if (src === newSource) throw "Had no effect";
                         Function(newSource);
@@ -218,9 +207,7 @@ function initWs(isManual = false) {
                             results = findAll(filters.byProps(...parsedArgs));
                             break;
                         case "Store":
-                            results = findAll(
-                                filters.byStoreName(parsedArgs[0]),
-                            );
+                            results = findAll(filters.byStoreName(parsedArgs[0]));
                             break;
                         case "ByCode":
                             results = findAll(filters.byCode(...parsedArgs));
@@ -229,9 +216,7 @@ function initWs(isManual = false) {
                             results = Object.keys(search(parsedArgs[0]));
                             break;
                         case "ComponentByCode":
-                            results = findAll(
-                                filters.componentByCode(...parsedArgs),
-                            );
+                            results = findAll(filters.componentByCode(...parsedArgs));
                             break;
                         default:
                             return reply("Unknown Find Type " + type);
@@ -239,8 +224,7 @@ function initWs(isManual = false) {
 
                     const uniqueResultsCount = new Set(results).size;
                     if (uniqueResultsCount === 0) throw "No results";
-                    if (uniqueResultsCount > 1)
-                        throw "Found more than one result! Make this filter more specific";
+                    if (uniqueResultsCount > 1) throw "Found more than one result! Make this filter more specific";
                 } catch (err) {
                     return reply("Failed to find: " + err);
                 }
@@ -263,10 +247,10 @@ export default definePlugin({
     settings,
 
     toolboxActions: {
-        Reconnect() {
+        "Reconnect"() {
             socket?.close(1000, "Reconnecting");
             initWs(true);
-        },
+        }
     },
 
     start() {
@@ -276,5 +260,5 @@ export default definePlugin({
     stop() {
         socket?.close(1000, "Plugin Stopped");
         socket = void 0;
-    },
+    }
 });

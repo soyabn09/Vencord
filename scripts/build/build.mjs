@@ -15,26 +15,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import esbuild from "esbuild";
 import { readdir } from "fs/promises";
 import { join } from "path";
 
-import {
-    BUILD_TIMESTAMP,
-    commonOpts,
-    exists,
-    globPlugins,
-    IS_DEV,
-    IS_REPORTER,
-    IS_STANDALONE,
-    IS_UPDATER_DISABLED,
-    resolvePluginName,
-    VERSION,
-    commonRendererPlugins,
-    watch,
-} from "./common.mjs";
+import { BUILD_TIMESTAMP, commonOpts, exists, globPlugins, IS_DEV, IS_REPORTER, IS_STANDALONE, IS_UPDATER_DISABLED, resolvePluginName, VERSION, commonRendererPlugins, watch } from "./common.mjs";
 
 const defines = {
     IS_STANDALONE,
@@ -44,7 +31,7 @@ const defines = {
     IS_WEB: false,
     IS_EXTENSION: false,
     VERSION: JSON.stringify(VERSION),
-    BUILD_TIMESTAMP,
+    BUILD_TIMESTAMP
 };
 
 if (defines.IS_STANDALONE === false)
@@ -60,17 +47,11 @@ const nodeCommonOpts = {
     format: "cjs",
     platform: "node",
     target: ["esnext"],
-    external: [
-        "electron",
-        "original-fs",
-        "~pluginNatives",
-        ...commonOpts.external,
-    ],
-    define: defines,
+    external: ["electron", "original-fs", "~pluginNatives", ...commonOpts.external],
+    define: defines
 };
 
-const sourceMapFooter = (s) =>
-    watch ? "" : `//# sourceMappingURL=vencord://${s}.js.map`;
+const sourceMapFooter = s => watch ? "" : `//# sourceMappingURL=vencord://${s}.js.map`;
 const sourcemap = watch ? "inline" : "external";
 
 /**
@@ -78,12 +59,12 @@ const sourcemap = watch ? "inline" : "external";
  */
 const globNativesPlugin = {
     name: "glob-natives-plugin",
-    setup: (build) => {
+    setup: build => {
         const filter = /^~pluginNatives$/;
-        build.onResolve({ filter }, (args) => {
+        build.onResolve({ filter }, args => {
             return {
                 namespace: "import-natives",
-                path: args.path,
+                path: args.path
             };
         });
 
@@ -94,21 +75,14 @@ const globNativesPlugin = {
             let i = 0;
             for (const dir of pluginDirs) {
                 const dirPath = join("src", dir);
-                if (!(await exists(dirPath))) continue;
+                if (!await exists(dirPath)) continue;
                 const plugins = await readdir(dirPath, { withFileTypes: true });
                 for (const file of plugins) {
                     const fileName = file.name;
                     const nativePath = join(dirPath, fileName, "native.ts");
-                    const indexNativePath = join(
-                        dirPath,
-                        fileName,
-                        "native/index.ts",
-                    );
+                    const indexNativePath = join(dirPath, fileName, "native/index.ts");
 
-                    if (
-                        !(await exists(nativePath)) &&
-                        !(await exists(indexNativePath))
-                    )
+                    if (!(await exists(nativePath)) && !(await exists(indexNativePath)))
                         continue;
 
                     const pluginName = await resolvePluginName(dirPath, file);
@@ -122,10 +96,10 @@ const globNativesPlugin = {
             code += `export default {${natives}};`;
             return {
                 contents: code,
-                resolveDir: "./src",
+                resolveDir: "./src"
             };
         });
-    },
+    }
 };
 
 await Promise.all([
@@ -134,16 +108,17 @@ await Promise.all([
         ...nodeCommonOpts,
         entryPoints: ["src/main/index.ts"],
         outfile: "dist/patcher.js",
-        footer: {
-            js: "//# sourceURL=VencordPatcher\n" + sourceMapFooter("patcher"),
-        },
+        footer: { js: "//# sourceURL=VencordPatcher\n" + sourceMapFooter("patcher") },
         sourcemap,
         define: {
             ...defines,
             IS_DISCORD_DESKTOP: true,
-            IS_VESKTOP: false,
+            IS_VESKTOP: false
         },
-        plugins: [...nodeCommonOpts.plugins, globNativesPlugin],
+        plugins: [
+            ...nodeCommonOpts.plugins,
+            globNativesPlugin
+        ]
     }),
     esbuild.build({
         ...commonOpts,
@@ -151,31 +126,30 @@ await Promise.all([
         outfile: "dist/renderer.js",
         format: "iife",
         target: ["esnext"],
-        footer: {
-            js: "//# sourceURL=VencordRenderer\n" + sourceMapFooter("renderer"),
-        },
+        footer: { js: "//# sourceURL=VencordRenderer\n" + sourceMapFooter("renderer") },
         globalName: "Vencord",
         sourcemap,
-        plugins: [globPlugins("discordDesktop"), ...commonRendererPlugins],
+        plugins: [
+            globPlugins("discordDesktop"),
+            ...commonRendererPlugins
+        ],
         define: {
             ...defines,
             IS_DISCORD_DESKTOP: true,
-            IS_VESKTOP: false,
-        },
+            IS_VESKTOP: false
+        }
     }),
     esbuild.build({
         ...nodeCommonOpts,
         entryPoints: ["src/preload.ts"],
         outfile: "dist/preload.js",
-        footer: {
-            js: "//# sourceURL=VencordPreload\n" + sourceMapFooter("preload"),
-        },
+        footer: { js: "//# sourceURL=VencordPreload\n" + sourceMapFooter("preload") },
         sourcemap,
         define: {
             ...defines,
             IS_DISCORD_DESKTOP: true,
-            IS_VESKTOP: false,
-        },
+            IS_VESKTOP: false
+        }
     }),
 
     // Vencord Desktop main & renderer & preload
@@ -183,18 +157,17 @@ await Promise.all([
         ...nodeCommonOpts,
         entryPoints: ["src/main/index.ts"],
         outfile: "dist/vencordDesktopMain.js",
-        footer: {
-            js:
-                "//# sourceURL=VencordDesktopMain\n" +
-                sourceMapFooter("vencordDesktopMain"),
-        },
+        footer: { js: "//# sourceURL=VencordDesktopMain\n" + sourceMapFooter("vencordDesktopMain") },
         sourcemap,
         define: {
             ...defines,
             IS_DISCORD_DESKTOP: false,
-            IS_VESKTOP: true,
+            IS_VESKTOP: true
         },
-        plugins: [...nodeCommonOpts.plugins, globNativesPlugin],
+        plugins: [
+            ...nodeCommonOpts.plugins,
+            globNativesPlugin
+        ]
     }),
     esbuild.build({
         ...commonOpts,
@@ -202,39 +175,35 @@ await Promise.all([
         outfile: "dist/vencordDesktopRenderer.js",
         format: "iife",
         target: ["esnext"],
-        footer: {
-            js:
-                "//# sourceURL=VencordDesktopRenderer\n" +
-                sourceMapFooter("vencordDesktopRenderer"),
-        },
+        footer: { js: "//# sourceURL=VencordDesktopRenderer\n" + sourceMapFooter("vencordDesktopRenderer") },
         globalName: "Vencord",
         sourcemap,
-        plugins: [globPlugins("vencordDesktop"), ...commonRendererPlugins],
+        plugins: [
+            globPlugins("vencordDesktop"),
+            ...commonRendererPlugins
+        ],
         define: {
             ...defines,
             IS_DISCORD_DESKTOP: false,
-            IS_VESKTOP: true,
-        },
+            IS_VESKTOP: true
+        }
     }),
     esbuild.build({
         ...nodeCommonOpts,
         entryPoints: ["src/preload.ts"],
         outfile: "dist/vencordDesktopPreload.js",
-        footer: {
-            js:
-                "//# sourceURL=VencordPreload\n" +
-                sourceMapFooter("vencordDesktopPreload"),
-        },
+        footer: { js: "//# sourceURL=VencordPreload\n" + sourceMapFooter("vencordDesktopPreload") },
         sourcemap,
         define: {
             ...defines,
             IS_DISCORD_DESKTOP: false,
-            IS_VESKTOP: true,
-        },
+            IS_VESKTOP: true
+        }
     }),
-]).catch((err) => {
+]).catch(err => {
     console.error("Build failed");
     console.error(err.message);
     // make ci fail
-    if (!commonOpts.watch) process.exitCode = 1;
+    if (!commonOpts.watch)
+        process.exitCode = 1;
 });

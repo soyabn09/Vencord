@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
@@ -29,7 +29,8 @@ export default definePlugin({
             find: '"onCloseImage",',
             replacement: {
                 match: /(return.{0,10}\.jsx.{0,50}isWindowFocused)/,
-                replace: "$self.altify(e);$1",
+                replace:
+                    "$self.altify(e);$1",
             },
         },
         {
@@ -50,7 +51,7 @@ export default definePlugin({
         let url: string = props.original || props.src;
         try {
             url = decodeURI(url);
-        } catch {}
+        } catch { }
 
         let name = url
             .slice(url.lastIndexOf("/") + 1)

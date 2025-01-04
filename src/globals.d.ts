@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { LoDashStatic } from "lodash";
 
@@ -45,15 +45,12 @@ declare global {
 
     export var VencordNative: typeof import("./VencordNative").default;
     export var Vencord: typeof import("./Vencord");
-    export var VencordStyles: Map<
-        string,
-        {
-            name: string;
-            source: string;
-            classNames: Record<string, string>;
-            dom: HTMLStyleElement | null;
-        }
-    >;
+    export var VencordStyles: Map<string, {
+        name: string;
+        source: string;
+        classNames: Record<string, string>;
+        dom: HTMLStyleElement | null;
+    }>;
     export var appSettings: {
         set(setting: string, v: any): void;
     };
@@ -77,4 +74,4 @@ declare global {
     }
 }
 
-export {};
+export { };

@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
@@ -34,27 +34,26 @@ export default definePlugin({
                 match: /canAnimate:.+?([,}].*?\))/g,
                 replace: (m, rest) => {
                     const destructuringMatch = rest.match(/}=.+/);
-                    if (destructuringMatch == null)
-                        return `canAnimate:!0${rest}`;
+                    if (destructuringMatch == null) return `canAnimate:!0${rest}`;
                     return m;
-                },
-            },
+                }
+            }
         },
         {
             // Status emojis
             find: "#{intl::GUILD_OWNER}",
             replacement: {
                 match: /(?<=\.activityEmoji,.+?animate:)\i/,
-                replace: "!0",
-            },
+                replace: "!0"
+            }
         },
         {
             // Guild Banner
             find: ".animatedBannerHoverLayer,onMouseEnter:",
             replacement: {
                 match: /(?<=guildBanner:\i,animate:)\i(?=}\))/,
-                replace: "!0",
-            },
-        },
-    ],
+                replace: "!0"
+            }
+        }
+    ]
 });

@@ -14,18 +14,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 export function Badge({ text, color }): JSX.Element {
     return (
-        <div
-            className="vc-plugins-badge"
-            style={{
-                backgroundColor: color,
-                justifySelf: "flex-end",
-                marginLeft: "auto",
-            }}
-        >
+        <div className="vc-plugins-badge" style={{
+            backgroundColor: color,
+            justifySelf: "flex-end",
+            marginLeft: "auto"
+        }}>
             {text}
         </div>
     );

@@ -14,19 +14,19 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 export function hex2Rgb(hex: string) {
     hex = hex.slice(1);
     if (hex.length < 6)
         hex = hex
             .split("")
-            .map((c) => c + c)
+            .map(c => c + c)
             .join("");
     if (hex.length === 6) hex += "ff";
     if (hex.length > 6) hex = hex.slice(0, 6);
     return hex
         .split(/(..)/)
         .filter(Boolean)
-        .map((c) => parseInt(c, 16));
+        .map(c => parseInt(c, 16));
 }

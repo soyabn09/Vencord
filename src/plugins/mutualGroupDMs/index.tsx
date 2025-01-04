@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Devs } from "@utils/constants";
@@ -22,16 +22,7 @@ import { isNonNullish } from "@utils/guards";
 import { Logger } from "@utils/Logger";
 import definePlugin from "@utils/types";
 import { findByPropsLazy, findComponentByCodeLazy } from "@webpack";
-import {
-    Avatar,
-    ChannelStore,
-    Clickable,
-    IconUtils,
-    RelationshipStore,
-    ScrollerThin,
-    useMemo,
-    UserStore,
-} from "@webpack/common";
+import { Avatar, ChannelStore, Clickable, IconUtils, RelationshipStore, ScrollerThin, useMemo, UserStore } from "@webpack/common";
 import { Channel, User } from "discord-types/general";
 
 const SelectedChannelActionCreators = findByPropsLazy("selectPrivateChannel");
@@ -42,26 +33,19 @@ const ExpandableList = findComponentByCodeLazy('"PRESS_SECTION"');
 const GuildLabelClasses = findByPropsLazy("guildNick", "guildAvatarWithoutIcon");
 
 function getGroupDMName(channel: Channel) {
-    return (
-        channel.name ||
+    return channel.name ||
         channel.recipients
             .map(UserStore.getUser)
             .filter(isNonNullish)
-            .map(
-                (c) =>
-                    RelationshipStore.getNickname(c.id) || UserUtils.getName(c),
-            )
-            .join(", ")
-    );
+            .map(c => RelationshipStore.getNickname(c.id) || UserUtils.getName(c))
+            .join(", ");
 }
 
 const getMutualGroupDms = (userId: string) =>
-    ChannelStore.getSortedPrivateChannels().filter(
-        (c) => c.isGroupDM() && c.recipients.includes(userId),
-    );
+    ChannelStore.getSortedPrivateChannels()
+        .filter(c => c.isGroupDM() && c.recipients.includes(userId));
 
-const isBotOrSelf = (user: User) =>
-    user.bot || user.id === UserStore.getCurrentUser().id;
+const isBotOrSelf = (user: User) => user.bot || user.id === UserStore.getCurrentUser().id;
 
 function getMutualGDMCountText(user: User) {
     const count = getMutualGroupDms(user.id).length;
@@ -69,7 +53,7 @@ function getMutualGDMCountText(user: User) {
 }
 
 function renderClickableGDMs(mutualDms: Channel[], onClose: () => void) {
-    return mutualDms.map((c) => (
+    return mutualDms.map(c => (
         <Clickable
             className={ProfileListClasses.listRow}
             onClick={() => {
@@ -78,21 +62,14 @@ function renderClickableGDMs(mutualDms: Channel[], onClose: () => void) {
             }}
         >
             <Avatar
-                src={IconUtils.getChannelIconURL({
-                    id: c.id,
-                    icon: c.icon,
-                    size: 32,
-                })}
+                src={IconUtils.getChannelIconURL({ id: c.id, icon: c.icon, size: 32 })}
                 size="SIZE_40"
                 className={ProfileListClasses.listAvatar}
-            ></Avatar>
+            >
+            </Avatar>
             <div className={ProfileListClasses.listRowContent}>
-                <div className={ProfileListClasses.listName}>
-                    {getGroupDMName(c)}
-                </div>
-                <div className={GuildLabelClasses.guildNick}>
-                    {c.recipients.length + 1} Members
-                </div>
+                <div className={ProfileListClasses.listName}>{getGroupDMName(c)}</div>
+                <div className={GuildLabelClasses.guildNick}>{c.recipients.length + 1} Members</div>
             </div>
         </Clickable>
     ));
@@ -115,10 +92,9 @@ export default definePlugin({
                 },
                 {
                     match: /\(0,\i\.jsx\)\(\i,\{items:\i,section:(\i)/,
-                    replace:
-                        "$1==='MUTUAL_GDMS'?$self.renderMutualGDMs(arguments[0]):$&",
-                },
-            ],
+                    replace: "$1==='MUTUAL_GDMS'?$self.renderMutualGDMs(arguments[0]):$&"
+                }
+            ]
         },
         {
             find: 'section:"MUTUAL_FRIENDS"',
@@ -170,22 +146,18 @@ export default definePlugin({
                 fade={true}
                 onClose={onClose}
             >
-                {entries.length > 0 ? (
-                    entries
-                ) : (
-                    <div className={ProfileListClasses.empty}>
-                        <div
-                            className={ProfileListClasses.emptyIconFriends}
-                        ></div>
-                        <div className={ProfileListClasses.emptyText}>
-                            No group dms in common
+                {entries.length > 0
+                    ? entries
+                    : (
+                        <div className={ProfileListClasses.empty}>
+                            <div className={ProfileListClasses.emptyIconFriends}></div>
+                            <div className={ProfileListClasses.emptyText}>No group dms in common</div>
                         </div>
-                    </div>
-                )}
+                    )
+                }
             </ScrollerThin>
         );
-    },
-    ),
+    }),
 
     renderDMPageList: ErrorBoundary.wrap(({ user, hasDivider, Divider, listStyle }: { user: User, hasDivider: boolean, Divider: JSX.Element, listStyle: string; }) => {
         const mutualGDms = getMutualGroupDms(user.id);

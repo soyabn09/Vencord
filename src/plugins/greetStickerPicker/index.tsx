@@ -14,18 +14,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
 import definePlugin, { OptionType } from "@utils/types";
 import { findLazy } from "@webpack";
-import {
-    ContextMenuApi,
-    FluxDispatcher,
-    Menu,
-    MessageActions,
-} from "@webpack/common";
+import { ContextMenuApi, FluxDispatcher, Menu, MessageActions } from "@webpack/common";
 import { Channel, Message } from "discord-types/general";
 
 interface Sticker {
@@ -37,52 +32,40 @@ interface Sticker {
 
 enum GreetMode {
     Greet = "Greet",
-    NormalMessage = "Message",
+    NormalMessage = "Message"
 }
 
 const settings = definePluginSettings({
     greetMode: {
         type: OptionType.SELECT,
         options: [
-            {
-                label: "Greet (you can only greet 3 times)",
-                value: GreetMode.Greet,
-                default: true,
-            },
-            {
-                label: "Normal Message (you can greet spam)",
-                value: GreetMode.NormalMessage,
-            },
+            { label: "Greet (you can only greet 3 times)", value: GreetMode.Greet, default: true },
+            { label: "Normal Message (you can greet spam)", value: GreetMode.NormalMessage }
         ],
-        description: "Choose the greet mode",
-    },
+        description: "Choose the greet mode"
+    }
 }).withPrivateSettings<{
     multiGreetChoices?: string[];
     unholyMultiGreetEnabled?: boolean;
 }>();
 
-const WELCOME_STICKERS = findLazy(
-    (m) => Array.isArray(m) && m[0]?.name === "Wave",
-);
+const WELCOME_STICKERS = findLazy(m => Array.isArray(m) && m[0]?.name === "Wave");
 
 function greet(channel: Channel, message: Message, stickers: string[]) {
     const options = MessageActions.getSendMessageOptionsForReply({
         channel,
         message,
         shouldMention: true,
-        showMentionToggle: true,
+        showMentionToggle: true
     });
 
-    if (
-        settings.store.greetMode === GreetMode.NormalMessage ||
-        stickers.length > 1
-    ) {
+    if (settings.store.greetMode === GreetMode.NormalMessage || stickers.length > 1) {
         options.stickerIds = stickers;
         const msg = {
             content: "",
             tts: false,
             invalidEmojis: [],
-            validNonShortcutEmojis: [],
+            validNonShortcutEmojis: []
         };
 
         MessageActions._sendMessage(channel.id, msg, options);
@@ -91,41 +74,38 @@ function greet(channel: Channel, message: Message, stickers: string[]) {
     }
 }
 
-function GreetMenu({
-    channel,
-    message,
-}: {
-    message: Message;
-    channel: Channel;
-}) {
+
+function GreetMenu({ channel, message }: { message: Message, channel: Channel; }) {
     const s = settings.use(["greetMode", "multiGreetChoices"]);
     const { greetMode, multiGreetChoices = [] } = s;
 
     return (
         <Menu.Menu
             navId="greet-sticker-picker"
-            onClose={() =>
-                FluxDispatcher.dispatch({ type: "CONTEXT_MENU_CLOSE" })
-            }
+            onClose={() => FluxDispatcher.dispatch({ type: "CONTEXT_MENU_CLOSE" })}
             aria-label="Greet Sticker Picker"
         >
-            <Menu.MenuGroup label="Greet Mode">
-                {Object.values(GreetMode).map((mode) => (
+            <Menu.MenuGroup
+                label="Greet Mode"
+            >
+                {Object.values(GreetMode).map(mode => (
                     <Menu.MenuRadioItem
                         key={mode}
                         group="greet-mode"
                         id={"greet-mode-" + mode}
                         label={mode}
                         checked={mode === greetMode}
-                        action={() => (s.greetMode = mode)}
+                        action={() => s.greetMode = mode}
                     />
                 ))}
             </Menu.MenuGroup>
 
             <Menu.MenuSeparator />
 
-            <Menu.MenuGroup label="Greet Stickers">
-                {WELCOME_STICKERS.map((sticker) => (
+            <Menu.MenuGroup
+                label="Greet Stickers"
+            >
+                {WELCOME_STICKERS.map(sticker => (
                     <Menu.MenuItem
                         key={sticker.id}
                         id={"greet-" + sticker.id}
@@ -143,10 +123,8 @@ function GreetMenu({
                         label="Unholy Multi-Greet"
                         id="unholy-multi-greet"
                     >
-                        {WELCOME_STICKERS.map((sticker) => {
-                            const checked = multiGreetChoices.some(
-                                (s) => s === sticker.id,
-                            );
+                        {WELCOME_STICKERS.map(sticker => {
+                            const checked = multiGreetChoices.some(s => s === sticker.id);
 
                             return (
                                 <Menu.MenuCheckboxItem
@@ -154,19 +132,11 @@ function GreetMenu({
                                     id={"multi-greet-" + sticker.id}
                                     label={sticker.description.split(" ")[0]}
                                     checked={checked}
-                                    disabled={
-                                        !checked &&
-                                        multiGreetChoices.length >= 3
-                                    }
+                                    disabled={!checked && multiGreetChoices.length >= 3}
                                     action={() => {
                                         s.multiGreetChoices = checked
-                                            ? multiGreetChoices.filter(
-                                                  (s) => s !== sticker.id,
-                                              )
-                                            : [
-                                                  ...multiGreetChoices,
-                                                  sticker.id,
-                                              ];
+                                            ? multiGreetChoices.filter(s => s !== sticker.id)
+                                            : [...multiGreetChoices, sticker.id];
                                     }}
                                 />
                             );
@@ -176,11 +146,10 @@ function GreetMenu({
                         <Menu.MenuItem
                             id="multi-greet-submit"
                             label="Send Greets"
-                            action={() =>
-                                greet(channel, message, multiGreetChoices!)
-                            }
+                            action={() => greet(channel, message, multiGreetChoices!)}
                             disabled={multiGreetChoices.length === 0}
                         />
+
                     </Menu.MenuItem>
                 </>
             )}
@@ -190,8 +159,7 @@ function GreetMenu({
 
 export default definePlugin({
     name: "GreetStickerPicker",
-    description:
-        "Allows you to use any greet sticker instead of only the random one by right-clicking the 'Wave to say hi!' button",
+    description: "Allows you to use any greet sticker instead of only the random one by right-clicking the 'Wave to say hi!' button",
     authors: [Devs.Ven],
 
     settings,
@@ -201,22 +169,19 @@ export default definePlugin({
             find: "#{intl::WELCOME_CTA_LABEL}",
             replacement: {
                 match: /innerClassName:\i\.welcomeCTAButton,(?<={channel:\i,message:\i}=(\i).{0,400}?)/,
-                replace:
-                    "$&onContextMenu:(vcEvent)=>$self.pickSticker(vcEvent, $1),",
-            },
-        },
+                replace: "$&onContextMenu:(vcEvent)=>$self.pickSticker(vcEvent, $1),"
+            }
+        }
     ],
 
     pickSticker(
         event: React.UIEvent,
         props: {
-            channel: Channel;
+            channel: Channel,
             message: Message;
-        },
+        }
     ) {
         if (!(props.message as any).deleted)
-            ContextMenuApi.openContextMenu(event, () => (
-                <GreetMenu {...props} />
-            ));
-    },
+            ContextMenuApi.openContextMenu(event, () => <GreetMenu {...props} />);
+    }
 });
