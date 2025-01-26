@@ -35,6 +35,7 @@
 
 .vc-sbic-badge-row {
     display: inline-flex;
-    margin-left: 4px;
+    margin-left: 2;
     vertical-align: top;
+    height: 1rem;
 }
