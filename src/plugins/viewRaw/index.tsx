@@ -82,6 +82,7 @@ function openViewRawModal(json: string, type: string, msgContent?: string) {
 }
 
 function openViewRawModalMessage(msg: Message) {
+    msg = sortObject(JSON.parse(JSON.stringify(msg)));
     const msgJson = JSON.stringify(msg, null, 4);
 
     return openViewRawModal(msgJson, "Message", msg.content);
