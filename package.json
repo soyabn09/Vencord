@@ -57,7 +57,7 @@
         "@vencord/discord-types": "link:packages/discord-types",
         "diff": "^7.0.0",
         "esbuild": "^0.25.1",
-        "eslint": "9.20.1",
+        "eslint": "9.27.0",
         "eslint-import-resolver-alias": "^1.1.2",
         "eslint-plugin-path-alias": "2.1.0",
         "eslint-plugin-react": "^7.37.3",
