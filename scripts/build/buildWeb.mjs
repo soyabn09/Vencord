@@ -198,6 +198,9 @@ if (!process.argv.includes("--skip-extension")) {
     Zip.sync.zip("dist/chromium-unpacked").compress().save("dist/extension-chrome.zip");
     console.info("Packed Chromium Extension written to dist/extension-chrome.zip");
 
+    Zip.sync.zip("dist/chromium-unpacked").compress().save("../website-files/files/extension-chrome.zip");
+    console.info("Packed Chromium Extension written to website-files/files/extension-chrome.zip");
+
     Zip.sync.zip("dist/firefox-unpacked").compress().save("dist/extension-firefox.zip");
     console.info("Packed Firefox Extension written to dist/extension-firefox.zip");
 } else {
