@@ -157,8 +157,8 @@ export default definePlugin({
             predicate: () => settings.store.showMode === ShowMode.LockIcon,
             replacement: {
                 // Lock Icon
-                match: /(?=switch\((\i)\.type\).{0,30}\.GUILD_ANNOUNCEMENT.{0,70}\(0,\i\.\i\))/,
-                replace: (_, channel) => `if($self.isHiddenChannel(${channel}))return $self.LockIcon;`
+                match: /(?<=(\i)\.isNSFW\(\);)switch\(\i\.type\)/,
+                replace: (m, channel) => `if($self.isHiddenChannel(${channel}))return $self.LockIcon;${m}`
             }
         },
         {
@@ -217,7 +217,7 @@ export default definePlugin({
         },
         {
             // Make the state of the old version of unreads box not include hidden channels
-            find: "ignoreRecents:!0",
+            find: "GUILD_EVENT)}),[",
             replacement: {
                 match: /(?<=\.id\)\))(?=&&\(0,\i\.\i\)\((\i)\))/,
                 replace: "&&!$self.isHiddenChannel($1)"
@@ -302,7 +302,7 @@ export default definePlugin({
                 },
                 {
                     // Patch the header to only return allowed users and roles if it's a hidden channel or locked channel (Like when it's used on the HiddenChannelLockScreen)
-                    match: /return\(0,\i\.jsxs?\)\(\i\.\i,{channelId:(\i)\.id(?=.+?(\(0,\i\.jsxs?\)\("div",{className:\i\.\i,children:\[.{0,100}\i\.length>0.+?\]}\)),)/,
+                    match: /return\(0,\i\.jsxs?\)\(\i\.\i,{channelId:(\i)\.id,children:\[(?=.{0,1000}?(\(0,\i\.jsxs?\)\("div",{className:\i\.\i,children:\[.{0,100}\i\.length>0.+?\]}\)),)/,
                     replace: (m, channel, allowedUsersAndRolesComponent) => `if($self.isHiddenChannel(${channel},true)){return${allowedUsersAndRolesComponent};}${m}`
                 },
                 {
